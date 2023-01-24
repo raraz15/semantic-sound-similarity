@@ -1,5 +1,9 @@
 ps/*
 
+models/*
+downloads/*
+analysis/*
+
 __pycache__/*
 
 *.csv
