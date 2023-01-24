@@ -11,6 +11,7 @@ ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH="models/yamnet/audioset-yamnet-1.pb"
 CLASSES_PATH="models/yamnet/audioset-yamnet-1.json"
 AUDIO_EXT=["ogg"] # TODO: wav?
+EMBEDDINGS_DIR = "analysis"
 
 def get_classes(model, audio, class_names):
     """ Extracts class activations and generates the class vector
@@ -42,7 +43,7 @@ def get_embeddings(model, audio):
         embeddings = None
     return embeddings
 
-def process_audio(model_activations, model_embeddings, class_names, audio_path, output_dir):
+def process_audio(model_activations, model_embeddings, class_names, audio_path, output_dir=""):
 
     # Load the audio file
     loader = EasyLoader()
@@ -54,10 +55,14 @@ def process_audio(model_activations, model_embeddings, class_names, audio_path, 
     embeddings = get_embeddings(model_embeddings, audio)
 
     # Save results
-    if not output_dir:
+    if not output_dir: # If dir not specified
         export_path = f"{audio_path}.json" # next to the audio file
     else:
-        export_path = os.path.join(output_dir, f"{os.path.basename(audio_path)}.json") # If dir specified
+        sound_bank_dir = os.path.basename(os.path.dirname(os.path.dirname(audio_path))) # Bank of sounds
+        query = os.path.basename(os.path.dirname(audio_path)) # The query name is the folder name
+        export_dir = os.path.join(output_dir, sound_bank_dir, query)
+        os.makedirs(export_dir, exist_ok=True)
+        export_path = os.path.join(export_dir, f"{os.path.basename(audio_path)}.json")
     json.dump({
         'classes': classes,
         'top_25_classes_probabilities': sorted_class_probabilities[0:25] if sorted_class_probabilities is not None else None,
@@ -68,7 +73,7 @@ if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description='YAMNet Explorer.')
     parser.add_argument('-p', '--path', type=str, required=True, help='Path to an audio file or a directory.')
-    parser.add_argument('-o', '--output-dir', type=str, default="", help="Save output files to a directory. If none specified, saved next to inputs.")
+    parser.add_argument('-o', '--output-dir', type=str, default=EMBEDDINGS_DIR, help="Save output files to a directory. If none specified, saved next to inputs.")
     args=parser.parse_args()
 
     # Configure the activation and the embedding models
@@ -77,7 +82,7 @@ if __name__=="__main__":
     class_names = json.load(open(CLASSES_PATH))['classes']
 
     if os.path.isfile(args.path):
-        process_audio(model_activations, model_embeddings, class_names, args.path, args.output_dir)
+        process_audio(model_activations, model_embeddings, class_names, args.path)
     else:
         # Search all the files and subdirectories for each AUDIO_EXT
         audio_paths = sum([glob.glob(args.path+f"/**/*.{ext}", recursive=True) for ext in AUDIO_EXT], [])

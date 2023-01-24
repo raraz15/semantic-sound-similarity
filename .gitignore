@@ -1,7 +1,8 @@
 ps/*
 
 models/*
-downloads/*
+sounds/*
+embeddings/*
 analysis/*
 
 __pycache__/*
