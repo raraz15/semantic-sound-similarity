@@ -11,7 +11,7 @@ ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH="models/yamnet/audioset-yamnet-1.pb"
 CLASSES_PATH="models/yamnet/audioset-yamnet-1.json"
 AUDIO_EXT=["ogg"] # TODO: wav?
-EMBEDDINGS_DIR = "analysis"
+EMBEDDINGS_DIR = "embeddings"
 
 def get_classes(model, audio, class_names):
     """ Extracts class activations and generates the class vector
@@ -73,7 +73,7 @@ if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description='YAMNet Explorer.')
     parser.add_argument('-p', '--path', type=str, required=True, help='Path to an audio file or a directory.')
-    parser.add_argument('-o', '--output-dir', type=str, default=EMBEDDINGS_DIR, help="Save output files to a directory. If none specified, saved next to inputs.")
+    parser.add_argument('-o', '--output-dir', type=str, default=EMBEDDINGS_DIR, help="Save output files to a directory.")
     args=parser.parse_args()
 
     # Configure the activation and the embedding models
