@@ -68,16 +68,16 @@ if __name__=="__main__":
         FREESOUND_API_KEY=json.load(infile)["FREESOUND_API_KEY"]
 
     # Initialize the freesound client
+    print("Initializing the Freesound Client...")
     client = freesound.FreesoundClient()
     client.set_token(FREESOUND_API_KEY)
 
     # Make the queries to freesound
+    print("Making the queries...")
     query_dict = {query['query']: query_freesound(client, query['query'], query['filter'], args.N) for query in queries.values()}
 
-    # Create the output directory
-    print(f"The files will be downloaded to: {args.output_dir}")
-
     # Download the queries and collect metadata
+    print(f"The files will be downloaded to: {args.output_dir}")
     metadata = []
     for query, sounds in query_dict.items():
         print(f"\nDownloading queries for: {query}")
