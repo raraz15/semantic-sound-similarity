@@ -1,4 +1,5 @@
 import os
+import argparse
 import json
 import glob
 from itertools import combinations
@@ -6,11 +7,22 @@ from itertools import combinations
 import numpy as np
 import pandas as pd
 
-analysis_dir="/home/roguz/freesound-perceptual_similarity/analysis"
+ANALYSIS_DIR = "analysis"
 
 if __name__=="__main__":
 
-    embed_paths = glob.glob(analysis_dir+"/*.json")
+    parser=argparse.ArgumentParser(description='Embedding analyzer.')
+    parser.add_argument('-p', '--path', type=str, required=True, help='Path to directory containing embedding json files.')
+    #parser.add_argument('-o', '--output-dir', type=str, default=ANALYSIS_DIR, help="Save output files to a directory. If none specified, saved next to inputs.")
+    args=parser.parse_args()
+
+    # Read all the json files in the tree
+    embed_paths = glob.glob(os.path.join(args.path, "**", "*.json"))
+
+    # Create the export directory
+    embeddings_name = os.path.basename(args.path)
+    export_dir = os.path.join(ANALYSIS_DIR, embeddings_name)
+    os.makedirs(export_dir, exist_ok=True)
 
     # Load the embeddings
     embeddings = {}
@@ -33,7 +45,7 @@ if __name__=="__main__":
     sorted_combs = [(*comb[i],p) for p,i in sorted(zip(products,idx), key=lambda x: x[0], reverse=True)]
 
     df = pd.DataFrame([{"A": r[0], "B": r[1], "product": r[2]} for r in sorted_combs])
-    df.to_csv("analysis_unnorm.csv",index=False)
+    df.to_csv(os.path.join(export_dir, "analysis_unnorm.csv"),index=False)
 
     products = []
     # Compute pairwise dot products of normalized embeddings
@@ -46,4 +58,4 @@ if __name__=="__main__":
     sorted_combs = [(*comb[i],p) for p,i in sorted(zip(products,idx), key=lambda x: x[0], reverse=True)]
 
     df = pd.DataFrame([{"A": r[0], "B": r[1], "product": r[2]} for r in sorted_combs])
-    df.to_csv("analysis_norm.csv",index=False)
+    df.to_csv(os.path.join(export_dir, "analysis_norm.csv"),index=False)
