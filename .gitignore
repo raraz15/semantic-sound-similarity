@@ -1,0 +1,7 @@
+ps/*
+
+__pycache__/*
+
+*.csv
+freesound_api.json
+queries.json
