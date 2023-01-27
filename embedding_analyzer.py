@@ -2,25 +2,16 @@ import os
 import argparse
 import json
 import glob
-from itertools import combinations
-from collections import defaultdict
 
 import numpy as np
-import pandas as pd
 
 ANALYSIS_DIR = "analysis"
-
-#def path_2_levels(path):
-#    one = os.path.dirname(path)
-#    two = os.path.dirname(one)
-#    return os.path.join(two,one,os.path.basename(path))
 
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description='Embedding analyzer.')
     parser.add_argument('-p', '--path', type=str, required=True, help='Path to directory containing embedding json files.')
     parser.add_argument('-N', type=int, default=3, help="Number of queries to return.")
-    #parser.add_argument('-o', '--output-dir', type=str, default=ANALYSIS_DIR, help="Save output files to a directory. If none specified, saved next to inputs.")
     args=parser.parse_args()
 
     # Read all the json files in the tree
@@ -54,37 +45,19 @@ if __name__=="__main__":
             embed_b = embed_b/np.linalg.norm(embed_b)
             products[i,j] = np.dot(embed_a,embed_b)
             products[j,i] = products[i,j]
+    products=np.round(products,3) # round to 3 decimal points
 
     # Print top args.N sounds for each sound
+    string = ""
     for i,row in enumerate(products):
         query_sound_path = os.path.splitext(embed_paths[i])[0]
         indices = np.argsort(row)[::-1][:args.N] # Top 3 sounds
-        print(f"\n{query_sound_path}".replace("embeddings","sounds"))
-        for j in indices:
+        string += f"Target: {query_sound_path}".replace("embeddings","sounds")
+        for n,j in enumerate(indices):
             match_sound_path = os.path.splitext(embed_paths[j])[0]
-            print(f"{match_sound_path:<{max_str_len-4}} - {np.round(row[j],3)}".replace("embeddings","sounds"))
-
-
-
-
-    #products = []
-    ## Compute pairwise dot products of normalized embeddings
-    #for a, b in comb:
-    #    emb_a = embeddings[a]/np.linalg.norm(embeddings[a])
-    #    emb_b = embeddings[b]/np.linalg.norm(embeddings[b])
-    #    products.append(np.dot(emb_a, emb_b))
-
-    ## Sort the products of combinations
-    #sorted_combs = [(*comb[i],p) for p,i in sorted(zip(products,idx), key=lambda x: x[0], reverse=True)]
-#
-    #df = pd.DataFrame([{"A": r[0], "B": r[1], "product": r[2]} for r in sorted_combs])
-    #df.to_csv(os.path.join(export_dir, "analysis_norm.csv"),index=False)
-
-    ## Compute pairwise dot products
-    #products = [np.dot(embeddings[a], embeddings[b]) for a,b in comb]
-    #
-    ## Sort the products of combinations
-    #sorted_combs = [(*comb[i],p) for p,i in sorted(zip(products,idx), key=lambda x: x[0], reverse=True)]
-#
-    #df = pd.DataFrame([{"A": r[0], "B": r[1], "product": r[2]} for r in sorted_combs])
-    #df.to_csv(os.path.join(export_dir, "analysis_unnorm.csv"),index=False)
+            string += f"\nQ{n} | {match_sound_path:<{max_str_len-4}} | {np.round(row[j],3)}".replace("embeddings","sounds")
+        string += "\n\n"
+    
+    # Export the results
+    with open("results.txt", "w") as outfile:
+        outfile.write(string)
