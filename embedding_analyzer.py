@@ -51,10 +51,10 @@ if __name__=="__main__":
     # Print top args.N sounds for each sound
     string = ""
     for i,row in enumerate(products):
-        string += f"Target: {embeddings[i]['audio_path']}"
+        string += f"T  | {embeddings[i]['audio_path']}"
         indices = np.argsort(row)[::-1][:args.N] # Top 3 sounds
         for n,j in enumerate(indices):
-            string += f"\nQ{n} | {embeddings[j]['audio_path']:<{max_str_len-4}} | {np.round(row[j],3)}"
+            string += f"\nQ{n} | {embeddings[j]['audio_path']:<{max_str_len}} | {np.round(row[j],3)}"
         string += "\n\n"
 
     # Export the results
