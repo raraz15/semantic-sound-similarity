@@ -16,48 +16,52 @@ if __name__=="__main__":
 
     # Read all the json files in the tree
     embed_paths = glob.glob(os.path.join(args.path, "**", "*.json"))
-
-    # Create the export directory
-    embeddings_name = os.path.basename(args.path)
-    export_dir = os.path.join(ANALYSIS_DIR, embeddings_name)
-    os.makedirs(export_dir, exist_ok=True)
+    print(f"{len(embed_paths)} embeddings were found.")
 
     # Load the embeddings
-    embeddings, max_str_len = {}, 0
+    embeddings_dict, max_str_len = {}, 0
     for embed_path in embed_paths:
         with open(embed_path, 'r') as infile: # Load the json file
-            embedding=json.load(infile)['embeddings']
-            if type(embedding) != type(None): # Filter out the None types
-                #audio_name = os.path.splitext(os.path.basename(embed_path))[0]
-                embeddings[embed_path] = np.array(embedding)
-                if len(embed_path) > max_str_len: # For pretty print
-                    max_str_len = len(embed_path)
-    embed_paths = list(embeddings.keys()) # Overwrite
-    embeds = list(embeddings.values())
+            model_outputs = json.load(infile)
+        if model_outputs['embeddings'] is not None: # Filter out the None types
+            audio_path = model_outputs["audio_path"]
+            embeddings_dict[audio_path] = np.array(model_outputs['embeddings'])
+            if len(audio_path) > max_str_len: # For pretty print
+                max_str_len = len(audio_path)
+    sound_paths = list(embeddings_dict.keys())
+    embeddings = list(embeddings_dict.values())
+    print(f"{len(embeddings)} embeddings were read.")
 
     # Compute pairwise dot products of normalized embeddings
-    products = np.zeros((len(embeds),len(embeds))) # Encode 0 for similarity to itself
-    for i,embed_a in enumerate(embeds):
-        for j,embed_b in enumerate(embeds):
+    products = np.zeros((len(embeddings),len(embeddings))) # Encode 0 for similarity to itself
+    for i,embed_a in enumerate(embeddings):
+        for j,embed_b in enumerate(embeddings):
             if i<=j:
                 continue
             embed_a = embed_a/np.linalg.norm(embed_a)
             embed_b = embed_b/np.linalg.norm(embed_b)
             products[i,j] = np.dot(embed_a,embed_b)
             products[j,i] = products[i,j]
-    products=np.round(products,3) # round to 3 decimal points
+    products = np.round(products,3) # round to 3 decimal points
+
+    # Create the export directory
+    embeddings_name = os.path.basename(args.path)
+    export_dir = os.path.join(ANALYSIS_DIR, embeddings_name)
+    print(f"Analysis results will be exported to: {export_dir}")
+    os.makedirs(export_dir, exist_ok=True)
 
     # Print top args.N sounds for each sound
     string = ""
     for i,row in enumerate(products):
-        query_sound_path = os.path.splitext(embed_paths[i])[0]
+        string += f"Target: {sound_paths[i]}"
         indices = np.argsort(row)[::-1][:args.N] # Top 3 sounds
-        string += f"Target: {query_sound_path}".replace("embeddings","sounds")
         for n,j in enumerate(indices):
-            match_sound_path = os.path.splitext(embed_paths[j])[0]
-            string += f"\nQ{n} | {match_sound_path:<{max_str_len-4}} | {np.round(row[j],3)}".replace("embeddings","sounds")
+            string += f"\nQ{n} | {sound_paths[j]:<{max_str_len-4}} | {np.round(row[j],3)}"
         string += "\n\n"
-    
+
     # Export the results
-    with open("results.txt", "w") as outfile:
+    with open(os.path.join(export_dir, "results.txt"), "w") as outfile:
         outfile.write(string)
+
+    ##############
+    print("Done!")

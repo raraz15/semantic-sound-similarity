@@ -64,15 +64,16 @@ def process_audio(model_activations, model_embeddings, class_names, audio_path, 
         os.makedirs(export_dir, exist_ok=True)
         export_path = os.path.join(export_dir, f"{os.path.basename(audio_path)}.json")
     json.dump({
+        'audio_path': audio_path,
         'classes': classes,
-        'top_25_classes_probabilities': sorted_class_probabilities[0:25] if sorted_class_probabilities is not None else None,
+        'top_10_classes_probabilities': sorted_class_probabilities[:10] if sorted_class_probabilities is not None else None,
         'embeddings': embeddings
     }, open(export_path, 'w'), indent=4)
 
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description='YAMNet Explorer.')
-    parser.add_argument('-p', '--path', type=str, required=True, help='Path to an audio file or a directory.')
+    parser.add_argument('-p', '--path', type=str, required=True, help='Path to an audio file or a directory containing audio files.')
     parser.add_argument('-o', '--output-dir', type=str, default=EMBEDDINGS_DIR, help="Save output files to a directory.")
     args=parser.parse_args()
 
