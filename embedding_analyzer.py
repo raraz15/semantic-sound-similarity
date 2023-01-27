@@ -19,30 +19,28 @@ if __name__=="__main__":
     print(f"{len(embed_paths)} embeddings were found.")
 
     # Load the embeddings
-    embeddings_dict, max_str_len = {}, 0
+    embeddings, max_str_len = [], 0
     for embed_path in embed_paths:
         with open(embed_path, 'r') as infile: # Load the json file
             model_outputs = json.load(infile)
         if model_outputs['embeddings'] is not None: # Filter out the None types
-            audio_path = model_outputs["audio_path"]
-            embeddings_dict[audio_path] = np.array(model_outputs['embeddings'])
-            if len(audio_path) > max_str_len: # For pretty print
-                max_str_len = len(audio_path)
-    sound_paths = list(embeddings_dict.keys())
-    embeddings = list(embeddings_dict.values())
+            del model_outputs["classes"] # Remove unnecessary info
+            del model_outputs["top_10_classes_probabilities"]
+            embeddings.append(model_outputs)
+            if len(model_outputs["audio_path"]) > max_str_len: # For pretty print
+                max_str_len = len(model_outputs["audio_path"])
     print(f"{len(embeddings)} embeddings were read.")
 
     # Compute pairwise dot products of normalized embeddings
     products = np.zeros((len(embeddings),len(embeddings))) # Encode 0 for similarity to itself
     for i,embed_a in enumerate(embeddings):
+        embed_a = embed_a["embeddings"]/np.linalg.norm(embed_a["embeddings"])
         for j,embed_b in enumerate(embeddings):
             if i<=j:
                 continue
-            embed_a = embed_a/np.linalg.norm(embed_a)
-            embed_b = embed_b/np.linalg.norm(embed_b)
-            products[i,j] = np.dot(embed_a,embed_b)
+            embed_b = embed_b["embeddings"]/np.linalg.norm(embed_b["embeddings"])
+            products[i,j] = np.round(np.dot(embed_a,embed_b),4) # Round the dot product
             products[j,i] = products[i,j]
-    products = np.round(products,3) # round to 3 decimal points
 
     # Create the export directory
     embeddings_name = os.path.basename(args.path)
@@ -53,10 +51,10 @@ if __name__=="__main__":
     # Print top args.N sounds for each sound
     string = ""
     for i,row in enumerate(products):
-        string += f"Target: {sound_paths[i]}"
+        string += f"Target: {embeddings[i]['audio_path']}"
         indices = np.argsort(row)[::-1][:args.N] # Top 3 sounds
         for n,j in enumerate(indices):
-            string += f"\nQ{n} | {sound_paths[j]:<{max_str_len-4}} | {np.round(row[j],3)}"
+            string += f"\nQ{n} | {embeddings[j]['audio_path']:<{max_str_len-4}} | {np.round(row[j],3)}"
         string += "\n\n"
 
     # Export the results
