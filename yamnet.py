@@ -6,11 +6,11 @@ import argparse
 from essentia.standard import EasyLoader, TensorflowPredictVGGish
 
 TRIM_DUR = 30
-SAMPLE_RATE=16000
+SAMPLE_RATE = 16000
 ANALYZER_NAME = 'audioset-yamnet_v1'
-MODEL_PATH="models/yamnet/audioset-yamnet-1.pb"
-CLASSES_PATH="models/yamnet/audioset-yamnet-1.json"
-AUDIO_EXT=["ogg"] # TODO: wav?
+MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
+CLASSES_PATH = "models/yamnet/audioset-yamnet-1.json"
+AUDIO_EXT = ["ogg"] # TODO: wav?
 EMBEDDINGS_DIR = "embeddings"
 
 def get_classes(model, audio, class_names):
