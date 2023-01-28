@@ -5,7 +5,7 @@ import glob
 
 import numpy as np
 
-ANALYSIS_DIR = "analysis"
+ANALYSIS_DIR = "analysis/yamnet"
 
 if __name__=="__main__":
 
@@ -24,9 +24,8 @@ if __name__=="__main__":
         with open(embed_path, 'r') as infile: # Load the json file
             model_outputs = json.load(infile)
         if model_outputs['embeddings'] is not None: # Filter out the None types
-            del model_outputs["classes"] # Remove unnecessary info
-            del model_outputs["top_10_classes_probabilities"]
-            embeddings.append(model_outputs)
+            embeddings.append({"audio_path": model_outputs["audio_path"], 
+                                "embeddings": model_outputs["embeddings"]})
             if len(model_outputs["audio_path"]) > max_str_len: # For pretty print
                 max_str_len = len(model_outputs["audio_path"])
     print(f"{len(embeddings)} embeddings were read.")
