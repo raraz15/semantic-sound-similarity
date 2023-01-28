@@ -12,11 +12,11 @@ MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
 AUDIO_EXT = ["ogg"] # TODO: wav?
 EMBEDDINGS_DIR = "embeddings/yamnet"
 
-
+# TODO: frame aggregation, frame filtering, PCA
+# TODO: only discard non-floatable frames?
 def get_clip_embedding(model, audio):
     """ Takes an embedding model and an audio array and returns the clip level embedding.
     """
-    # Extract embeddings
     try:
         embedding = model(audio).mean(axis=0)  # Take mean of 1-second frame embeddings
         embedding = [float(value) for value in embedding] # Needs to be a list of non-np types so that JSON can encode it
