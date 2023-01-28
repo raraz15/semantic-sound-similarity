@@ -10,7 +10,7 @@ import pandas as pd
 import freesound
 
 FREESOUND_API_KEY = "freesound_api.json"
-FREESOUND_STORE_METADATA_FIELDS = ['id', 'name', 'username', 'previews', 'license', 'tags']  # Freesound metadata properties to store
+FREESOUND_STORE_METADATA_FIELDS = ['id', 'name', 'username', 'previews', 'license', 'tags', 'description', 'url']  # Freesound metadata properties to store
 
 DOWNLOADS_DIR=os.path.join("sounds",dt.datetime.strftime(dt.datetime.now(),"%d_%m_%Y-%H_%M"))
 
