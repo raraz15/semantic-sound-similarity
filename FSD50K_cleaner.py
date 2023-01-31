@@ -29,22 +29,34 @@ if __name__=="__main__":
     tags = [" ".join(tag.split("-")) for tag in tags] # Replace - with space
     print(len(tags))
 
-    first_letters = [tag[0] for tag in tags]
-    alphabet = sorted(list(set(first_letters)))
+    #first_letters = [tag[0] for tag in tags]
+    #alphabet = sorted(list(set(first_letters)))
 
-    rep_dict = {tag: [] for tag in tags} # group dict
-    tags_up = list(rep_dict.keys()) # current tags list
-
-    tags_subset = tags_up[:530] # tags starting with "a"
-    tags_subset = [tag for tag in tags_subset if len(tag)>2] # Skip short tags
+    tags_subset = tags[:530] # tags starting with "a"
+    tags_subset = [tag for tag in tags_subset if len(tag)>3] # Skip short tags
     comb = [(tag0,tag1) for tag0,tag1 in combinations(tags_subset, 2)] # All 2 combinations
 
+    groups = []
     for i,(tag0,tag1) in enumerate(comb):
         dist = ed.eval(tag0, tag1)
         if dist==1:
-            ask_user = input(f"|{tag0}|{tag1}| Merge: y/N?")
-            if ask_user=="y":
-                rep_dict[tag0].append(tag1)
+            if input(f"|{tag0}|{tag1}| Merge: y/N?")=="y":
+                tag0_in,tag1_in = False,False
+                for j,group in enumerate(groups): # Searcg each group for both  tags
+                    if tag0 in group:
+                        tag0_in = True
+                    if tag1 in group:
+                        tag1_in = True
+                    if tag0_in or tag1_in:
+                        break # A tag is found exit search
+                if (not tag0_in) and (not tag1_in): # Neither tag exist in a group, create
+                    groups.append(f"{tag0}|{tag1}")
+                elif tag0_in and (not tag1_in): # Add tag1 to the group
+                    groups[j] += f"|{tag1}"
+                elif (not tag0_in) and tag1_in: # Add tag0 to the group
+                    groups[j] += f"|{tag0}"
+                #print(groups)
+                #print()
 
-    with open("lol.json","w") as outfile:
-        json.dump(rep_dict,outfile,indent=4)
+    #with open("lol.json","w") as outfile:
+    #    json.dump(rep_dict,outfile,indent=4)
