@@ -45,7 +45,7 @@ if __name__=="__main__":
 
     # You can remove these lines if there are too many tags
     N = len([1 for tag0,tag1 in comb if ed.eval(tag0,tag1)==1])
-    print(f"Your validation is required for: {N} pairs.")
+    print(f"Your validation is required for: {N} pairs.\n")
 
     # Typo finder algorithm. Finds 1 character typos
     groups,remove_indices = [],[]
@@ -101,8 +101,16 @@ if __name__=="__main__":
             clean_tags.append(tag)
         metadata_dict[clip_id]["tags"] = clean_tags
 
-    with open(os.path.join(EXPORT_DIR, "changed.json"),"w") as outfile:
+    # Export the new metadata
+    input_name = os.path.splitext(os.path.basename(args.path))[0]
+    output_path = os.path.join(EXPORT_DIR, f"{input_name}_{args.letter}.json")
+    print(f"Exporting the new metadata to: {output_path}")
+    with open(output_path,"w") as outfile:
         json.dump(metadata_dict,outfile,indent=4)
 
-    #############
+    # Count tags
+    tags = set([tag for metadata in metadata_dict.values() for tag in metadata["tags"]])
+    print(f"{len(tags)} unique tags remaining.")
+
+    print("\n#############")
     print("Done!")
