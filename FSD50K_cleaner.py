@@ -1,5 +1,6 @@
 import os
 import json
+from shutil import copy
 import argparse
 from itertools import combinations
 
@@ -7,7 +8,6 @@ import editdistance as ed
 
 EXPORT_DIR = "/home/roguz/freesound-perceptual_similarity/clean_tags"
 
-# TODO: make a copy of the input json
 # TODO: fix bpm
 if __name__=="__main__":
 
@@ -18,6 +18,10 @@ if __name__=="__main__":
 
     with open(args.path ,"r") as infile:
         metadata_dict = json.load(infile)
+    input_name = os.path.splitext(os.path.basename(args.path))[0]
+    copy_path = os.path.join(EXPORT_DIR, f"{input_name}_copy.json")
+    copy(args.path, copy_path) # Make a copy of the file
+    print(f"Made a copy of the input to: {copy_path}")
     print(f"There are {len(metadata_dict)} clip metadata.")
 
     # Retrieve unique tags
@@ -45,7 +49,7 @@ if __name__=="__main__":
 
     # You can remove these lines if there are too many tags
     N = len([1 for tag0,tag1 in comb if ed.eval(tag0,tag1)==1])
-    print(f"Your validation is required for: {N} pairs.\n")
+    print(f"Your validation is required for {N} pairs.\n")
 
     # Typo finder algorithm. Finds 1 character typos
     groups,remove_indices = [],[]
@@ -80,8 +84,8 @@ if __name__=="__main__":
         for group in groups:
             outfile.write(group+"\n")
 
-    print("\nSelect the representative/correct spelling...")
     # Ask for which name to keep
+    print("\nSelect the representative/correct spelling...")
     replacement_dict = {}
     for group in groups:
         names = group.split("|")
@@ -102,13 +106,12 @@ if __name__=="__main__":
         metadata_dict[clip_id]["tags"] = clean_tags
 
     # Export the new metadata
-    input_name = os.path.splitext(os.path.basename(args.path))[0]
     output_path = os.path.join(EXPORT_DIR, f"{input_name}_{args.letter}.json")
-    print(f"Exporting the new metadata to: {output_path}")
+    print(f"\nExporting the new metadata to: {output_path}")
     with open(output_path,"w") as outfile:
         json.dump(metadata_dict,outfile,indent=4)
 
-    # Count tags
+    # Count remaining tags
     tags = set([tag for metadata in metadata_dict.values() for tag in metadata["tags"]])
     print(f"{len(tags)} unique tags remaining.")
 
