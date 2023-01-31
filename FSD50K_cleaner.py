@@ -1,19 +1,22 @@
 import os
 import json
+import argparse
 from itertools import combinations
 
 import editdistance as ed
 
-DATASET_DIR = "/data/FSD50K"
 EXPORT_DIR = "/home/roguz/freesound-perceptual_similarity/clean_tags"
 
-# TODO: ask where the json is
-# TODO: ask which letter to fix
 # TODO: make a copy of the input json
 # TODO: fix bpm
 if __name__=="__main__":
 
-    with open(f"{DATASET_DIR}/FSD50K.metadata/eval_clips_info_FSD50K.json" ,"r") as infile:
+    parser=argparse.ArgumentParser(description='FSD50K tag cleaner.')
+    parser.add_argument('-p', '--path', type=str, required=True, help='JSON file containing the queries.')
+    parser.add_argument('-l', '--letter', type=str, required=True, help='Which letter to fix.')
+    args=parser.parse_args()
+
+    with open(args.path ,"r") as infile:
         metadata_dict = json.load(infile)
     print(f"There are {len(metadata_dict)} clip metadata.")
 
@@ -22,17 +25,29 @@ if __name__=="__main__":
     tags = sorted(list(set(tags)))
     print(f"{len(tags)} unique tags found.")
 
-    # Some cleaning and formatting
-    tags = tags[275:] # remove numbers for now
-    print(f"{len(tags)} tags left after removing number tags.")
+    # Find start positions of each letter
+    first_letters = [tag[0] for tag in tags]
+    tags = tags[first_letters.index("a"):]# Remove numbers for now
+    print(f"{len(tags)} tags left after removing only number tags.")
+    first_letters = [tag[0] for tag in tags]
+    alphabet = sorted(list(set(first_letters)))
+    alph_indices = [first_letters.index(a) for a in alphabet]
+    alph_indices.append(len(tags)) # Add z
+    start_idx = alph_indices[alphabet.index(args.letter)]
+    end_idx = alph_indices[alphabet.index(args.letter)+1]
+
+    # Select which tags to work with
+    tags = tags[start_idx:end_idx] # Only tags starting with "args.letter"
+    print(f"{len(tags)} tags start with '{args.letter}'")
     tags = [tag for tag in tags if len(tag)>3] # Skip short tags
-    print(f"{len(tags)} tags left after removing short tags.")
+    print(f"{len(tags)} tags left after removing short ones.")
+    comb = [(tag0,tag1) for tag0,tag1 in combinations(tags, 2)] # All 2 combinations
 
-    # TODO:
-    tags_subset = tags[489:1132][:100] # tags starting with "b"
-    comb = [(tag0,tag1) for tag0,tag1 in combinations(tags_subset, 2)] # All 2 combinations
+    # You can remove these lines if there are too many tags
+    N = len([1 for tag0,tag1 in comb if ed.eval(tag0,tag1)==1])
+    print(f"Your validation is required for: {N} pairs.")
 
-    # Find 1 character typos
+    # Typo finder algorithm. Finds 1 character typos
     groups,remove_indices = [],[]
     for i,(tag0,tag1) in enumerate(comb):
         computed = False
@@ -60,9 +75,8 @@ if __name__=="__main__":
                 elif (not tag0_in) and tag1_in: # Add tag0 to the group
                     groups[j] += f"|{tag0}"
 
-    # TODO: name convention
     # Export the groups
-    with open(os.path.join(EXPORT_DIR, "groups.txt"),"w") as outfile:
+    with open(os.path.join(EXPORT_DIR, f"{args.letter}.txt"),"w") as outfile:
         for group in groups:
             outfile.write(group+"\n")
 
