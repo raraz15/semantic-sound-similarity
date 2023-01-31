@@ -67,7 +67,7 @@ if __name__=="__main__":
         for group in groups:
             outfile.write(group+"\n")
 
-    print("\nSelect the representatives...")
+    print("\nSelect the representative/correct spelling...")
     # Ask for which name to keep
     replacement_dict = {}
     for group in groups:
@@ -79,20 +79,14 @@ if __name__=="__main__":
         for i,name in enumerate(names):
             replacement_dict[name] = names[int(j)]
 
-    ## Unify the grouped tags
-    #for clip_id,metadata in metadata_dict.items():
-    #    clean_tags = []
-    #    for tag in metadata["tags"]:
-    #        grouped = False
-    #        for group in groups:
-    #            if tag in group:
-    #                grouped = True
-    #                break
-    #        if not grouped:
-    #            clean_tags.append(tag)
-    #        else:
-    #            clean_tags.append(group.split("|")[0].replace(" ","-"))
-    #    metadata_dict[clip_id]["tags"] = clean_tags
+    # Unify the grouped tags
+    for clip_id,metadata in metadata_dict.items():
+        clean_tags = []
+        for tag in metadata["tags"]:
+            if tag in replacement_dict:
+                tag = replacement_dict[tag]
+            clean_tags.append(tag)
+        metadata_dict[clip_id]["tags"] = clean_tags
 
-    #with open("lol.json","w") as outfile:
-    #    json.dump(rep_dict,outfile,indent=4)
+    with open("lol.json","w") as outfile:
+        json.dump(metadata_dict,outfile,indent=4)
