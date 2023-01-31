@@ -24,10 +24,11 @@ if __name__=="__main__":
     print(f"{len(tags)} tags left after removing short tags.")
     tags = [" ".join(tag.split("-")) for tag in tags] # Replace - with space
 
-
-    tags_subset = tags[489:1132] # tags starting with "b"
+    # TODO:
+    tags_subset = tags[489:1132][:50] # tags starting with "b"
     comb = [(tag0,tag1) for tag0,tag1 in combinations(tags_subset, 2)] # All 2 combinations
 
+    # Find 1 character typos
     groups,remove_indices = [],[]
     for i,(tag0,tag1) in enumerate(comb):
         computed = False
@@ -39,7 +40,7 @@ if __name__=="__main__":
             continue
         dist = ed.eval(tag0, tag1) # Calculate levehnsthein distance
         if dist==1:
-            if input(f"|{tag0}|{tag1}| Merge [y/N]?: ")=="y":
+            if input(f"|{tag0}|{tag1}| Merge? [y/N]: ")=="y":
                 #remove_indices.append(i)
                 tag0_in,tag1_in = False,False
                 for j,group in enumerate(groups): # Search each group for both tags
@@ -56,27 +57,27 @@ if __name__=="__main__":
                 elif (not tag0_in) and tag1_in: # Add tag0 to the group
                     groups[j] += f"|{tag0}"
 
-    ## Go back to the original format
-    #for i,group in enumerate(groups):
-    #    groups[i] = group.replace("-", " ")
-#
-    ## TODO: name convention
-    ## Export the groups
-    #with open("groups.txt","w") as outfile:
-    #    for group in groups:
-    #        outfile.write(group+"\n")
-#
-    #print("\nSelect the representatives...")
-    ## Ask for which name to keep
-    #replacement_dict = {}
-    #for group in groups:
-    #    names = group.split("|")
-    #    for i,name in enumerate(names):
-    #        print(f"{i}: {name}")
-    #    j = input("Which word is the representative?: \n")
-    #    for i,name in enumerate(names):
-    #        replacement_dict[name] = names[j]
+    # Go back to the original format
+    for i,group in enumerate(groups):
+        groups[i] = group.replace("-", " ")
 
+    # TODO: name convention
+    # Export the groups
+    with open("groups.txt","w") as outfile:
+        for group in groups:
+            outfile.write(group+"\n")
+
+    print("\nSelect the representatives...")
+    # Ask for which name to keep
+    replacement_dict = {}
+    for group in groups:
+        names = group.split("|")
+        print("\nWhich word?")
+        for i,name in enumerate(names):
+            print(f"{i}: {name}")
+        j = input("Number: ")
+        for i,name in enumerate(names):
+            replacement_dict[name] = names[int(j)]
 
     ## Unify the grouped tags
     #for clip_id,metadata in metadata_dict.items():
