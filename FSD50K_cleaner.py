@@ -36,13 +36,21 @@ if __name__=="__main__":
     tags_subset = [tag for tag in tags_subset if len(tag)>3] # Skip short tags
     comb = [(tag0,tag1) for tag0,tag1 in combinations(tags_subset, 2)] # All 2 combinations
 
-    groups = []
+    groups,remove_indices = [],[]
     for i,(tag0,tag1) in enumerate(comb):
+        computed = False
+        for j,group in enumerate(groups): # Skip for already compared tags
+            if tag0 in group and tag1 in group:
+                computed = True
+                break
+        if computed:
+            continue
         dist = ed.eval(tag0, tag1)
         if dist==1:
-            if input(f"|{tag0}|{tag1}| Merge: y/N?")=="y":
+            if input(f"|{tag0}|{tag1}| Merge: y/N?" )=="y":
+                remove_indices.append(i)
                 tag0_in,tag1_in = False,False
-                for j,group in enumerate(groups): # Searcg each group for both  tags
+                for j,group in enumerate(groups): # Search each group for both tags
                     if tag0 in group:
                         tag0_in = True
                     if tag1 in group:
@@ -55,8 +63,13 @@ if __name__=="__main__":
                     groups[j] += f"|{tag1}"
                 elif (not tag0_in) and tag1_in: # Add tag0 to the group
                     groups[j] += f"|{tag0}"
-                #print(groups)
-                #print()
+    print(groups)
+
+    print(len(remove_indices))
+    comb = [x for i,x in enumerate(comb) if i not in remove_indices]
+    
+
+
 
     #with open("lol.json","w") as outfile:
     #    json.dump(rep_dict,outfile,indent=4)
