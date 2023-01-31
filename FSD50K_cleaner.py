@@ -5,7 +5,12 @@ from itertools import combinations
 import editdistance as ed
 
 DATASET_DIR = "/data/FSD50K"
+EXPORT_DIR = "/home/roguz/freesound-perceptual_similarity/clean_tags"
 
+# TODO: ask where the json is
+# TODO: ask which letter to fix
+# TODO: make a copy of the input json
+# TODO: fix bpm
 if __name__=="__main__":
 
     with open(f"{DATASET_DIR}/FSD50K.metadata/eval_clips_info_FSD50K.json" ,"r") as infile:
@@ -22,10 +27,9 @@ if __name__=="__main__":
     print(f"{len(tags)} tags left after removing number tags.")
     tags = [tag for tag in tags if len(tag)>3] # Skip short tags
     print(f"{len(tags)} tags left after removing short tags.")
-    tags = [" ".join(tag.split("-")) for tag in tags] # Replace - with space
 
     # TODO:
-    tags_subset = tags[489:1132][:50] # tags starting with "b"
+    tags_subset = tags[489:1132][:100] # tags starting with "b"
     comb = [(tag0,tag1) for tag0,tag1 in combinations(tags_subset, 2)] # All 2 combinations
 
     # Find 1 character typos
@@ -41,7 +45,6 @@ if __name__=="__main__":
         dist = ed.eval(tag0, tag1) # Calculate levehnsthein distance
         if dist==1:
             if input(f"|{tag0}|{tag1}| Merge? [y/N]: ")=="y":
-                #remove_indices.append(i)
                 tag0_in,tag1_in = False,False
                 for j,group in enumerate(groups): # Search each group for both tags
                     if tag0 in group:
@@ -57,13 +60,9 @@ if __name__=="__main__":
                 elif (not tag0_in) and tag1_in: # Add tag0 to the group
                     groups[j] += f"|{tag0}"
 
-    # Go back to the original format
-    for i,group in enumerate(groups):
-        groups[i] = group.replace("-", " ")
-
     # TODO: name convention
     # Export the groups
-    with open("groups.txt","w") as outfile:
+    with open(os.path.join(EXPORT_DIR, "groups.txt"),"w") as outfile:
         for group in groups:
             outfile.write(group+"\n")
 
@@ -88,5 +87,8 @@ if __name__=="__main__":
             clean_tags.append(tag)
         metadata_dict[clip_id]["tags"] = clean_tags
 
-    with open("lol.json","w") as outfile:
+    with open(os.path.join(EXPORT_DIR, "changed.json"),"w") as outfile:
         json.dump(metadata_dict,outfile,indent=4)
+
+    #############
+    print("Done!")
