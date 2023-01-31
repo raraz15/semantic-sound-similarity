@@ -1,54 +1,46 @@
 import os
 import json
-from collections import Counter
 from itertools import combinations
-
-import numpy as np
-from scipy import stats
-import matplotlib.pyplot as plt
 
 import editdistance as ed
 
-if __name__=="__main__":
+DATASET_DIR = "/data/FSD50K"
 
-    DATASET_DIR = "/data/FSD50K"
+if __name__=="__main__":
 
     with open(f"{DATASET_DIR}/FSD50K.metadata/eval_clips_info_FSD50K.json" ,"r") as infile:
         metadata_dict = json.load(infile)
-    print(len(metadata_dict))
+    print(f"There are {len(metadata_dict)} clip metadata.")
 
-    all_tags, no_tags = [], []
-    for clip_id,metadata in metadata_dict.items():
-        all_tags.extend(metadata["tags"])
-        no_tags += [len(metadata["tags"])]
-    counter = Counter(all_tags)
-    counter = {k: v for k,v in sorted(counter.items())}
-    tags = list(counter.keys())
-    print(len(counter))
+    # Retrieve unique tags
+    tags = [tag for metadata in metadata_dict.values() for tag in metadata["tags"]]
+    tags = sorted(list(set(tags)))
+    print(f"{len(tags)} unique tags found.")
+
+    # Some cleaning and formatting
     tags = tags[275:] # remove numbers for now
+    print(f"{len(tags)} tags left after removing number tags.")
+    tags = [tag for tag in tags if len(tag)>3] # Skip short tags
+    print(f"{len(tags)} tags left after removing short tags.")
     tags = [" ".join(tag.split("-")) for tag in tags] # Replace - with space
-    print(len(tags))
 
-    #first_letters = [tag[0] for tag in tags]
-    #alphabet = sorted(list(set(first_letters)))
 
-    tags_subset = tags[:530] # tags starting with "a"
-    tags_subset = [tag for tag in tags_subset if len(tag)>3] # Skip short tags
+    tags_subset = tags[489:1132] # tags starting with "b"
     comb = [(tag0,tag1) for tag0,tag1 in combinations(tags_subset, 2)] # All 2 combinations
 
     groups,remove_indices = [],[]
     for i,(tag0,tag1) in enumerate(comb):
         computed = False
-        for j,group in enumerate(groups): # Skip for already compared tags
+        for j,group in enumerate(groups): # Skip already compared tags
             if tag0 in group and tag1 in group:
                 computed = True
                 break
         if computed:
             continue
-        dist = ed.eval(tag0, tag1)
+        dist = ed.eval(tag0, tag1) # Calculate levehnsthein distance
         if dist==1:
-            if input(f"|{tag0}|{tag1}| Merge: y/N?" )=="y":
-                remove_indices.append(i)
+            if input(f"|{tag0}|{tag1}| Merge [y/N]?: ")=="y":
+                #remove_indices.append(i)
                 tag0_in,tag1_in = False,False
                 for j,group in enumerate(groups): # Search each group for both tags
                     if tag0 in group:
@@ -63,13 +55,43 @@ if __name__=="__main__":
                     groups[j] += f"|{tag1}"
                 elif (not tag0_in) and tag1_in: # Add tag0 to the group
                     groups[j] += f"|{tag0}"
-    print(groups)
 
-    print(len(remove_indices))
-    comb = [x for i,x in enumerate(comb) if i not in remove_indices]
-    
+    ## Go back to the original format
+    #for i,group in enumerate(groups):
+    #    groups[i] = group.replace("-", " ")
+#
+    ## TODO: name convention
+    ## Export the groups
+    #with open("groups.txt","w") as outfile:
+    #    for group in groups:
+    #        outfile.write(group+"\n")
+#
+    #print("\nSelect the representatives...")
+    ## Ask for which name to keep
+    #replacement_dict = {}
+    #for group in groups:
+    #    names = group.split("|")
+    #    for i,name in enumerate(names):
+    #        print(f"{i}: {name}")
+    #    j = input("Which word is the representative?: \n")
+    #    for i,name in enumerate(names):
+    #        replacement_dict[name] = names[j]
 
 
+    ## Unify the grouped tags
+    #for clip_id,metadata in metadata_dict.items():
+    #    clean_tags = []
+    #    for tag in metadata["tags"]:
+    #        grouped = False
+    #        for group in groups:
+    #            if tag in group:
+    #                grouped = True
+    #                break
+    #        if not grouped:
+    #            clean_tags.append(tag)
+    #        else:
+    #            clean_tags.append(group.split("|")[0].replace(" ","-"))
+    #    metadata_dict[clip_id]["tags"] = clean_tags
 
     #with open("lol.json","w") as outfile:
     #    json.dump(rep_dict,outfile,indent=4)
