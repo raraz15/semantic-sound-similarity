@@ -4,6 +4,7 @@ models/*
 sounds/*
 embeddings/*
 analysis/*
+clean_tags/*
 
 __pycache__/*
 
