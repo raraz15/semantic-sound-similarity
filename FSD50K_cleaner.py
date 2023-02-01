@@ -66,27 +66,29 @@ if __name__=="__main__":
             if (tag0 in group) and (tag1 in group):
                 computed = True
                 break
-        if computed:
-            continue
-        dist = ed.eval(tag0, tag1) # Calculate levehnsthein distance
-        if dist==1:
-            decision = input(f"|{tag0}|{tag1}| Merge? [y/N]: ")=="y"
-            decisions.append([tag0,tag1,decision]) # Keep a track of the decisions
-            if decision:
-                tag0_in,tag1_in = False,False
-                for j,group in enumerate(groups): # Search each group for both tags
-                    if tag0 in group:
-                        tag0_in = True
-                    if tag1 in group:
-                        tag1_in = True
-                    if tag0_in or tag1_in:
-                        break # A tag is found exit search
-                if (not tag0_in) and (not tag1_in): # Neither tag exist in a group, create
-                    groups.append(f"{tag0}|{tag1}")
-                elif tag0_in and (not tag1_in): # Add tag1 to the group
-                    groups[j] += f"|{tag1}"
-                elif (not tag0_in) and tag1_in: # Add tag0 to the group
-                    groups[j] += f"|{tag0}"
+        if not computed:
+            dist = ed.eval(tag0, tag1) # Calculate levehnsthein distance
+            if dist==1:
+                decision = input(f"|{tag0}|{tag1}| Merge? [y/N]: ")=="y"
+                decisions.append([tag0,tag1,decision]) # Keep a track of the decisions
+                if decision:
+                    # Search each group for the tags
+                    tag0_in,tag1_in = False,False
+                    for j,group in enumerate(groups):
+                        for tag in group.split("|"): # Compare tag by tag
+                            if tag0 == tag:
+                                tag0_in = True
+                            elif tag1 == tag:
+                                tag1_in = True
+                        if tag0_in or tag1_in:
+                            break # A group is found, exit the search
+                    # Put the new tags in corresponding group
+                    if (not tag0_in) and (not tag1_in): # Neither tag exist in a group, create one
+                        groups.append(f"{tag0}|{tag1}")
+                    elif tag0_in and (not tag1_in): # Add tag1 to the group
+                        groups[j] += f"|{tag1}"
+                    elif (not tag0_in) and tag1_in: # Add tag0 to the group
+                        groups[j] += f"|{tag0}"
 
     # Export the decisions
     output_path = os.path.join(args.output, f"{args.letter}_decisions.txt")
