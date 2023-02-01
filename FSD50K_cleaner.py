@@ -54,41 +54,44 @@ if __name__=="__main__":
     print(f"{len(tags)} tags left after removing short ones.")
     comb = [(tag0,tag1) for tag0,tag1 in combinations(tags, 2)] # All 2 combinations
 
-    # You can remove these lines if there are too many tags
-    N = len([1 for tag0,tag1 in comb if ed.eval(tag0,tag1)==1])
+    # Find which combinations differ by 1 distance
+    comb_dist = []
+    for tag0,tag1 in comb:
+        dist = ed.eval(tag0, tag1) # Calculate levehnsthein distance
+        if dist == 1:
+            comb_dist.append((tag0,tag1))
+    N = len(comb_dist)
     print(f"Your validation is required for {N} pairs.\n")
 
     # Typo finder algorithm. Finds 1 character typos
     groups,decisions = [],[]
-    for i,(tag0,tag1) in enumerate(comb):
+    for i,(tag0,tag1) in enumerate(comb_dist):
         computed = False
         for j,group in enumerate(groups): # Skip already compared tags
             if (tag0 in group) and (tag1 in group):
                 computed = True
                 break
         if not computed:
-            dist = ed.eval(tag0, tag1) # Calculate levehnsthein distance
-            if dist==1:
-                decision = input(f"|{tag0}|{tag1}| Merge? [y/N]: ")=="y"
-                decisions.append([tag0,tag1,decision]) # Keep a track of the decisions
-                if decision:
-                    # Search each group for the tags
-                    tag0_in,tag1_in = False,False
-                    for j,group in enumerate(groups):
-                        for tag in group.split("|"): # Compare tag by tag
-                            if tag0 == tag:
-                                tag0_in = True
-                            elif tag1 == tag:
-                                tag1_in = True
-                        if tag0_in or tag1_in:
-                            break # A group is found, exit the search
-                    # Put the new tags in corresponding group
-                    if (not tag0_in) and (not tag1_in): # Neither tag exist in a group, create one
-                        groups.append(f"{tag0}|{tag1}")
-                    elif tag0_in and (not tag1_in): # Add tag1 to the group
-                        groups[j] += f"|{tag1}"
-                    elif (not tag0_in) and tag1_in: # Add tag0 to the group
-                        groups[j] += f"|{tag0}"
+            decision = input(f"{i+1:>3}/{N}|{tag0}|{tag1}| Merge? [y/N]: ")=="y"
+            decisions.append([tag0,tag1,decision]) # Keep a track of the decisions
+            if decision:
+                # Search each group for the tags
+                tag0_in,tag1_in = False,False
+                for j,group in enumerate(groups):
+                    for tag in group.split("|"): # Compare tag by tag
+                        if tag0 == tag:
+                            tag0_in = True
+                        elif tag1 == tag:
+                            tag1_in = True
+                    if tag0_in or tag1_in:
+                        break # A group is found, exit the search
+                # Put the new tags in corresponding group
+                if (not tag0_in) and (not tag1_in): # Neither tag exist in a group, create one
+                    groups.append(f"{tag0}|{tag1}")
+                elif tag0_in and (not tag1_in): # Add tag1 to the group
+                    groups[j] += f"|{tag1}"
+                elif (not tag0_in) and tag1_in: # Add tag0 to the group
+                    groups[j] += f"|{tag0}"
 
     # Export the decisions
     output_path = os.path.join(args.output, f"{args.letter}_decisions.txt")
