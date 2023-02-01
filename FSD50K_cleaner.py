@@ -53,7 +53,7 @@ if __name__=="__main__":
     print(f"Your validation is required for {N} pairs.\n")
 
     # Typo finder algorithm. Finds 1 character typos
-    groups,remove_indices = [],[]
+    groups,decisions = [],[]
     for i,(tag0,tag1) in enumerate(comb):
         computed = False
         for j,group in enumerate(groups): # Skip already compared tags
@@ -64,7 +64,9 @@ if __name__=="__main__":
             continue
         dist = ed.eval(tag0, tag1) # Calculate levehnsthein distance
         if dist==1:
-            if input(f"|{tag0}|{tag1}| Merge? [y/N]: ")=="y":
+            decision = input(f"|{tag0}|{tag1}| Merge? [y/N]: ")=="y"
+            decisions.append([tag0,tag1,decision]) # Keep a track of the decisions
+            if decision:
                 tag0_in,tag1_in = False,False
                 for j,group in enumerate(groups): # Search each group for both tags
                     if tag0 in group:
@@ -80,8 +82,17 @@ if __name__=="__main__":
                 elif (not tag0_in) and tag1_in: # Add tag0 to the group
                     groups[j] += f"|{tag0}"
 
+    # Export the decisions
+    output_path = os.path.join(args.output, f"{args.letter}_decisions.txt")
+    print(f"Exported your decisions to: {output_path}")
+    with open(output_path,"w") as outfile:
+        for x,y,z in decisions:
+            outfile.write(f"{x}|{y}|{z}\n")
+
     # Export the groups
-    with open(os.path.join(args.output, f"{args.letter}.txt"),"w") as outfile:
+    output_path = os.path.join(args.output, f"{args.letter}.txt")
+    print(f"Exported the groups to: {output_path}")
+    with open(output_path,"w") as outfile:
         for group in groups:
             outfile.write(group+"\n")
 
@@ -98,9 +109,15 @@ if __name__=="__main__":
             for i,name in enumerate(names):
                 replacement_dict[name] = names[int(j)]
         except: # If the user makes a mistake while typing.
-            j = input("Number: ")
+            j = input("Choose a number this time: ")
             for i,name in enumerate(names):
                 replacement_dict[name] = names[int(j)]
+
+    # Export the replacement dict
+    output_path = os.path.join(args.output, f"{args.letter}_replacement.json")
+    print(f"Exported the replacement dictionary to: {output_path}")
+    with open(output_path,"w") as outfile:
+        json.dump(replacement_dict, outfile, indent=4)
 
     # Unify the grouped tags
     for clip_id,metadata in metadata_dict.items():
@@ -121,5 +138,5 @@ if __name__=="__main__":
     tags = set([tag for metadata in metadata_dict.values() for tag in metadata["tags"]])
     print(f"{len(tags)} unique tags remaining.")
 
-    print("\n#############")
+    print("\n############")
     print("Done!")
