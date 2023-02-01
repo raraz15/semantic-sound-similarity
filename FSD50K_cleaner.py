@@ -14,12 +14,13 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description='FSD50K tag cleaner.')
     parser.add_argument('-p', '--path', type=str, required=True, help='JSON file containing the queries.')
     parser.add_argument('-l', '--letter', type=str, required=True, help='Which letter to fix.')
+    parser.add_argument('-o', '--output', type=str, default=EXPORT_DIR, help='Output directory.')
     args=parser.parse_args()
 
     with open(args.path ,"r") as infile:
         metadata_dict = json.load(infile)
     input_name = os.path.splitext(os.path.basename(args.path))[0]
-    copy_path = os.path.join(EXPORT_DIR, f"{input_name}_copy.json")
+    copy_path = os.path.join(args.output, f"{input_name}_copy.json")
     copy(args.path, copy_path) # Make a copy of the file
     print(f"Made a copy of the input to: {copy_path}")
     print(f"There are {len(metadata_dict)} clip metadata.")
@@ -80,7 +81,7 @@ if __name__=="__main__":
                     groups[j] += f"|{tag0}"
 
     # Export the groups
-    with open(os.path.join(EXPORT_DIR, f"{args.letter}.txt"),"w") as outfile:
+    with open(os.path.join(args.output, f"{args.letter}.txt"),"w") as outfile:
         for group in groups:
             outfile.write(group+"\n")
 
@@ -92,9 +93,14 @@ if __name__=="__main__":
         print("\nWhich word?")
         for i,name in enumerate(names):
             print(f"{i}: {name}")
-        j = input("Number: ")
-        for i,name in enumerate(names):
-            replacement_dict[name] = names[int(j)]
+        try:
+            j = input("Number: ")
+            for i,name in enumerate(names):
+                replacement_dict[name] = names[int(j)]
+        except: # If the user makes a mistake while typing.
+            j = input("Number: ")
+            for i,name in enumerate(names):
+                replacement_dict[name] = names[int(j)]
 
     # Unify the grouped tags
     for clip_id,metadata in metadata_dict.items():
@@ -106,7 +112,7 @@ if __name__=="__main__":
         metadata_dict[clip_id]["tags"] = clean_tags
 
     # Export the new metadata
-    output_path = os.path.join(EXPORT_DIR, f"{input_name}_{args.letter}.json")
+    output_path = os.path.join(args.output, f"{input_name}_{args.letter}.json")
     print(f"\nExporting the new metadata to: {output_path}")
     with open(output_path,"w") as outfile:
         json.dump(metadata_dict,outfile,indent=4)
