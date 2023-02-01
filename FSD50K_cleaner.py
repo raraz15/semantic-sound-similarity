@@ -23,7 +23,7 @@ if __name__=="__main__":
 
     # Create the output dir
     os.makedirs(args.output, exist_ok=True)
-    
+
     # Make a copy of the input
     input_name = os.path.splitext(os.path.basename(args.path))[0]
     copy_path = os.path.join(args.output, f"{input_name}_copy.json")
@@ -70,7 +70,7 @@ if __name__=="__main__":
         tag0_in,tag1_in = False,False
         n0,n1 = -1,-1
         for j,group in enumerate(groups):
-            for tag in group.split("|"): # Compare tag by tag
+            for tag in group: # Compare tag by tag
                 if tag0 == tag:
                     tag0_in = True
                     n0 = j # Record which group tag0 is in
@@ -83,17 +83,18 @@ if __name__=="__main__":
                 print(f"[{i+1:>3}/{N}]|{tag0}|{tag1}| Already merged to the same group.")
             else:
                 print(f"[{i+1:>3}/{N}]|{tag0}|{tag1}| Already merged to different groups.")
+            #decisions.append([tag0,tag1,"Skipped"]) # Keep a track of the decisions
         else:
             decision = input(f"[{i+1:>3}/{N}]|{tag0}|{tag1}| Merge? [y/N]: ")=="y"
             decisions.append([tag0,tag1,decision]) # Keep a track of the decisions
             if decision:
                 # Put the new tags in corresponding group
                 if (not tag0_in) and (not tag1_in): # Neither tag exist in a group, create one
-                    groups.append(f"{tag0}|{tag1}")
+                    groups.append([tag0,tag1])
                 elif tag0_in and (not tag1_in): # Add tag1 to the group
-                    groups[n0] += f"|{tag1}"
+                    groups[n0].append(tag1)
                 elif (not tag0_in) and tag1_in: # Add tag0 to the group
-                    groups[n1] += f"|{tag0}"
+                    groups[n1].append(tag0)
     print(f"You created {len(groups)} groups.")
 
     # Export the decisions
@@ -108,24 +109,23 @@ if __name__=="__main__":
     print(f"Exported the groups to: {output_path}")
     with open(output_path,"w") as outfile:
         for group in groups:
-            outfile.write(group+"\n")
+            outfile.write("|".join(group)+"\n")
 
     # Ask for which name to keep
     print("\nSelect the representative/correct spelling...")
     replacement_dict = {}
     for k,group in enumerate(groups):
-        names = group.split("|")
         print(f"\n[{k+1}/{len(groups)}] Which word?")
-        for i,name in enumerate(names):
+        for i,name in enumerate(group):
             print(f"{i}: {name}")
         try:
             j = input("Number: ")
-            for i,name in enumerate(names):
-                replacement_dict[name] = names[int(j)]
+            for i,name in enumerate(group):
+                replacement_dict[name] = group[int(j)]
         except: # If the user makes a mistake while typing.
             j = input(f"Choose a number between [0, {i}]: ")
-            for i,name in enumerate(names):
-                replacement_dict[name] = names[int(j)]
+            for i,name in enumerate(group):
+                replacement_dict[name] = group[int(j)]
 
     # Export the replacement dict
     output_path = os.path.join(args.output, f"{args.letter}_replacement.json")
