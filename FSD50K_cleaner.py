@@ -38,7 +38,7 @@ if __name__=="__main__":
 
     # Find start positions of each letter
     first_letters = [tag[0] for tag in tags]
-    tags = tags[first_letters.index("a"):]# Remove numbers for now
+    tags = tags[first_letters.index("a"):][:50] # Remove numbers for now
     print(f"{len(tags)} tags left after removing only number tags.")
     first_letters = [tag[0] for tag in tags]
     alphabet = sorted(list(set(first_letters)))
@@ -68,26 +68,33 @@ if __name__=="__main__":
     for i,(tag0,tag1) in enumerate(comb_dist):
         # Search each group for the tags
         tag0_in,tag1_in = False,False
+        n0,n1 = -1,-1
         for j,group in enumerate(groups):
             for tag in group.split("|"): # Compare tag by tag
                 if tag0 == tag:
                     tag0_in = True
+                    n0 = j # Record which group tag0 is in
                 elif tag1 == tag:
                     tag1_in = True
+                    n1 = j # Record which group tag1 is in
+        # Ask for user decision if the tags are not merged yet
         if tag0_in and tag1_in:
-            print(f"{i+1:>3}/{N}|{tag0}|{tag1}| Already merged.")
+            if n0 == n1:
+                print(f"[{i+1:>3}/{N}]|{tag0}|{tag1}| Already merged to the same group.")
+            else:
+                print(f"[{i+1:>3}/{N}]|{tag0}|{tag1}| Already merged to different groups.")
         else:
-            decision = input(f"{i+1:>3}/{N}|{tag0}|{tag1}| Merge? [y/N]: ")=="y"
+            decision = input(f"[{i+1:>3}/{N}]|{tag0}|{tag1}| Merge? [y/N]: ")=="y"
             decisions.append([tag0,tag1,decision]) # Keep a track of the decisions
             if decision:
                 # Put the new tags in corresponding group
                 if (not tag0_in) and (not tag1_in): # Neither tag exist in a group, create one
                     groups.append(f"{tag0}|{tag1}")
                 elif tag0_in and (not tag1_in): # Add tag1 to the group
-                    groups[j] += f"|{tag1}"
+                    groups[n0] += f"|{tag1}"
                 elif (not tag0_in) and tag1_in: # Add tag0 to the group
-                    groups[j] += f"|{tag0}"
-    print(f"You created {groups} groups.")
+                    groups[n1] += f"|{tag0}"
+    print(f"You created {len(groups)} groups.")
 
     # Export the decisions
     output_path = os.path.join(args.output, f"{args.letter}_decisions.txt")
@@ -108,7 +115,7 @@ if __name__=="__main__":
     replacement_dict = {}
     for k,group in enumerate(groups):
         names = group.split("|")
-        print(f"\n{k+1}/{len(groups)}|Which word?")
+        print(f"\n[{k+1}/{len(groups)}] Which word?")
         for i,name in enumerate(names):
             print(f"{i}: {name}")
         try:
@@ -116,7 +123,7 @@ if __name__=="__main__":
             for i,name in enumerate(names):
                 replacement_dict[name] = names[int(j)]
         except: # If the user makes a mistake while typing.
-            j = input("Choose a number this time: ")
+            j = input(f"Choose a number between [0, {i}]: ")
             for i,name in enumerate(names):
                 replacement_dict[name] = names[int(j)]
 
