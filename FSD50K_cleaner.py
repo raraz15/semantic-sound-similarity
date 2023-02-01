@@ -17,11 +17,17 @@ if __name__=="__main__":
     parser.add_argument('-o', '--output', type=str, default=EXPORT_DIR, help='Output directory.')
     args=parser.parse_args()
 
+    # Read the metadata dict
     with open(args.path ,"r") as infile:
         metadata_dict = json.load(infile)
+
+    # Create the output dir
+    os.makedirs(args.output, exist_ok=True)
+    
+    # Make a copy of the input
     input_name = os.path.splitext(os.path.basename(args.path))[0]
     copy_path = os.path.join(args.output, f"{input_name}_copy.json")
-    copy(args.path, copy_path) # Make a copy of the file
+    copy(args.path, copy_path) 
     print(f"Made a copy of the input to: {copy_path}")
     print(f"There are {len(metadata_dict)} clip metadata.")
 
@@ -37,7 +43,7 @@ if __name__=="__main__":
     first_letters = [tag[0] for tag in tags]
     alphabet = sorted(list(set(first_letters)))
     alph_indices = [first_letters.index(a) for a in alphabet]
-    alph_indices.append(len(tags)) # Add z
+    alph_indices.append(len(tags)) # Add end of z
     start_idx = alph_indices[alphabet.index(args.letter)]
     end_idx = alph_indices[alphabet.index(args.letter)+1]
 
@@ -57,7 +63,7 @@ if __name__=="__main__":
     for i,(tag0,tag1) in enumerate(comb):
         computed = False
         for j,group in enumerate(groups): # Skip already compared tags
-            if tag0 in group and tag1 in group:
+            if (tag0 in group) and (tag1 in group):
                 computed = True
                 break
         if computed:
