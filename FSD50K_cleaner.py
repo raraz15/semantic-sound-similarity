@@ -38,7 +38,7 @@ if __name__=="__main__":
 
     # Find start positions of each letter
     first_letters = [tag[0] for tag in tags]
-    tags = tags[first_letters.index("a"):][:50] # Remove numbers for now
+    tags = tags[first_letters.index("a"):] # Remove numbers for now
     print(f"{len(tags)} tags left after removing only number tags.")
     first_letters = [tag[0] for tag in tags]
     alphabet = sorted(list(set(first_letters)))
