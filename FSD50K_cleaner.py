@@ -8,7 +8,7 @@ import editdistance as ed
 
 EXPORT_DIR = "/home/roguz/freesound-perceptual_similarity/clean_tags"
 
-# TODO: fix bpm
+# TODO: Clean the number tags (bpm needs -)
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description='FSD50K tag cleaner.')
@@ -36,7 +36,7 @@ if __name__=="__main__":
     tags = sorted(list(set(tags)))
     print(f"{len(tags)} unique tags found.")
 
-    # Find start positions of each letter
+    # Find start positions of each letter, we will clean the tags letter by letter
     first_letters = [tag[0] for tag in tags]
     tags = tags[first_letters.index("a"):] # Remove numbers for now
     print(f"{len(tags)} tags left after removing only number tags.")
@@ -44,11 +44,11 @@ if __name__=="__main__":
     alphabet = sorted(list(set(first_letters)))
     alph_indices = [first_letters.index(a) for a in alphabet]
     alph_indices.append(len(tags)) # Add end of z
+
+    # Select only tags starting with "args.letter"
     start_idx = alph_indices[alphabet.index(args.letter)]
     end_idx = alph_indices[alphabet.index(args.letter)+1]
-
-    # Select which tags to work with
-    tags = tags[start_idx:end_idx] # Only tags starting with "args.letter"
+    tags = tags[start_idx:end_idx]
     print(f"{len(tags)} tags start with '{args.letter}'")
     tags = [tag for tag in tags if len(tag)>3] # Skip short tags
     print(f"{len(tags)} tags left after removing short ones.")
@@ -83,9 +83,9 @@ if __name__=="__main__":
                 print(f"[{i+1:>3}/{N}]|{tag0}|{tag1}| Already merged to the same group.")
             else:
                 print(f"[{i+1:>3}/{N}]|{tag0}|{tag1}| Already merged to different groups.")
-            #decisions.append([tag0,tag1,"Skipped"]) # Keep a track of the decisions
+            decisions.append([tag0,tag1,"Skipped"]) # Keep a track of the decisions
         else:
-            decision = input(f"[{i+1:>3}/{N}]|{tag0}|{tag1}| Merge? [y/N]: ")=="y"
+            decision = input(f"[{i+1:>{len(str(N))}}/{N}]|{tag0}|{tag1}| Merge? [y/N]: ")=="y"
             decisions.append([tag0,tag1,decision]) # Keep a track of the decisions
             if decision:
                 # Put the new tags in corresponding group
@@ -119,11 +119,11 @@ if __name__=="__main__":
         for i,name in enumerate(group):
             print(f"{i}: {name}")
         try:
-            j = input("Number: ")
+            j = input(f"Choose between [0, {len(group)-1}]: ")
             for i,name in enumerate(group):
                 replacement_dict[name] = group[int(j)]
         except: # If the user makes a mistake while typing.
-            j = input(f"Choose a number between [0, {i}]: ")
+            j = input(f"Choose between [0, {len(group)-1}]: ")
             for i,name in enumerate(group):
                 replacement_dict[name] = group[int(j)]
 
