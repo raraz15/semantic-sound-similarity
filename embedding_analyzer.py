@@ -5,7 +5,7 @@ import glob
 
 import numpy as np
 
-ANALYSIS_DIR = "analysis/yamnet"
+ANALYSIS_DIR = "analysis"
 
 if __name__=="__main__":
 
@@ -43,7 +43,8 @@ if __name__=="__main__":
 
     # Create the export directory
     embeddings_name = os.path.basename(args.path)
-    export_dir = os.path.join(ANALYSIS_DIR, embeddings_name)
+    model_name = os.path.basename(os.path.dirname(args.path))
+    export_dir = os.path.join(ANALYSIS_DIR, model_name, embeddings_name)
     print(f"Analysis results will be exported to: {export_dir}")
     os.makedirs(export_dir, exist_ok=True)
 
