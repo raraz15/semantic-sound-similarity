@@ -15,7 +15,7 @@ if __name__=="__main__":
     args=parser.parse_args()
 
     # Read all the json files in the tree
-    embed_paths = glob.glob(os.path.join(args.path, "**", "*.json"))
+    embed_paths = glob.glob(os.path.join(args.path, "**", "*.json"), recursive=True)
     print(f"{len(embed_paths)} embeddings were found.")
 
     # Load the embeddings
