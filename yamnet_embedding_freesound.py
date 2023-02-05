@@ -10,7 +10,7 @@ SAMPLE_RATE = 16000
 ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
 AUDIO_EXT = ["ogg"] # TODO: wav?
-EMBEDDINGS_DIR = "embeddings/yamnet"
+EMBEDDINGS_DIR = f"embeddings/{ANALYZER_NAME}"
 
 # TODO: frame aggregation, frame filtering, PCA
 # TODO: only discard non-floatable frames?

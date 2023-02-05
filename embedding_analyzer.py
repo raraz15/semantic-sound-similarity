@@ -31,6 +31,7 @@ if __name__=="__main__":
     print(f"{len(embeddings)} embeddings were read.")
 
     # Compute pairwise dot products of normalized embeddings
+    print("Computing pairwise dot products...")
     products = np.zeros((len(embeddings),len(embeddings))) # Encode 0 for similarity to itself
     for i,embed_a in enumerate(embeddings):
         embed_a = embed_a["embeddings"]/np.linalg.norm(embed_a["embeddings"])
