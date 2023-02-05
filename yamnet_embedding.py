@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import argparse
 
@@ -10,8 +11,7 @@ TRIM_DUR = 30
 SAMPLE_RATE = 16000
 ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
-AUDIO_EXT = ["ogg"] # TODO: wav?
-EMBEDDINGS_DIR = "embeddings/yamnet"
+EMBEDDINGS_DIR = f"embeddings/{ANALYZER_NAME}"
 
 # TODO: frame aggregation, frame filtering, PCA
 # TODO: only discard non-floatable frames?
@@ -61,9 +61,13 @@ if __name__=="__main__":
     print(f"Exporting the embeddings to: {output_dir}")
 
     # Process each audio
+    start_time = time.time()
     for i,audio_path in enumerate(audio_paths):
         print(f"[{i}/{len(audio_paths)}]")
         process_audio(model_embeddings, audio_path, output_dir)
+    total_time = time.time()-start_time
+    print(f"\nTotal time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"Average time/file: {total_time/len(audio_paths):.2f} sec.")
 
     #############
     print("Done!")
