@@ -1,8 +1,7 @@
 import os
+import glob
 import json
 import argparse
-
-import pandas as pd
 
 from essentia.standard import EasyLoader, TensorflowPredictVGGish
 
@@ -25,7 +24,7 @@ def get_clip_embedding(model, audio):
         embedding = None
     return embedding
 
-def process_audio(model_embeddings, audio_path, output_dir):
+def process_audio(model_embeddings, audio_path, output_dir=""):
 
     # Load the audio file
     loader = EasyLoader()
@@ -36,34 +35,36 @@ def process_audio(model_embeddings, audio_path, output_dir):
     embedding = get_clip_embedding(model_embeddings, audio)
 
     # Save results
-    fname = os.path.splitext(os.path.basename(audio_path))[0]
-    output_path = os.path.join(output_dir, f"{fname}.json")
-    with open(output_path, 'w') as outfile:
-        json.dump({'audio_path': audio_path, 'embeddings': embedding}, outfile, indent=4)
+    if not output_dir: # If dir not specified
+        export_path = f"{audio_path}.json" # next to the audio file
+    else:
+        sound_bank_dir = os.path.basename(os.path.dirname(os.path.dirname(audio_path))) # Bank of sounds
+        query = os.path.basename(os.path.dirname(audio_path)) # The query name is the folder name
+        export_dir = os.path.join(output_dir, sound_bank_dir, query)
+        os.makedirs(export_dir, exist_ok=True)
+        export_path = os.path.join(export_dir, f"{os.path.basename(audio_path)}.json")
+    json.dump({
+        'audio_path': audio_path,
+        'embeddings': embedding
+    }, open(export_path, 'w'), indent=4)
 
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description='YAMNet Explorer.')
-    parser.add_argument('-p', '--path', type=str, required=True, help='Path to csv file containing audio paths.')
+    parser.add_argument('-p', '--path', type=str, required=True, help='Path to an audio file or a directory containing audio files.')
+    parser.add_argument('-o', '--output-dir', type=str, default=EMBEDDINGS_DIR, help="Save output files to a directory.")
     args=parser.parse_args()
 
     # Configure the embedding model
     model_embeddings = TensorflowPredictVGGish(graphFilename=MODEL_PATH, input="melspectrogram", output="embeddings")
 
-    # Read the labels and file names
-    audio_paths = pd.read_csv(args.path)["path"].to_list()
-    print(f"There are {len(audio_paths)} files to process.")
-
-    # Create the output directory
-    subset = os.path.splitext(os.path.basename(args.path))[0]
-    output_dir = os.path.join(EMBEDDINGS_DIR, subset)
-    os.makedirs(output_dir, exist_ok=True)
-    print(f"Exporting the embeddings to: {output_dir}")
-
-    # Process each audio
-    for i,audio_path in enumerate(audio_paths):
-        print(f"[{i}/{len(audio_paths)}]")
-        process_audio(model_embeddings, audio_path, output_dir)
+    if os.path.isfile(args.path):
+        process_audio(model_embeddings, args.path)
+    else:
+        # Search all the files and subdirectories for each AUDIO_EXT
+        audio_paths = sum([glob.glob(args.path+f"/**/*.{ext}", recursive=True) for ext in AUDIO_EXT], [])
+        for audio_path in audio_paths:
+            process_audio(model_embeddings, audio_path, args.output_dir)
 
     #############
     print("Done!")
