@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict, Counter
 
 import pandas as pd
@@ -7,9 +8,12 @@ SEED = 27
 N = 20 # Number of samples to include
 np.random.seed(SEED)
 
+AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
+GT_PATH = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
+
 if __name__=="__main__":
 
-    df = pd.read_csv("/data/FSD50K/FSD50K.ground_truth/eval.csv")
+    df = pd.read_csv(GT_PATH)
     print(df.shape)
 
     # Count all the tags, find unique ones
@@ -36,8 +40,10 @@ if __name__=="__main__":
     for key,fnames in fnames_dict.items():
         samples = np.random.choice(fnames, size=N, replace=False) # Sample N fnames
         for fname in samples:
-            df_sub.append([fname,key,df[df["fname"]==fname]["labels"].values[0]])
-    df_sub = pd.DataFrame(df_sub, columns=["fname","key","labels"])
+            audio_path = os.path.join(AUDIO_DIR, f"{fname}.wav")
+            labels = df[df["fname"]==fname]["labels"].values[0]
+            df_sub.append([audio_path,key,labels])
+    df_sub = pd.DataFrame(df_sub, columns=["path","key","labels"])
     print(df_sub.shape)
     
     # Export csv
