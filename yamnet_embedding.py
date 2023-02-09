@@ -12,6 +12,7 @@ SAMPLE_RATE = 16000
 ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
 EMBEDDINGS_DIR = f"embeddings/{ANALYZER_NAME}"
+AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
 
 # TODO: frame aggregation, frame filtering, PCA
 # TODO: only discard non-floatable frames?
@@ -50,8 +51,9 @@ if __name__=="__main__":
     # Configure the embedding model
     model_embeddings = TensorflowPredictVGGish(graphFilename=MODEL_PATH, input="melspectrogram", output="embeddings")
 
-    # Read the labels and file names
-    audio_paths = pd.read_csv(args.path)["path"].to_list()
+    # Read the file names
+    fnames = pd.read_csv(args.path)["fname"].to_list()
+    audio_paths = [os.path.join(AUDIO_DIR, f"{fname}.wav") for fname in fnames]
     print(f"There are {len(audio_paths)} files to process.")
 
     # Create the output directory
