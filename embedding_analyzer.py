@@ -1,4 +1,5 @@
 import os
+import time
 import argparse
 import json
 import glob
@@ -7,6 +8,7 @@ import numpy as np
 
 ANALYSIS_DIR = "analysis"
 
+# TODO: for large sound collections, write the output when a row is complete
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description='Embedding analyzer.')
@@ -32,6 +34,7 @@ if __name__=="__main__":
 
     # Compute pairwise dot products of normalized embeddings
     print("Computing pairwise dot products...")
+    start_time = time.time()
     products = np.zeros((len(embeddings),len(embeddings))) # Encode 0 for similarity to itself
     for i,embed_a in enumerate(embeddings):
         embed_a = embed_a["embeddings"]/np.linalg.norm(embed_a["embeddings"])
@@ -41,6 +44,8 @@ if __name__=="__main__":
             embed_b = embed_b["embeddings"]/np.linalg.norm(embed_b["embeddings"])
             products[i,j] = np.round(np.dot(embed_a,embed_b),4) # Round the dot product
             products[j,i] = products[i,j]
+    total_time = time.time()-start_time
+    print(f"\nTotal computation time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
     # Create the export directory
     embeddings_name = os.path.basename(args.path)
