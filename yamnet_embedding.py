@@ -3,6 +3,7 @@ import time
 import json
 import argparse
 
+import numpy as np
 import pandas as pd
 
 from essentia.standard import EasyLoader, TensorflowPredictVGGish
@@ -25,6 +26,7 @@ def create_embeddings(model, audio):
     except AttributeError:
         return None
 
+# TODO: effect of zero padding?
 def process_audio(model_embeddings, audio_path, output_dir):
     """ Reads the audio of given path, creates the embeddings and exports them.
     """
@@ -32,6 +34,9 @@ def process_audio(model_embeddings, audio_path, output_dir):
     loader = EasyLoader()
     loader.configure(filename=audio_path, sampleRate=SAMPLE_RATE, endTime=TRIM_DUR, replayGain=0)
     audio = loader()
+    # Zero pad short clips
+    if audio.shape[0] < SAMPLE_RATE:
+        audio = np.concatenate((audio, np.zeros((SAMPLE_RATE-audio.shape[0]))))
     # Process
     embedding = create_embeddings(model_embeddings, audio)
     # Save results
@@ -66,7 +71,7 @@ if __name__=="__main__":
     start_time = time.time()
     for i,audio_path in enumerate(audio_paths):
         print(f"\n[{i}/{len(audio_paths)}]")
-        process_audio(model_embeddings, audio_path, output_dir, args.a)
+        process_audio(model_embeddings, audio_path, output_dir)
     total_time = time.time()-start_time
     print(f"\nTotal time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(audio_paths):.2f} sec.")
