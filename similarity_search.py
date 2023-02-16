@@ -40,14 +40,16 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description='Embedding analyzer.')
     parser.add_argument('-p', '--path', type=str, required=True, help='Path to directory containing embedding json files.')
     parser.add_argument("-a", "-aggregation", type=str, default="mean", help="Type of embedding aggregation.")
-    parser.add_argument('-N', type=int, default=15, help="Number of queries to return.")
+    parser.add_argument('-N', type=int, default=25, help="Number of queries to return.")
     args=parser.parse_args()
 
     # Read all the json files in the tree
     embed_paths = glob.glob(os.path.join(args.path, "**", "*.json"), recursive=True)
-    print(f"{len(embed_paths)} embeddings were found.")
+    print(f"{len(embed_paths)} embeddings were found in the directory.")
 
     # Load the embeddings and process them
+    print("Reading the embeddings and processing them...")
+    start_time = time.time()
     embeddings, audio_paths, max_str_len = [], [], 0
     for embed_path in embed_paths:
         with open(embed_path, 'r') as infile: # Load the json file
@@ -61,17 +63,22 @@ if __name__=="__main__":
             if len(model_outputs["audio_path"]) > max_str_len: # For pretty print
                 max_str_len = len(model_outputs["audio_path"])
     print(f"{len(embeddings)} embeddings were read.")
+    total_time = time.time()-start_time
+    print(f"Total processing time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
-    print("Finding similar sounds...")
+    print("\nFor each item, finding similar sounds...")
     start_time = time.time()
     similarity_scores, similarity_indices = [], []
     for i,query in enumerate(embeddings):
-        print(f"[{i+1}/{len(embeddings)}]")
+        if i%1000==0:
+            print(f"[{i+1}/{len(embeddings)}]")
         similarities, indices = find_similar_sounds(query, embeddings, args.N)
         similarity_scores.append(similarities)
         similarity_indices.append(indices)
     total_time = time.time()-start_time
-    print(f"\nTotal computation time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"Total computation time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"Average time/file: {total_time/len(embeddings):.3f} sec.")
+    print()
 
     # Print top args.N sounds for each sound
     string = ""
@@ -89,7 +96,7 @@ if __name__=="__main__":
     os.makedirs(export_dir, exist_ok=True)
 
     # Export the results
-    with open(os.path.join(export_dir, "results.txt"), "w") as outfile:
+    with open(os.path.join(export_dir, f"{args.a}-results.txt"), "w") as outfile:
         outfile.write(string)
 
     ##############
