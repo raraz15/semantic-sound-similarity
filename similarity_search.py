@@ -3,7 +3,6 @@ import time
 import argparse
 import json
 import glob
-from itertools import combinations
 
 import numpy as np
 
@@ -28,6 +27,13 @@ def aggregate_frames(embeds, normalize=True, aggregation="none"):
         embeds = np.median(embeds, axis=0)
     return embeds
 
+# TODO: Nearest Neighbor, ANN
+def find_similar_sounds(query, corpus, N):
+    # Compute pairwise dot similarities of normalized embeddings
+    similarities = [np.dot(query, ref) for ref in corpus]
+    indices = np.argsort(similarities)[::-1][1:N+1] # Top N sounds, except itself
+    return similarities, indices
+
 # TODO: for large sound collections, write the output when a row is complete
 if __name__=="__main__":
 
@@ -42,7 +48,7 @@ if __name__=="__main__":
     print(f"{len(embed_paths)} embeddings were found.")
 
     # Load the embeddings and process them
-    embeddings, max_str_len = [], 0
+    embeddings, audio_paths, max_str_len = [], [], 0
     for embed_path in embed_paths:
         with open(embed_path, 'r') as infile: # Load the json file
             model_outputs = json.load(infile)
@@ -50,32 +56,29 @@ if __name__=="__main__":
             # Aggregate frame level embeddings into a clip level embedding
             clip_embedding = aggregate_frames(model_outputs["embeddings"], 
                                               aggregation=args.a)
-            embeddings.append({"audio_path": model_outputs["audio_path"], 
-                                "embeddings": clip_embedding})
+            embeddings.append(clip_embedding)
+            audio_paths.append(model_outputs["audio_path"])
             if len(model_outputs["audio_path"]) > max_str_len: # For pretty print
                 max_str_len = len(model_outputs["audio_path"])
     print(f"{len(embeddings)} embeddings were read.")
 
-    # TODO: Nearest Neighbor, ANN
-    # Compute pairwise dot similarities of normalized embeddings
-    print("Computing pairwise dot similarities...")
+    print("Finding similar sounds...")
     start_time = time.time()
-    comb = [(a,b) for a,b in combinations(list(range(len(embeddings))), 2)]
-    similarities = np.zeros((len(embeddings),len(embeddings))) # Encode 0 for similarity to itself
-    for i,j in comb:
-        similarities[i,j] = np.dot(embeddings[i]['embeddings'],embeddings[j]['embeddings'])
-        similarities[j,i] = similarities[i,j]
+    similarity_scores, similarity_indices = [], []
+    for i,query in enumerate(embeddings):
+        print(f"[{i+1}/{len(embeddings)}]")
+        similarities, indices = find_similar_sounds(query, embeddings, args.N)
+        similarity_scores.append(similarities)
+        similarity_indices.append(indices)
     total_time = time.time()-start_time
     print(f"\nTotal computation time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
     # Print top args.N sounds for each sound
     string = ""
-    for i,row in enumerate(similarities):
-        string += f"T  | {embeddings[i]['audio_path']}"
-        indices = np.argsort(row)[::-1][:args.N] # Top N sounds
-        indices = [ind for ind in indices if ind!=i] # Remove itself
-        for n,j in enumerate(indices):
-            string += f"\nQ{n} | {embeddings[j]['audio_path']:<{max_str_len}} | {np.round(row[j],3)}"
+    for i,(similarities,indices) in enumerate(zip(similarity_scores,similarity_indices)):
+        string += f"{'T':>{len(str(args.N))+1}} | {audio_paths[i]}"
+        for n,(s,j) in enumerate(zip(similarities,indices)):
+            string += f"\n{'Q'+str(n):>{len(str(args.N))+1}} | {audio_paths[j]:<{max_str_len}} | {np.round(s,3)}"
         string += "\n\n"
 
     # Create the export directory
