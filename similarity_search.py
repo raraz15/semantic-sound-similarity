@@ -69,13 +69,6 @@ if __name__=="__main__":
     total_time = time.time()-start_time
     print(f"\nTotal computation time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
-    # Create the export directory
-    embeddings_name = os.path.basename(args.path)
-    model_name = os.path.basename(os.path.dirname(args.path))
-    export_dir = os.path.join(ANALYSIS_DIR, model_name, embeddings_name)
-    print(f"Analysis results will be exported to: {export_dir}")
-    os.makedirs(export_dir, exist_ok=True)
-
     # Print top args.N sounds for each sound
     string = ""
     for i,row in enumerate(products):
@@ -85,6 +78,13 @@ if __name__=="__main__":
         for n,j in enumerate(indices):
             string += f"\nQ{n} | {embeddings[j]['audio_path']:<{max_str_len}} | {np.round(row[j],3)}"
         string += "\n\n"
+
+    # Create the export directory
+    embeddings_name = os.path.basename(args.path)
+    model_name = os.path.basename(os.path.dirname(args.path))
+    export_dir = os.path.join(ANALYSIS_DIR, model_name, embeddings_name)
+    print(f"Analysis results are exported to: {export_dir}")
+    os.makedirs(export_dir, exist_ok=True)
 
     # Export the results
     with open(os.path.join(export_dir, "results.txt"), "w") as outfile:
