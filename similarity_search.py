@@ -3,6 +3,7 @@ import time
 import argparse
 import json
 import glob
+from itertools import combinations
 
 import numpy as np
 
@@ -33,7 +34,7 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description='Embedding analyzer.')
     parser.add_argument('-p', '--path', type=str, required=True, help='Path to directory containing embedding json files.')
     parser.add_argument("-a", "-aggregation", type=str, default="mean", help="Type of embedding aggregation.")
-    parser.add_argument('-N', type=int, default=10, help="Number of queries to return.")
+    parser.add_argument('-N', type=int, default=15, help="Number of queries to return.")
     args=parser.parse_args()
 
     # Read all the json files in the tree
@@ -59,14 +60,12 @@ if __name__=="__main__":
     # Compute pairwise dot products of normalized embeddings
     print("Computing pairwise dot products...")
     start_time = time.time()
+    comb = [(a,b) for a,b in combinations(list(range(len(embeddings))), 2)]
     products = np.zeros((len(embeddings),len(embeddings))) # Encode 0 for similarity to itself
-    for i,embed_a in enumerate(embeddings):
-        for j,embed_b in enumerate(embeddings):
-            if i<=j:
-                continue
-            similarity = np.dot(embed_a['embeddings'],embed_b['embeddings'])
-            products[i,j] = np.round(similarity,4) # Round for display
-            products[j,i] = products[i,j]
+    for i,j in comb:
+        similarity = np.dot(embeddings[i]['embeddings'],embeddings[j]['embeddings'])
+        products[i,j] = np.round(similarity,4) # Round for display
+        products[j,i] = products[i,j]
     total_time = time.time()-start_time
     print(f"\nTotal computation time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
@@ -81,7 +80,7 @@ if __name__=="__main__":
     string = ""
     for i,row in enumerate(products):
         string += f"T  | {embeddings[i]['audio_path']}"
-        indices = np.argsort(row)[::-1][:args.N] # Top 3 sounds
+        indices = np.argsort(row)[::-1][:args.N] # Top N sounds
         indices = [ind for ind in indices if ind!=i] # Remove itself
         for n,j in enumerate(indices):
             string += f"\nQ{n} | {embeddings[j]['audio_path']:<{max_str_len}} | {np.round(row[j],3)}"
