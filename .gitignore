@@ -3,7 +3,7 @@ ps/*
 models/*
 sounds/*
 embeddings/*
-analysis/*
+similarity_results/*
 clean_tags/*
 
 __pycache__/*
