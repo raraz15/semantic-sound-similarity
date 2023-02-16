@@ -61,12 +61,11 @@ if __name__=="__main__":
     start_time = time.time()
     products = np.zeros((len(embeddings),len(embeddings))) # Encode 0 for similarity to itself
     for i,embed_a in enumerate(embeddings):
-        embed_a = embed_a["embeddings"]/np.linalg.norm(embed_a["embeddings"])
         for j,embed_b in enumerate(embeddings):
             if i<=j:
                 continue
-            embed_b = embed_b["embeddings"]/np.linalg.norm(embed_b["embeddings"])
-            products[i,j] = np.round(np.dot(embed_a,embed_b),4) # Round the dot product
+            similarity = np.dot(embed_a['embeddings'],embed_b['embeddings'])
+            products[i,j] = np.round(similarity,4) # Round for display
             products[j,i] = products[i,j]
     total_time = time.time()-start_time
     print(f"\nTotal computation time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
