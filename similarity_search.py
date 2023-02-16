@@ -41,7 +41,7 @@ if __name__=="__main__":
     embed_paths = glob.glob(os.path.join(args.path, "**", "*.json"), recursive=True)
     print(f"{len(embed_paths)} embeddings were found.")
 
-    # Load the embeddings
+    # Load the embeddings and process them
     embeddings, max_str_len = [], 0
     for embed_path in embed_paths:
         with open(embed_path, 'r') as infile: # Load the json file
@@ -57,21 +57,20 @@ if __name__=="__main__":
     print(f"{len(embeddings)} embeddings were read.")
 
     # TODO: Nearest Neighbor, ANN
-    # Compute pairwise dot products of normalized embeddings
-    print("Computing pairwise dot products...")
+    # Compute pairwise dot similarities of normalized embeddings
+    print("Computing pairwise dot similarities...")
     start_time = time.time()
     comb = [(a,b) for a,b in combinations(list(range(len(embeddings))), 2)]
-    products = np.zeros((len(embeddings),len(embeddings))) # Encode 0 for similarity to itself
+    similarities = np.zeros((len(embeddings),len(embeddings))) # Encode 0 for similarity to itself
     for i,j in comb:
-        similarity = np.dot(embeddings[i]['embeddings'],embeddings[j]['embeddings'])
-        products[i,j] = np.round(similarity,4) # Round for display
-        products[j,i] = products[i,j]
+        similarities[i,j] = np.dot(embeddings[i]['embeddings'],embeddings[j]['embeddings'])
+        similarities[j,i] = similarities[i,j]
     total_time = time.time()-start_time
     print(f"\nTotal computation time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
     # Print top args.N sounds for each sound
     string = ""
-    for i,row in enumerate(products):
+    for i,row in enumerate(similarities):
         string += f"T  | {embeddings[i]['audio_path']}"
         indices = np.argsort(row)[::-1][:args.N] # Top N sounds
         indices = [ind for ind in indices if ind!=i] # Remove itself
