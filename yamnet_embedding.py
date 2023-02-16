@@ -11,40 +11,29 @@ TRIM_DUR = 30
 SAMPLE_RATE = 16000
 ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
-#EVAL_CSV_PATH = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
 EMBEDDINGS_DIR = f"embeddings/{ANALYZER_NAME}"
 AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
 
-# TODO: frame aggregation, frame filtering, PCA
 # TODO: only discard non-floatable frames?
-# TODO: change name
-def get_clip_embedding(model, audio, aggregation="mean"):
+def create_embeddings(model, audio):
     """ Takes an embedding model and an audio array and returns the clip level embedding.
     """
     try:
         embeddings = model(audio) # Embedding vectors of each frame
-        if aggregation=="mean":
-            embedding = embeddings.mean(axis=0)  # Take mean of 1-second frame embeddings
-            embedding = [float(value) for value in embedding] # Needs to be a list of non-np types so that JSON can encode
-            return embedding
-        elif aggregation=="None":
-            embeddings = [[float(value) for value in embedding] for embedding in embeddings]
-            return embeddings
-        else:
-            raise NotImplementedError
+        embeddings = [[float(value) for value in embedding] for embedding in embeddings]
+        return embeddings
     except AttributeError:
         return None
 
-def process_audio(model_embeddings, audio_path, output_dir, aggregation="mean"):
-
+def process_audio(model_embeddings, audio_path, output_dir):
+    """ Reads the audio of given path, creates the embeddings and exports them.
+    """
     # Load the audio file
     loader = EasyLoader()
     loader.configure(filename=audio_path, sampleRate=SAMPLE_RATE, endTime=TRIM_DUR, replayGain=0)
     audio = loader()
-
     # Process
-    embedding = get_clip_embedding(model_embeddings, audio, aggregation)
-
+    embedding = create_embeddings(model_embeddings, audio)
     # Save results
     fname = os.path.splitext(os.path.basename(audio_path))[0]
     output_path = os.path.join(output_dir, f"{fname}.json")
@@ -55,7 +44,6 @@ if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description='YAMNet Explorer.')
     parser.add_argument('-p', '--path', type=str, required=True, help='Path to csv file containing fnames.')
-    parser.add_argument("-a", "-aggregation", type=str, default="mean", help="Type of embedding aggregation.")
     args=parser.parse_args()
 
     # Configure the embedding model
@@ -70,7 +58,7 @@ if __name__=="__main__":
 
     # Create the output directory
     subset = os.path.splitext(os.path.basename(args.path))[0]
-    output_dir = os.path.join(EMBEDDINGS_DIR, subset, args.a) # model_name/audio_set/aggregation
+    output_dir = os.path.join(EMBEDDINGS_DIR, subset) # model_name/audio_set
     os.makedirs(output_dir, exist_ok=True)
     print(f"Exporting the embeddings to: {output_dir}")
 
