@@ -83,6 +83,7 @@ if __name__=="__main__":
     for i,row in enumerate(products):
         string += f"T  | {embeddings[i]['audio_path']}"
         indices = np.argsort(row)[::-1][:args.N] # Top 3 sounds
+        indices = [ind for ind in indices if ind!=i] # Remove itself
         for n,j in enumerate(indices):
             string += f"\nQ{n} | {embeddings[j]['audio_path']:<{max_str_len}} | {np.round(row[j],3)}"
         string += "\n\n"
