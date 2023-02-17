@@ -3,10 +3,16 @@ ps/*
 models/*
 sounds/*
 embeddings/*
-analysis/*
+similarity_results/*
+clean_tags/*
+various/*
+notebooks/*
 
 __pycache__/*
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
 
 *.csv
+*.ipynb
 freesound_api.json
 queries.json
