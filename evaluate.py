@@ -39,7 +39,7 @@ if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description='Compute metrics for a similairty search result.')
     parser.add_argument('-p', '--path', type=str, required=True, help='Path to results.json file.')
-    parser.add_argument('-M', type=int, default=50)
+    parser.add_argument('-M', type=int, default=15)
     args=parser.parse_args()
 
     # Read the ground truth annotations
@@ -52,9 +52,9 @@ if __name__=="__main__":
     N = len(results_dict[fnames[0]]) # Number of returned results for each query
 
     # Calculate mAP@k for various values
-    print("Calculating mAP@k...")
+    print("Calculating mAP@K for various k values...")
     maps = []
-    for k in range(args.M,N+args.M,args.M):
+    for k in range(args.M,(N//args.M)*args.M,args.M):
         start_time = time.time()
         aps = []
         for query_fname in fnames:
