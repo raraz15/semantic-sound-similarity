@@ -23,6 +23,8 @@ def aggregate_frames(embeds, normalize=True, aggregation="none"):
         embeds = embeds.mean(axis=0)
     elif aggregation=="median":
         embeds = np.median(embeds, axis=0)
+    elif aggregation=="max":
+        embeds = embeds.max(axis=0)
     else:
         ax = 1
     # Normalize each time frame by itself if specified
