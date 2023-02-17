@@ -54,7 +54,7 @@ def search_similar_sounds(query, corpus, N, algo="dot"):
 # TODO: delete text output, only json
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description='Embedding analyzer.')
+    parser=argparse.ArgumentParser(description='Similarity searcher.')
     parser.add_argument('-p', '--path', type=str, required=True, help='Directory containing embedding json files.')
     parser.add_argument("-a", "-aggregation", type=str, default="mean", help="Type of embedding aggregation.")
     parser.add_argument("-s", "--search", type=str, default="dot", help="Type of similarity search algorithm.")
@@ -119,17 +119,17 @@ if __name__=="__main__":
     with open(os.path.join(export_dir, f"{args.search}-{args.a}-results.json"), "w") as outfile:
         json.dump(results_dict, outfile, indent=4)
 
-    # Write the top args.N sounds for each sound to a text file
-    string = ""
-    indent = len(str(args.N))+1 # pretty print
-    for i,(similarities,indices) in enumerate(zip(similarity_scores,similarity_indices)):
-        string += f"{'T':>{indent}} | {audio_paths[i]}"
-        for n,j in enumerate(indices):
-            s = np.round(similarities[j],3) # round for display
-            string += f"\n{'Q'+str(n):>{indent}} | {audio_paths[j]:<{str_len}} | {s}"
-        string += "\n\n"
-    with open(os.path.join(export_dir, f"{args.search}-{args.a}-results.txt"), "w") as outfile:
-        outfile.write(string)
+    ## Write the top args.N sounds for each sound to a text file
+    #string = ""
+    #indent = len(str(args.N))+1 # pretty print
+    #for i,(similarities,indices) in enumerate(zip(similarity_scores,similarity_indices)):
+    #    string += f"{'T':>{indent}} | {audio_paths[i]}"
+    #    for n,j in enumerate(indices):
+    #        s = np.round(similarities[j],3) # round for display
+    #        string += f"\n{'Q'+str(n):>{indent}} | {audio_paths[j]:<{str_len}} | {s}"
+    #    string += "\n\n"
+    #with open(os.path.join(export_dir, f"{args.search}-{args.a}-results.txt"), "w") as outfile:
+    #    outfile.write(string)
 
     ##############
     print("Done!")
