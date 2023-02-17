@@ -54,7 +54,7 @@ if __name__=="__main__":
     # Calculate mAP@k for various values
     print("Calculating mAP@K for various k values...")
     maps = []
-    for k in range(args.M,(N//args.M)*args.M,args.M):
+    for k in range(args.M,((N//args.M)+1)*args.M,args.M):
         start_time = time.time()
         aps = []
         for query_fname in fnames:
@@ -76,4 +76,4 @@ if __name__=="__main__":
     print(f"Results are exported to {output_dir}")
     results_name = os.path.splitext(os.path.basename(args.path))[0]
     maps = pd.DataFrame(maps)
-    maps.to_csv(os.path.join(output_dir, f"{results_name}.csv"))
+    maps.to_csv(os.path.join(output_dir, f"{results_name}.csv"),index=False)
