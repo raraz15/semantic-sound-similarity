@@ -9,7 +9,7 @@ import numpy as np
 ANALYSIS_DIR = "similarity_results"
 
 # TODO: frame aggregation
-# TODO: energy based frame filtering
+# TODO: energy based frame filtering (at audio input)
 # TODO: PCA
 def aggregate_frames(embeds, normalize=True, aggregation="none"):
     """ Takes a list of embeddings and aggregates them into a clip level embedding.
@@ -51,6 +51,7 @@ def search_similar_sounds(query, corpus, N, algo="dot"):
         raise NotImplementedError
 
 # TODO: for large sound collections, write the output when a row is complete
+# TODO: delete text output, only json
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description='Embedding analyzer.')
@@ -85,6 +86,7 @@ if __name__=="__main__":
     total_time = time.time()-start_time
     print(f"Total pre-processing time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
+    # Perform the sound search
     print("\nFor each sound, searching for similar sounds...")
     start_time = time.time()
     similarity_scores, similarity_indices = [], []
@@ -98,7 +100,26 @@ if __name__=="__main__":
     print(f"Total computation time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(embeddings):.3f} sec.")
 
-    # Print top args.N sounds for each sound
+    # Create the export directory
+    embeddings_name = os.path.basename(args.path)
+    model_name = os.path.basename(os.path.dirname(args.path))
+    export_dir = os.path.join(ANALYSIS_DIR, model_name, embeddings_name)
+    print(f"\nAnalysis results are exported to: {export_dir}")
+    os.makedirs(export_dir, exist_ok=True)
+
+    # Export results to a json file
+    results_dict = {}
+    for i,(similarities,indices) in enumerate(zip(similarity_scores,similarity_indices)):
+        query_fname = os.path.splitext(os.path.basename(audio_paths[i]))[0]
+        results_dict[query_fname] = []
+        for n,j in enumerate(indices):
+            score = similarities[j]
+            ref_fname = os.path.splitext(os.path.basename(audio_paths[j]))[0]
+            results_dict[query_fname].append({ref_fname: float(score)})
+    with open(os.path.join(export_dir, f"{args.search}-{args.a}-results.json"), "w") as outfile:
+        json.dump(results_dict, outfile, indent=4)
+
+    # Write the top args.N sounds for each sound to a text file
     string = ""
     indent = len(str(args.N))+1 # pretty print
     for i,(similarities,indices) in enumerate(zip(similarity_scores,similarity_indices)):
@@ -107,14 +128,6 @@ if __name__=="__main__":
             s = np.round(similarities[j],3) # round for display
             string += f"\n{'Q'+str(n):>{indent}} | {audio_paths[j]:<{str_len}} | {s}"
         string += "\n\n"
-
-    # Create the export directory
-    embeddings_name = os.path.basename(args.path)
-    model_name = os.path.basename(os.path.dirname(args.path))
-    export_dir = os.path.join(ANALYSIS_DIR, model_name, embeddings_name)
-    print(f"\nAnalysis results are exported to: {export_dir}")
-    os.makedirs(export_dir, exist_ok=True)
-    # Export the results
     with open(os.path.join(export_dir, f"{args.search}-{args.a}-results.txt"), "w") as outfile:
         outfile.write(string)
 
