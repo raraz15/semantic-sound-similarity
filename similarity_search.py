@@ -58,7 +58,7 @@ if __name__=="__main__":
     parser.add_argument('-p', '--path', type=str, required=True, help='Directory containing embedding json files.')
     parser.add_argument("-a", "-aggregation", type=str, default="mean", help="Type of embedding aggregation.")
     parser.add_argument("-s", "--search", type=str, default="dot", help="Type of similarity search algorithm.")
-    parser.add_argument('-N', type=int, default=25, help="Number of queries to return.")
+    parser.add_argument('-N', type=int, default=200, help="Number of queries to return.")
     args=parser.parse_args()
 
     # Read all the json files in the tree
