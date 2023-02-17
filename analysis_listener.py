@@ -6,6 +6,7 @@ import random
 
 import pandas as pd
 
+#GT_PATH = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
 GT_PATH = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
 
 # TODO: print labels
@@ -13,14 +14,14 @@ if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description='Listen to target and query sounds from an analysis.')
     parser.add_argument('-p', '--path', type=str, required=True, help='Path to a results.txt file.')
-    parser.add_argument('-N', type=int, default=3, help="Number of queries to return.")
+    parser.add_argument('-N', type=int, default=25, help="Number of queries to return.")
     args=parser.parse_args()
 
     # Parse the analysis file
     with open(args.path ,"r") as infile:
         x = [line for line in infile.read().split("\n") if line]
 
-    # Read the emtadata
+    # Read the meta data
     df = pd.read_csv(GT_PATH)
 
     # Randomly sample a target sound
