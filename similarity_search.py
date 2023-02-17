@@ -30,12 +30,25 @@ def aggregate_frames(embeds, normalize=True, aggregation="none"):
         embeds = embeds/np.linalg.norm(embeds,axis=ax)[..., np.newaxis]
     return embeds
 
-# TODO: Nearest Neighbor, ANN
 def dot_product_search(query, corpus, N):
     """Computes pairwise dot product similarities and returns the indices of top N"""
     similarities = [np.dot(query, ref) for ref in corpus]
     indices = np.argsort(similarities)[::-1][1:N+1] # Do not return itself
     return similarities, indices
+
+# TODO: ANN
+def nn_search(query, corpus, N):
+    distances = [np.linalg.norm(query-ref) for ref in corpus]
+    indices = np.argsort(distances)[1:N+1] # Do not return itself
+    return distances, indices
+
+def search_similar_sounds(query, corpus, N, algo="dot"):
+    if algo=="dot":
+        return dot_product_search(query, corpus, N)
+    elif algo=="nn":
+        return nn_search(query, corpus, N)
+    else:
+        raise NotImplementedError
 
 # TODO: for large sound collections, write the output when a row is complete
 if __name__=="__main__":
@@ -43,6 +56,7 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description='Embedding analyzer.')
     parser.add_argument('-p', '--path', type=str, required=True, help='Directory containing embedding json files.')
     parser.add_argument("-a", "-aggregation", type=str, default="mean", help="Type of embedding aggregation.")
+    parser.add_argument("-s", "--search", type=str, default="dot", help="Type of similarity search algorithm.")
     parser.add_argument('-N', type=int, default=25, help="Number of queries to return.")
     args=parser.parse_args()
 
@@ -77,7 +91,7 @@ if __name__=="__main__":
     for i,query in enumerate(embeddings):
         if i%1000==0:
             print(f"[{i:>{len(str(1000))}}/{len(embeddings)}]")
-        similarities, indices = dot_product_search(query, embeddings, args.N)
+        similarities, indices = search_similar_sounds(query, embeddings, args.N, args.search)
         similarity_scores.append(similarities)
         similarity_indices.append(indices)
     total_time = time.time()-start_time
@@ -101,7 +115,7 @@ if __name__=="__main__":
     print(f"\nAnalysis results are exported to: {export_dir}")
     os.makedirs(export_dir, exist_ok=True)
     # Export the results
-    with open(os.path.join(export_dir, f"{args.a}-results.txt"), "w") as outfile:
+    with open(os.path.join(export_dir, f"{args.search}-{args.a}-results.txt"), "w") as outfile:
         outfile.write(string)
 
     ##############
