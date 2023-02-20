@@ -106,7 +106,8 @@ if __name__=="__main__":
     embeddings_name = os.path.basename(args.path)
     model_name = os.path.basename(os.path.dirname(args.path))
     export_dir = os.path.join(ANALYSIS_DIR, model_name, embeddings_name)
-    print(f"\nAnalysis results are exported to: {export_dir}")
+    output_path = os.path.join(export_dir, f"{args.search}-{args.a}-results.json")
+    print(f"\nExporting analysis results to: {output_path}")
     os.makedirs(export_dir, exist_ok=True)
 
     # Export results to a json file
@@ -118,7 +119,7 @@ if __name__=="__main__":
             score = similarities[j]
             ref_fname = os.path.splitext(os.path.basename(audio_paths[j]))[0]
             results_dict[query_fname].append({ref_fname: float(score)})
-    with open(os.path.join(export_dir, f"{args.search}-{args.a}-results.json"), "w") as outfile:
+    with open(output_path, "w") as outfile:
         json.dump(results_dict, outfile, indent=4)
 
     ## Write the top args.N sounds for each sound to a text file
