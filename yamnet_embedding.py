@@ -1,3 +1,7 @@
+"""Takes a csv file specifying audio file names and computes 
+embeddings using audioset-yamnet_v1. All frame embeddings
+are exported."""
+
 import os
 import time
 import json
@@ -47,8 +51,10 @@ def process_audio(model_embeddings, audio_path, output_dir):
 
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description='YAMNet Explorer.')
-    parser.add_argument('-p', '--path', type=str, required=True, help='Path to csv file containing fnames.')
+    parser=argparse.ArgumentParser(description=__doc__, 
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-p', '--path', type=str, required=True, 
+                        help='Path to csv file containing fnames.')
     args=parser.parse_args()
 
     # Configure the embedding model

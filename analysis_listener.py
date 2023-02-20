@@ -1,3 +1,5 @@
+"""Listen to randomly selected target and query sounds from an analysis file."""
+
 import os
 import sys
 import argparse
@@ -12,9 +14,12 @@ GT_PATH = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
 # TODO: print labels
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description='Listen to target and query sounds from an analysis.')
-    parser.add_argument('-p', '--path', type=str, required=True, help='Path to a results.txt file.')
-    parser.add_argument('-N', type=int, default=25, help="Number of queries to return.")
+    parser=argparse.ArgumentParser(description=__doc__, 
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-p', '--path', type=str, required=True, 
+                        help='Path to a results.txt file.')
+    parser.add_argument('-N', type=int, default=25, 
+                        help="Number of queries to return.")
     args=parser.parse_args()
 
     # Parse the analysis file

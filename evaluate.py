@@ -1,3 +1,5 @@
+"""Compute evaluation metrics for the similarity search result of an embedding model over a dataset."""
+
 import os
 import time
 import argparse
@@ -37,9 +39,12 @@ def calculate_average_precision(query_labels, result, df):
 
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description='Compute metrics for a similairty search result.')
-    parser.add_argument('-p', '--path', type=str, required=True, help='Path to results.json file.')
-    parser.add_argument('-M', type=int, default=15)
+    parser=argparse.ArgumentParser(description=__doc__, 
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-p', '--path', type=str, required=True, 
+                        help='Path to results.json file.')
+    parser.add_argument('-M', type=int, default=15, 
+                        help="MAP@k calculation increments.")
     args=parser.parse_args()
 
     # Read the ground truth annotations

@@ -1,4 +1,4 @@
-# Code adapted from UPF MTG ASP Lab homework of Frederic Font.
+"""Freesound Sound Retriever. Code adapted from UPF MTG ASP Lab homework of Frederic Font."""
 
 import os
 import json
@@ -52,10 +52,14 @@ def make_pandas_record(sound, directory):
 
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description='Freesound Sound Retriever.')
-    parser.add_argument('-p', '--path', type=str, required=True, help='JSON file containing the queries.')
-    parser.add_argument('-o', '--output-dir', type=str, default=DOWNLOADS_DIR, help='Directory to download the audio files and the dataframe.')
-    parser.add_argument('-N', type=int, default=10, help='Number of queries to download.')
+    parser=argparse.ArgumentParser(description=__doc__, 
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-p', '--path', type=str, required=True, 
+                        help='JSON file containing the queries.')
+    parser.add_argument('-o', '--output-dir', type=str, default=DOWNLOADS_DIR, 
+                        help='Directory to download the audio files and the dataframe.')
+    parser.add_argument('-N', type=int, default=10, 
+                        help='Number of queries to download.')
     args=parser.parse_args()
 
     # Load the queries
