@@ -2,7 +2,7 @@
 
 source ~/.bashrc
 
-EXTRACTOR="fs-essentia-extractor_v1"
+EXTRACTOR="fs-essentia-extractor_legacy"
 AUDIO_DIR="/data/FSD50K/FSD50K.eval_audio/"
 OUTPUT_DIR="/home/roguz/freesound-perceptual_similarity/embeddings/${EXTRACTOR}/eval/"
 mkdir -p $OUTPUT_DIR
