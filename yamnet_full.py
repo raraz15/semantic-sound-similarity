@@ -16,7 +16,7 @@ ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
 CLASSES_PATH = "models/yamnet/audioset-yamnet-1.json"
 AUDIO_EXT = ["ogg"] # TODO: wav?
-EMBEDDINGS_DIR = f"embeddings/{ANALYZER_NAME}"
+EMBEDDINGS_DIR = f"data/embeddings/{ANALYZER_NAME}"
 
 def get_classes(model, audio, class_names):
     """ Extracts class activations and generates the class vector

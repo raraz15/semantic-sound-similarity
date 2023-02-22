@@ -16,7 +16,7 @@ TRIM_DUR = 30
 SAMPLE_RATE = 16000
 ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
-EMBEDDINGS_DIR = f"embeddings/{ANALYZER_NAME}"
+EMBEDDINGS_DIR = f"data/embeddings/{ANALYZER_NAME}"
 AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
 
 # TODO: only discard non-floatable frames?

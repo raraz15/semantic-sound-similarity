@@ -9,7 +9,7 @@ import glob
 
 import numpy as np
 
-ANALYSIS_DIR = "similarity_results"
+ANALYSIS_DIR = "data/similarity_results"
 
 # TODO: frame aggregation
 # TODO: energy based frame filtering (at audio input)

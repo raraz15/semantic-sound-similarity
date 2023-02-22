@@ -12,7 +12,7 @@ import pandas as pd
 from sklearn.metrics import average_precision_score
 
 GT_PATH = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
-EVAL_DIR = "evaluation_results"
+EVAL_DIR = "data/evaluation_results"
 
 def get_labels(fname, df):
     """Returns the set of labels of the fname from the dataframe."""
