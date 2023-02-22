@@ -30,6 +30,7 @@ def create_embeddings(model, audio):
     except AttributeError:
         return None
 
+# TODO: remove audio_path ? 
 # TODO: effect of zero padding?
 def process_audio(model_embeddings, audio_path, output_dir):
     """ Reads the audio of given path, creates the embeddings and exports them.
