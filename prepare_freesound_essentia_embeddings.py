@@ -134,7 +134,7 @@ if __name__=="__main__":
     print("Applying PCA...")
     start_time = time.time()
     n_components = args.N
-    if args.plot: # For informative purposes keep principal components
+    if args.plot_scree: # For informative purposes keep principal components
         n_components= None
     pca = PCA(n_components=n_components)
     embeddings = pca.fit_transform(embeddings)
