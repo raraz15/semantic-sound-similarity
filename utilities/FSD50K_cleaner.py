@@ -8,7 +8,7 @@ from itertools import combinations
 
 import editdistance as ed
 
-EXPORT_DIR = "data/clean_tags"
+EXPORT_DIR = "../data/clean_tags"
 
 # TODO: Clean the number tags (bpm needs -)
 if __name__=="__main__":
