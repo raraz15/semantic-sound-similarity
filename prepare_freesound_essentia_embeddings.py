@@ -1,3 +1,8 @@
+"""Takes fs-essentia-extractor_legacy embeddings, and to implements
+the Gaia feature preprocessing with Python. Namely, select a subset
+ of the features, normalizes each of them independently and applies
+ dimensionality reduction with PCA."""
+
 import os
 import argparse
 import time
@@ -140,8 +145,7 @@ if __name__=="__main__":
     print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
     # Create the output dir
-    #model = os.path.basename(args.path)
-    output_dir = args.path+"_prepared"
+    output_dir = f"{args.path}-PCA_{args.N}"
     os.makedirs(output_dir, exist_ok=True)
     print(f"Exporting the embeddings to: {output_dir}...")
 
