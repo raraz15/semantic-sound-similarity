@@ -21,6 +21,8 @@ def aggregate_frames(embeds, normalize=True, aggregation="none"):
     # Convert to numpy array
     if type(embeds)==list:
         embeds = np.array(embeds)
+    if len(embeds.shape)==1:
+        embeds = embeds.reshape(1,-1)
     # Aggreagate
     if aggregation=="mean":
         embeds = embeds.mean(axis=0)
@@ -63,11 +65,19 @@ if __name__=="__main__":
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-p', '--path', type=str, required=True, 
                         help='Directory containing embedding json files.')
-    parser.add_argument("-a", "-aggregation", type=str, default="mean", 
+    parser.add_argument("-a", "-aggregation", 
+                        type=str, 
+                        choices=["mean", "median", "max", "none"], 
+                        default="mean", 
                         help="Type of embedding aggregation.")
-    parser.add_argument("-s", "--search", type=str, default="dot", 
+    parser.add_argument("-s", "--search", 
+                        type=str, 
+                        choices=["dot", "nn"],
+                        default="dot", 
                         help="Type of similarity search algorithm.")
-    parser.add_argument('-N', type=int, default=200, 
+    parser.add_argument('-N', 
+                        type=int, 
+                        default=200, 
                         help="Number of queries to return.")
     args=parser.parse_args()
 
