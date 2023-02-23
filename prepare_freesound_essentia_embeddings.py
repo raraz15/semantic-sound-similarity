@@ -147,7 +147,7 @@ if __name__=="__main__":
     # Create the output dir
     output_dir = f"{args.path}-PCA_{args.N}"
     os.makedirs(output_dir, exist_ok=True)
-    print(f"Exporting the embeddings to: {output_dir}...")
+    print(f"Exporting the embeddings to: {output_dir}")
 
     # Scree plot
     if args.plot_scree:
