@@ -74,7 +74,7 @@ if __name__=="__main__":
     parser.add_argument('-p', '--path', type=str, required=True, 
                         help='Directory containing fs-essentia-extractor_legacy embeddings.')
     parser.add_argument('--plot-scree', action='store_true', 
-                        help="Plot the var contributions of PCA components.")
+                        help="Plot variance contributions of PCA components.")
     parser.add_argument("-N", type=int, default=100, 
                         help="Number of PCA components to keep.")
     args = parser.parse_args()
@@ -155,9 +155,10 @@ if __name__=="__main__":
         data = os.path.basename(args.path)
         title=f'FSD50K.{data} - {model} Embeddings PCA Scree Plot'
         PC_values = np.arange(pca.n_components_) + 1
+        cumsum_variance = 100*np.cumsum(pca.explained_variance_ratio_)
         fig,ax = plt.subplots(figsize=(15,8), constrained_layout=True)
         fig.suptitle(title, fontsize=20)
-        ax.plot(PC_values, 100*np.cumsum(pca.explained_variance_ratio_), 'ro-', linewidth=2)
+        ax.plot(PC_values, cumsum_variance, 'ro-', linewidth=2)
         ax.set_xlim([-5,len(PC_values)+5])
         ax.set_yticks(np.arange(0,105,5)) # 5% increase
         ax.set_xlabel('Number of Principal Components Selected', fontsize=15)
