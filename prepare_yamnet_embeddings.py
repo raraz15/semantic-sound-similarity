@@ -52,7 +52,7 @@ if __name__=="__main__":
                         action="store_false", 
                         help="Do not normalize the aggregated clip embedding.")
     parser.add_argument("-N", type=int, default=100, 
-                        help="Number of PCA components to keep.")
+                        help="Number of PCA components to keep. -1 to do not apply.")
     parser.add_argument('--plot-scree', action='store_true', 
                         help="Plot variance contributions of PCA components.")
     args=parser.parse_args()
@@ -79,19 +79,11 @@ if __name__=="__main__":
     total_time = time.time()-start_time
     print(f"Total pre-processing time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
-    # Apply PCA
-    print("Applying PCA...")
-    start_time = time.time()
-    n_components = args.N if not args.plot_scree else None # Keep None for plotting scree
-    pca = PCA(n_components=n_components)
-    embeddings = pca.fit_transform(embeddings)
-    total_time = time.time()-start_time
-    print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
-
     # Create the output dir
-    output_dir = f"{args.path}-Agg_{args.a}-PCA_{args.N}"
+    n_components = args.N if args.N!=-1 else embeddings.shape[1]
+    output_dir = f"{args.path}-Agg_{args.a}-PCA_{n_components}"
     os.makedirs(output_dir, exist_ok=True)
-    print(f"Exporting the embeddings to: {output_dir}...")
+    print(f"Output directory: {output_dir}...")
 
     # Scree plot
     if args.plot_scree:
@@ -100,6 +92,8 @@ if __name__=="__main__":
         model = os.path.basename(args.path)
         data = os.path.basename(os.path.dirname(args.path))
         title=f'FSD50K.{data} - {model} Embeddings PCA Scree Plot'
+        pca = PCA(n_components=None, copy=True)
+        pca.fit(embeddings)
         PC_values = np.arange(pca.n_components_) + 1
         cumsum_variance = 100*np.cumsum(pca.explained_variance_ratio_)
         fig,ax = plt.subplots(figsize=(15,8), constrained_layout=True)
@@ -113,7 +107,16 @@ if __name__=="__main__":
         figure_path = os.path.join(output_dir, f'FSD50K.{data}-{model}-scree_plot.jpeg')
         fig.savefig(figure_path)
 
+    # Apply PCA
+    print("Applying PCA to each embedding...")
+    start_time = time.time()
+    pca = PCA(n_components=n_components)
+    embeddings = pca.fit_transform(embeddings)
+    total_time = time.time()-start_time
+    print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+
     # Export the transformed embeddings
+    print("Exporting the embeddings...")
     for embed_path,embed in zip(embed_paths,embeddings):
         fname = get_file_name(embed_path)
         embed = {"audio_path": os.path.join(AUDIO_DIR,f"{fname}.wav"),
