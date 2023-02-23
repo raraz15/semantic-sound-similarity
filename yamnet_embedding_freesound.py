@@ -1,3 +1,7 @@
+"""Takes an audio path or a directory containing audio files
+and computes embeddings using audioset-yamnet_v1. Export structure is for 
+folowing freesound_retriever.py All frame embeddings are exported."""
+
 import os
 import glob
 import json
@@ -10,7 +14,7 @@ SAMPLE_RATE = 16000
 ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
 AUDIO_EXT = ["ogg"] # TODO: wav?
-EMBEDDINGS_DIR = f"embeddings/{ANALYZER_NAME}"
+EMBEDDINGS_DIR = f"data/embeddings/{ANALYZER_NAME}"
 
 # TODO: frame aggregation, frame filtering, PCA
 # TODO: only discard non-floatable frames?
@@ -50,13 +54,18 @@ def process_audio(model_embeddings, audio_path, output_dir=""):
 
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description='YAMNet Explorer.')
-    parser.add_argument('-p', '--path', type=str, required=True, help='Path to an audio file or a directory containing audio files.')
-    parser.add_argument('-o', '--output-dir', type=str, default=EMBEDDINGS_DIR, help="Save output files to a directory.")
+    parser=argparse.ArgumentParser(description=__doc__, 
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-p', '--path', type=str, required=True, 
+                        help='Path to an audio file or a directory containing audio files.')
+    parser.add_argument('-o', '--output-dir', type=str, default=EMBEDDINGS_DIR, 
+                        help="Save output files to a directory.")
     args=parser.parse_args()
 
     # Configure the embedding model
-    model_embeddings = TensorflowPredictVGGish(graphFilename=MODEL_PATH, input="melspectrogram", output="embeddings")
+    model_embeddings = TensorflowPredictVGGish(graphFilename=MODEL_PATH, 
+                                                input="melspectrogram", 
+                                                output="embeddings")
 
     if os.path.isfile(args.path):
         process_audio(model_embeddings, args.path)

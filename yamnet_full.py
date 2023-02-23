@@ -1,3 +1,8 @@
+"""Takes an audio path or a directory containing audio files
+and computes embeddings using audioset-yamnet_v1. Export structure is for 
+folowing freesound_retriever.py All frame embeddings are exported also top
+class probabilities."""
+
 import os
 import glob
 import json
@@ -11,7 +16,7 @@ ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
 CLASSES_PATH = "models/yamnet/audioset-yamnet-1.json"
 AUDIO_EXT = ["ogg"] # TODO: wav?
-EMBEDDINGS_DIR = f"embeddings/{ANALYZER_NAME}"
+EMBEDDINGS_DIR = f"data/embeddings/{ANALYZER_NAME}"
 
 def get_classes(model, audio, class_names):
     """ Extracts class activations and generates the class vector
@@ -72,9 +77,12 @@ def process_audio(model_activations, model_embeddings, class_names, audio_path, 
 
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description='YAMNet Explorer.')
-    parser.add_argument('-p', '--path', type=str, required=True, help='Path to an audio file or a directory containing audio files.')
-    parser.add_argument('-o', '--output-dir', type=str, default=EMBEDDINGS_DIR, help="Save output files to a directory.")
+    parser=argparse.ArgumentParser(description=__doc__, 
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-p', '--path', type=str, required=True, 
+                        help='Path to an audio file or a directory containing audio files.')
+    parser.add_argument('-o', '--output-dir', type=str, default=EMBEDDINGS_DIR, 
+                        help="Save output files to a directory.")
     args=parser.parse_args()
 
     # Configure the activation and the embedding models

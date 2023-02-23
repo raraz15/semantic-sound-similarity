@@ -1,4 +1,4 @@
-# Code adapted from UPF MTG ASP Lab homework of Frederic Font.
+"""Freesound Sound Retriever. Code adapted from UPF MTG ASP Lab homework of Frederic Font."""
 
 import os
 import json
@@ -12,7 +12,7 @@ import freesound
 FREESOUND_API_KEY = "freesound_api.json"
 FREESOUND_STORE_METADATA_FIELDS = ['id', 'name', 'username', 'previews', 'license', 'tags', 'description', 'url']  # Freesound metadata properties to store
 
-DOWNLOADS_DIR=os.path.join("sounds",dt.datetime.strftime(dt.datetime.now(),"%d_%m_%Y-%H_%M"))
+DOWNLOADS_DIR=os.path.join("..","data","sounds",dt.datetime.strftime(dt.datetime.now(),"%d_%m_%Y-%H_%M"))
 
 # TODO: what does pager do?
 def query_freesound(client, query, filt, num_results):
@@ -52,10 +52,14 @@ def make_pandas_record(sound, directory):
 
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description='Freesound Sound Retriever.')
-    parser.add_argument('-p', '--path', type=str, required=True, help='JSON file containing the queries.')
-    parser.add_argument('-o', '--output-dir', type=str, default=DOWNLOADS_DIR, help='Directory to download the audio files and the dataframe.')
-    parser.add_argument('-N', type=int, default=10, help='Number of queries to download.')
+    parser=argparse.ArgumentParser(description=__doc__, 
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-p', '--path', type=str, required=True, 
+                        help='JSON file containing the queries.')
+    parser.add_argument('-o', '--output-dir', type=str, default=DOWNLOADS_DIR, 
+                        help='Directory to download the audio files and the dataframe.')
+    parser.add_argument('-N', type=int, default=10, 
+                        help='Number of queries to download.')
     args=parser.parse_args()
 
     # Load the queries

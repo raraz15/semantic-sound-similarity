@@ -1,3 +1,6 @@
+"""For each label, randomly samples N sounds from FSD50K.eval and saves
+the metadata to a csv file. """
+
 import os
 from collections import defaultdict, Counter
 

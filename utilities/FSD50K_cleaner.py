@@ -1,3 +1,5 @@
+"""FSD50K tag cleaner algorithm. Author: R. Oğuz Araz"""
+
 import os
 import json
 from shutil import copy
@@ -6,15 +8,19 @@ from itertools import combinations
 
 import editdistance as ed
 
-EXPORT_DIR = "/home/roguz/freesound-perceptual_similarity/clean_tags"
+EXPORT_DIR = "../data/clean_tags"
 
 # TODO: Clean the number tags (bpm needs -)
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description='FSD50K tag cleaner.')
-    parser.add_argument('-p', '--path', type=str, required=True, help='JSON file containing the queries.')
-    parser.add_argument('-l', '--letter', type=str, required=True, help='Which letter to fix.')
-    parser.add_argument('-o', '--output', type=str, default=EXPORT_DIR, help='Output directory.')
+    parser=argparse.ArgumentParser(description=__doc__, 
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-p', '--path', type=str, required=True, 
+                        help='JSON file containing the queries.')
+    parser.add_argument('-l', '--letter', type=str, required=True, 
+                        help='Which letter to fix.')
+    parser.add_argument('-o', '--output', type=str, default=EXPORT_DIR, 
+                        help='Output directory.')
     args=parser.parse_args()
 
     # Read the metadata dict

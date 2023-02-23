@@ -1,3 +1,7 @@
+"""Takes a csv file specifying audio file names and computes 
+embeddings using audioset-yamnet_v1. All frame embeddings
+are exported."""
+
 import os
 import time
 import json
@@ -12,7 +16,7 @@ TRIM_DUR = 30
 SAMPLE_RATE = 16000
 ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
-EMBEDDINGS_DIR = f"embeddings/{ANALYZER_NAME}"
+EMBEDDINGS_DIR = f"data/embeddings/{ANALYZER_NAME}"
 AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
 
 # TODO: only discard non-floatable frames?
@@ -26,6 +30,7 @@ def create_embeddings(model, audio):
     except AttributeError:
         return None
 
+# TODO: remove audio_path ? 
 # TODO: effect of zero padding?
 def process_audio(model_embeddings, audio_path, output_dir):
     """ Reads the audio of given path, creates the embeddings and exports them.
@@ -47,8 +52,10 @@ def process_audio(model_embeddings, audio_path, output_dir):
 
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description='YAMNet Explorer.')
-    parser.add_argument('-p', '--path', type=str, required=True, help='Path to csv file containing fnames.')
+    parser=argparse.ArgumentParser(description=__doc__, 
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-p', '--path', type=str, required=True, 
+                        help='Path to csv file containing fnames.')
     args=parser.parse_args()
 
     # Configure the embedding model

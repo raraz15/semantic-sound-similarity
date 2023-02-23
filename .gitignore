@@ -1,5 +1,6 @@
 ps/*
 
+data/*
 models/*
 sounds/*
 embeddings/*
@@ -7,6 +8,7 @@ similarity_results/*
 clean_tags/*
 various/*
 notebooks/*
+evaluation_results/*
 
 __pycache__/*
 .ipynb_checkpoints
