@@ -11,40 +11,40 @@ import numpy as np
 
 ANALYSIS_DIR = "data/similarity_results"
 
-# TODO: frame aggregation
+# In a preproccesing script,
 # TODO: energy based frame filtering (at audio input)
 # TODO: PCA
-def aggregate_frames(embeds, normalize=True, aggregation="none"):
-    """ Takes a list of embeddings and aggregates them into a clip level embedding.
+
+def aggregate_frames(embeds, normalize=True, aggregation="mean"):
+    """ Takes a list of embeddings and aggregates them into a 
+    clip level embedding if not already aggregated.
     """
-    ax = 0 # Normalization axis for aggregation
     # Convert to numpy array
     if type(embeds)==list:
         embeds = np.array(embeds)
-    if len(embeds.shape)==1:
-        embeds = embeds.reshape(1,-1)
-    # Aggreagate
-    if aggregation=="mean":
-        embeds = embeds.mean(axis=0)
-    elif aggregation=="median":
-        embeds = np.median(embeds, axis=0)
-    elif aggregation=="max":
-        embeds = embeds.max(axis=0)
-    else:
-        ax = 1
-    # Normalize each time frame by itself if specified
+    # Aggreagate if multiple frames exist and specified
+    if aggregation!="none" and len(embeds.shape)!=1:
+        if aggregation=="mean":
+            embeds = embeds.mean(axis=0)
+        elif aggregation=="median":
+            embeds = np.median(embeds, axis=0)
+        elif aggregation=="max":
+            embeds = embeds.max(axis=0)
+    # Normalize the clip level embedding
     if normalize:
-        embeds = embeds/np.linalg.norm(embeds,axis=ax)[..., np.newaxis]
+        embeds = embeds/np.linalg.norm(embeds)
     return embeds
 
 def dot_product_search(query, corpus, N):
     """Computes pairwise dot product similarities and returns the indices of top N"""
+    assert len(query.shape)==1, f"To use dot product search, queries should be aggregated! {query.shape}"
     similarities = [np.dot(query, ref) for ref in corpus]
     indices = np.argsort(similarities)[::-1][1:N+1] # Do not return itself
     return similarities, indices
 
 # TODO: ANN
 def nn_search(query, corpus, N):
+    """Computes pairwise distances and returns the indices of bottom N"""
     distances = [np.linalg.norm(query-ref) for ref in corpus]
     indices = np.argsort(distances)[1:N+1] # Do not return itself
     return distances, indices
@@ -77,8 +77,11 @@ if __name__=="__main__":
                         help="Type of similarity search algorithm.")
     parser.add_argument('-N', 
                         type=int, 
-                        default=200, 
+                        default=205, 
                         help="Number of queries to return.")
+    parser.add_argument("--no-normalization",
+                        action="store_false", 
+                        help="Do not normalize the aggregated embeddings.")
     args=parser.parse_args()
 
     # Read all the json files in the tree
@@ -96,6 +99,7 @@ if __name__=="__main__":
         # Process and collect
         if model_outputs['embeddings'] is not None: # Filter out the None types
             clip_embedding = aggregate_frames(model_outputs["embeddings"], 
+                                              normalize=args.no_normalization, 
                                               aggregation=args.a)
             embeddings.append(clip_embedding)
             audio_paths.append(model_outputs["audio_path"])
