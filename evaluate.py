@@ -19,7 +19,8 @@ def get_labels(fname, df):
     return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
 
 def calculate_average_precision(query_labels, result, df):
-   # Evaluate if each document is relevant
+    """We define a retrieved document relevant when there is
+    at least a match."""
     y_true, y_score, counts = [], [], []
     for ref_result in result:
         ref_fname = list(ref_result.keys())[0]
@@ -67,7 +68,7 @@ if __name__=="__main__":
             result = results_dict[query_fname][:k] # Cutoff at k
             ap, _ = calculate_average_precision(query_labels, result, df)
             aps.append(ap)
-        map = sum(aps)/len(aps)
+        map = sum(aps)/len(aps) # mean average precision
         maps.append({"k": k, "mAP": map})
         total_time = time.time()-start_time
         time_str = time.strftime('%H:%M:%S', time.gmtime(total_time))

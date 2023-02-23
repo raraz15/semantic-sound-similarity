@@ -1,6 +1,6 @@
-"""Takes a csv file specifying audio file names and computes 
-embeddings using audioset-yamnet_v1. All frame embeddings
-are exported."""
+"""Takes a csv file specifying audio file names and computes embeddings 
+using audioset-yamnet_v1. All frame embeddings are exported without
+aggregation."""
 
 import os
 import time
@@ -30,7 +30,7 @@ def create_embeddings(model, audio):
     except AttributeError:
         return None
 
-# TODO: remove audio_path ? 
+# TODO: remove audio_path ?
 # TODO: effect of zero padding?
 def process_audio(model_embeddings, audio_path, output_dir):
     """ Reads the audio of given path, creates the embeddings and exports them.
