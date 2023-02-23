@@ -16,8 +16,9 @@ TRIM_DUR = 30
 SAMPLE_RATE = 16000
 ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH = "models/yamnet/audioset-yamnet-1.pb"
-EMBEDDINGS_DIR = f"data/embeddings/{ANALYZER_NAME}"
+EMBEDDINGS_DIR = f"data/embeddings/eval/{ANALYZER_NAME}"
 AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
+GT_DIR = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
 
 # TODO: only discard non-floatable frames?
 def create_embeddings(model, audio):
@@ -53,7 +54,7 @@ if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description=__doc__, 
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p', '--path', type=str, required=True, 
+    parser.add_argument('-p', '--path', type=str, default=GT_DIR, 
                         help='Path to csv file containing fnames.')
     args=parser.parse_args()
 
@@ -68,8 +69,9 @@ if __name__=="__main__":
     print(f"There are {len(audio_paths)} files to process.")
 
     # Create the output directory
-    subset = os.path.splitext(os.path.basename(args.path))[0]
-    output_dir = os.path.join(EMBEDDINGS_DIR, subset) # model_name/audio_set
+    #subset = os.path.splitext(os.path.basename(args.path))[0]
+    #output_dir = os.path.join(EMBEDDINGS_DIR, subset) # model_name/audio_set
+    output_dir = EMBEDDINGS_DIR
     os.makedirs(output_dir, exist_ok=True)
     print(f"Exporting the embeddings to: {output_dir}")
 

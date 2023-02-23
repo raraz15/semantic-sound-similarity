@@ -31,6 +31,8 @@ MBAND_FEATURES = [
     "spectral_contrast"
 ]
 
+AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
+
 def get_file_name(path):
     return os.path.splitext(os.path.basename(path))[0]
 
@@ -38,9 +40,8 @@ def load_yaml(path):
     return yaml.safe_load(Path(path).read_text())
 
 def select_subset(output):
-    """ Selects a determined subset from a large set of features
-    """
-    # For features that have multiple bands, collect all statistics for each band separately
+    """ Selects a determined subset from a large set of features"""
+    # Collect statistics of each band separately
     mband_feats = {}
     for feat in MBAND_FEATURES:
         n_bands = len(output["lowlevel"][feat][PCA_DESCRIPTORS[0]]) # Get the Number of bands
@@ -52,7 +53,6 @@ def select_subset(output):
     # Insert the collection to the rest
     for k,v in mband_feats.items():
         output["lowlevel"][k] = v
-
     # Select the subset of features
     embed = {}
     for feat,feat_dct in output["lowlevel"].items():
@@ -60,10 +60,7 @@ def select_subset(output):
             embed[feat] = []
             for stat in PCA_DESCRIPTORS:
                 embed[feat].append(feat_dct[stat])
-
     return embed
-
-AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
 
 # TODO: remove AUDIO_PATH?
 # TODO: whiten PCA??
@@ -73,10 +70,10 @@ if __name__=="__main__":
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-p', '--path', type=str, required=True, 
                         help='Directory containing fs-essentia-extractor_legacy embeddings.')
-    parser.add_argument('--plot-scree', action='store_true', 
-                        help="Plot variance contributions of PCA components.")
     parser.add_argument("-N", type=int, default=100, 
                         help="Number of PCA components to keep.")
+    parser.add_argument('--plot-scree', action='store_true', 
+                        help="Plot variance contributions of PCA components.")
     args = parser.parse_args()
 
     # Read all the embeddins
@@ -126,24 +123,25 @@ if __name__=="__main__":
     # Concat all normalized features, make sure same order is followed
     print("Concatanating all the features....")
     start_time = time.time()
-    embeddings = np.array([np.array([embed[k] for k in SUBSET_KEYS]).reshape(-1) for embed in embeddings])
+    for i in range(len(embeddings)):
+        embeddings[i] = np.array([embeddings[i][k] for k in SUBSET_KEYS]).reshape(-1)
+    embeddings = np.array(embeddings)
+    #embeddings = np.array([np.array([embed[k] for k in SUBSET_KEYS]).reshape(-1) for embed in embeddings])
     total_time = time.time()-start_time
     print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
     # Apply PCA
     print("Applying PCA...")
     start_time = time.time()
-    n_components = args.N
-    if args.plot_scree: # For informative purposes keep principal components
-        n_components= None
+    n_components = args.N if not args.plot_scree else None # Keep None for plotting scree
     pca = PCA(n_components=n_components)
     embeddings = pca.fit_transform(embeddings)
     total_time = time.time()-start_time
     print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
     # Create the output dir
-    model = os.path.basename(os.path.dirname(args.path))
-    output_dir = args.path.replace(model,model+"_prepared")
+    #model = os.path.basename(args.path)
+    output_dir = args.path+"_prepared"
     os.makedirs(output_dir, exist_ok=True)
     print(f"Exporting the embeddings to: {output_dir}...")
 
@@ -151,8 +149,8 @@ if __name__=="__main__":
     if args.plot_scree:
         print(f"Plotting the PCA Scree plot next to the embeddings...")
         import matplotlib.pyplot as plt
-        model = os.path.basename(os.path.dirname(args.path))
-        data = os.path.basename(args.path)
+        model = os.path.basename(args.path)
+        data = os.path.basename(os.path.dirname(args.path))
         title=f'FSD50K.{data} - {model} Embeddings PCA Scree Plot'
         PC_values = np.arange(pca.n_components_) + 1
         cumsum_variance = 100*np.cumsum(pca.explained_variance_ratio_)

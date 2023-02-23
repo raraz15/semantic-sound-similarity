@@ -17,8 +17,7 @@ ANALYSIS_DIR = "data/similarity_results"
 
 def aggregate_frames(embeds, normalize=True, aggregation="mean"):
     """ Takes a list of embeddings and aggregates them into a 
-    clip level embedding if not already aggregated.
-    """
+    clip level embedding, if not already aggregated."""
     # Convert to numpy array
     if type(embeds)==list:
         embeds = np.array(embeds)
@@ -58,13 +57,13 @@ def search_similar_sounds(query, corpus, N, algo="dot"):
         raise NotImplementedError
 
 # TODO: for large sound collections, write the output when a row is complete
-# TODO: delete text output, only json
+# TODO: delete text output, only json ?
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description=__doc__, 
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-p', '--path', type=str, required=True, 
-                        help='Directory containing embedding json files.')
+                        help='Directory containing embedding.json files.')
     parser.add_argument("-a", "-aggregation", 
                         type=str, 
                         choices=["mean", "median", "max", "none"], 
@@ -81,7 +80,7 @@ if __name__=="__main__":
                         help="Number of queries to return.")
     parser.add_argument("--no-normalization",
                         action="store_false", 
-                        help="Do not normalize the aggregated embeddings.")
+                        help="Do not normalize the aggregated clip embedding.")
     args=parser.parse_args()
 
     # Read all the json files in the tree
@@ -125,9 +124,9 @@ if __name__=="__main__":
     print(f"Average time/file: {total_time/len(embeddings):.3f} sec.")
 
     # Create the export directory
-    embeddings_name = os.path.basename(args.path)
-    model_name = os.path.basename(os.path.dirname(args.path))
-    export_dir = os.path.join(ANALYSIS_DIR, model_name, embeddings_name)
+    model_name = os.path.basename(args.path)
+    dataset_name = os.path.basename(os.path.dirname(args.path))
+    export_dir = os.path.join(ANALYSIS_DIR, dataset_name, model_name)
     output_path = os.path.join(export_dir, f"{args.search}-{args.a}-results.json")
     print(f"\nExporting analysis results to: {output_path}")
     os.makedirs(export_dir, exist_ok=True)

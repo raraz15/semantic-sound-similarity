@@ -8,7 +8,6 @@ Advisors: Dmitry Bogdanov, Pablo Alonso
 Collaboration with: Frederic Font, Alastair Porter
 
 TODO:
-1) data/embeddings/dataset/model/...
 2) check all the scripts
 3) fs-essentia PCA=100 vs yamnet no PCA
 4) fs-essentia PCA=200, evaluate
