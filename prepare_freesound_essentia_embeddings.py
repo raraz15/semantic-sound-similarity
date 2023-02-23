@@ -149,20 +149,21 @@ if __name__=="__main__":
 
     # Scree plot
     if args.plot_scree:
-        print(f"Plotting PCA Scree plot to {output_dir}...")
+        print(f"Plotting the PCA Scree plot next to the embeddings...")
         import matplotlib.pyplot as plt
         model = os.path.basename(os.path.dirname(args.path))
         data = os.path.basename(args.path)
-        title=f'{model} - FSD50K.{data} Embeddings PCA Scree Plot'
+        title=f'FSD50K.{data} - {model} Embeddings PCA Scree Plot'
         PC_values = np.arange(pca.n_components_) + 1
         fig,ax = plt.subplots(figsize=(15,8), constrained_layout=True)
         fig.suptitle(title, fontsize=20)
         ax.plot(PC_values, 100*np.cumsum(pca.explained_variance_ratio_), 'ro-', linewidth=2)
         ax.set_xlim([-5,len(PC_values)+5])
+        ax.set_yticks(np.arange(0,105,5)) # 5% increase
         ax.set_xlabel('Number of Principal Components Selected', fontsize=15)
         ax.set_ylabel('% Cumulative Variance Explained', fontsize=15)
         ax.grid()
-        figure_path = os.path.join(output_dir, f'{model}-FSD50K.{data}-scree_plot.jpeg')
+        figure_path = os.path.join(output_dir, f'FSD50K.{data}-{model}-scree_plot.jpeg')
         fig.savefig(figure_path)
 
     # Export the transformed embeddings
