@@ -174,3 +174,6 @@ if __name__=="__main__":
         output_path = os.path.join(output_dir, f"{fname}.json")
         with open(output_path, "w") as outfile:
             json.dump(embed, outfile, indent=4)
+
+    #############
+    print("Done!")

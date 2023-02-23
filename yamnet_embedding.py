@@ -30,11 +30,10 @@ def create_embeddings(model, audio):
     except AttributeError:
         return None
 
-# TODO: remove audio_path ?
+# TODO: remove audio_path from export?
 # TODO: effect of zero padding?
 def process_audio(model_embeddings, audio_path, output_dir):
-    """ Reads the audio of given path, creates the embeddings and exports them.
-    """
+    """ Reads the audio of given path, creates the embeddings and exports."""
     # Load the audio file
     loader = EasyLoader()
     loader.configure(filename=audio_path, sampleRate=SAMPLE_RATE, endTime=TRIM_DUR, replayGain=0)
@@ -43,12 +42,12 @@ def process_audio(model_embeddings, audio_path, output_dir):
     if audio.shape[0] < SAMPLE_RATE:
         audio = np.concatenate((audio, np.zeros((SAMPLE_RATE-audio.shape[0]))))
     # Process
-    embedding = create_embeddings(model_embeddings, audio)
+    embeddings = create_embeddings(model_embeddings, audio)
     # Save results
     fname = os.path.splitext(os.path.basename(audio_path))[0]
     output_path = os.path.join(output_dir, f"{fname}.json")
     with open(output_path, 'w') as outfile:
-        json.dump({'audio_path': audio_path, 'embeddings': embedding}, outfile, indent=4)
+        json.dump({'audio_path': audio_path, 'embeddings': embeddings}, outfile, indent=4)
 
 if __name__=="__main__":
 

@@ -83,3 +83,6 @@ if __name__=="__main__":
     results_name = os.path.splitext(os.path.basename(args.path))[0]
     maps = pd.DataFrame(maps)
     maps.to_csv(os.path.join(output_dir, f"{results_name}.csv"),index=False)
+
+    #############
+    print("Done!")
