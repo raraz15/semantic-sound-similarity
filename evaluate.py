@@ -58,7 +58,7 @@ if __name__=="__main__":
     N = len(results_dict[fnames[0]]) # Number of returned results for each query
 
     # Calculate mAP@k for various values
-    print("Calculating mAP@K for various k values...")
+    print("Calculating mAP@K for various K values...")
     maps = []
     for k in range(args.M,((N//args.M)+1)*args.M,args.M):
         start_time = time.time()
