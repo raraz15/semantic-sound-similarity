@@ -81,7 +81,7 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     # Read all the embeddins
-    embed_paths = glob.glob(os.path.join(args.path, "**", "*.yaml"), recursive=True)
+    embed_paths = glob.glob(os.path.join(args.path, "*.yaml"))
     print(f"{len(embed_paths)} embeddings found.")
 
     # Create the initial embeddings from model outputs
