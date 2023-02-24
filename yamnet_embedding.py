@@ -31,8 +31,7 @@ def create_embeddings(model, audio):
     except AttributeError:
         return None
 
-# TODO: remove audio_path from export?
-# TODO: effect of zero padding?
+# TODO: effect of zero padding short clips?
 def process_audio(model_embeddings, audio_path, output_dir):
     """ Reads the audio of given path, creates the embeddings and exports."""
     # Load the audio file
@@ -66,11 +65,9 @@ if __name__=="__main__":
     # Read the file names
     fnames = pd.read_csv(args.path)["fname"].to_list()
     audio_paths = [os.path.join(AUDIO_DIR, f"{fname}.wav") for fname in fnames]
-    print(f"There are {len(audio_paths)} files to process.")
+    print(f"There are {len(audio_paths)} audio files to process.")
 
     # Create the output directory
-    #subset = os.path.splitext(os.path.basename(args.path))[0]
-    #output_dir = os.path.join(EMBEDDINGS_DIR, subset) # model_name/audio_set
     output_dir = EMBEDDINGS_DIR
     os.makedirs(output_dir, exist_ok=True)
     print(f"Exporting the embeddings to: {output_dir}")
@@ -78,7 +75,8 @@ if __name__=="__main__":
     # Process each audio
     start_time = time.time()
     for i,audio_path in enumerate(audio_paths):
-        print(f"\n[{i}/{len(audio_paths)}]")
+        if i%1000==0:
+            print(f"[{i:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")
         process_audio(model_embeddings, audio_path, output_dir)
     total_time = time.time()-start_time
     print(f"\nTotal time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
