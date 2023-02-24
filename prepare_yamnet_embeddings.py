@@ -88,6 +88,7 @@ if __name__=="__main__":
     print(f"Output directory: {output_dir}...")
 
     # Scree plot
+    # TODO: is this PCA effecting data?
     if args.plot_scree:
         print(f"Plotting the PCA Scree plot next to the embeddings...")
         import matplotlib.pyplot as plt
