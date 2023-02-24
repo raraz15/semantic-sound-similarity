@@ -1,3 +1,8 @@
+"""Takes frame level yamnet embeddings and processes them for similarity
+search. First aggregates frame level embeddings into clip level embeddings
+then applies PCA to reduce the dimensions and finally normalizes by the
+length."""
+
 import os
 import argparse
 import time
@@ -14,9 +19,9 @@ AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
 def get_file_name(path):
     return os.path.splitext(os.path.basename(path))[0]
 
-def aggregate_frames(embeds, normalize=True, aggregation="mean"):
-    """ Takes a list of embeddings and aggregates them into a 
-    clip level embedding, if not already aggregated."""
+def aggregate_frames(embeds, aggregation="mean"):
+    """ Takes a list of frame level embeddings and aggregates 
+    them into a clip level embedding, if not already aggregated."""
     # Convert to numpy array
     if type(embeds)==list:
         embeds = np.array(embeds)
@@ -28,10 +33,12 @@ def aggregate_frames(embeds, normalize=True, aggregation="mean"):
             embeds = np.median(embeds, axis=0)
         elif aggregation=="max":
             embeds = embeds.max(axis=0)
-    # Normalize the clip level embedding
-    if normalize:
-        embeds = embeds/np.linalg.norm(embeds)
     return embeds
+
+def normalize_embedding(embeds):
+    """Normalize the clip level embedding"""
+    assert len(embeds.shape)==1, "Expects a 1D Clip Embedding"
+    return embeds/np.linalg.norm(embeds)
 
 if __name__=="__main__":
 
@@ -44,11 +51,11 @@ if __name__=="__main__":
                         choices=["mean", "median", "max", "none"], 
                         default="mean", 
                         help="Type of embedding aggregation.")
-    parser.add_argument("--no-normalization",
-                        action="store_false", 
-                        help="Do not normalize the aggregated clip embedding.")
     parser.add_argument("-N", type=int, default=100, 
                         help="Number of PCA components to keep. -1 to do not apply.")
+    parser.add_argument("--no-normalization",
+                        action="store_false", 
+                        help="Do not normalize clip embedding at the end.")
     parser.add_argument('--plot-scree', action='store_true', 
                         help="Plot variance contributions of PCA components.")
     args=parser.parse_args()
@@ -67,7 +74,6 @@ if __name__=="__main__":
         # Process and collect
         if model_outputs['embeddings'] is not None: # Filter out the None types
             clip_embedding = aggregate_frames(model_outputs["embeddings"], 
-                                              normalize=args.no_normalization, 
                                               aggregation=args.a)
             embeddings.append(clip_embedding)
     embeddings = np.array(embeddings)
@@ -110,6 +116,13 @@ if __name__=="__main__":
     embeddings = pca.fit_transform(embeddings)
     total_time = time.time()-start_time
     print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+
+    # Normalize at the end if specified
+    if not args.no_normalization:
+        print("Normalizing embeddings...")
+        start_time = time.time()
+        embeddings = np.array([normalize_embedding(embed) for embed in embeddings])
+        print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
     # Export the transformed embeddings
     print("Exporting the embeddings...")
