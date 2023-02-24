@@ -8,6 +8,7 @@ Advisors: Dmitry Bogdanov, Pablo Alonso
 Collaboration with: Frederic Font, Alastair Porter
 
 TODO:
-1) more evaluation metrics
-    MR1
-    ncdg
+- ncdg metric
+- YAMNET median, max
+- VGGish
+- Fonseca, L3, ...
