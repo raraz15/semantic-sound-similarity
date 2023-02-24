@@ -161,13 +161,14 @@ if __name__=="__main__":
         figure_path = os.path.join(output_dir, f'FSD50K.{data}-{model}-scree_plot.jpeg')
         fig.savefig(figure_path)
 
-    # Apply PCA
-    print("Applying PCA to each embedding...")
-    start_time = time.time()
-    pca = PCA(n_components=n_components)
-    embeddings = pca.fit_transform(embeddings)
-    total_time = time.time()-start_time
-    print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    # Apply PCA if specified
+    if args.N!=-1:
+        print("Applying PCA to each embedding...")
+        start_time = time.time()
+        pca = PCA(n_components=n_components)
+        embeddings = pca.fit_transform(embeddings)
+        total_time = time.time()-start_time
+        print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
     # Export the transformed embeddings
     print("Exporting the embeddings...")
