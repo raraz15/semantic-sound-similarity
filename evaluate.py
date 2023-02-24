@@ -19,7 +19,8 @@ def get_labels(fname, df):
     return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
 
 def calculate_average_precision(query_labels, result, df):
-   # Evaluate if each document is relevant
+    """We define a retrieved document relevant when there is
+    at least a match."""
     y_true, y_score, counts = [], [], []
     for ref_result in result:
         ref_fname = list(ref_result.keys())[0]
@@ -57,7 +58,7 @@ if __name__=="__main__":
     N = len(results_dict[fnames[0]]) # Number of returned results for each query
 
     # Calculate mAP@k for various values
-    print("Calculating mAP@K for various k values...")
+    print("Calculating mAP@K for various K values...")
     maps = []
     for k in range(args.M,((N//args.M)+1)*args.M,args.M):
         start_time = time.time()
@@ -67,18 +68,22 @@ if __name__=="__main__":
             result = results_dict[query_fname][:k] # Cutoff at k
             ap, _ = calculate_average_precision(query_labels, result, df)
             aps.append(ap)
-        map = sum(aps)/len(aps)
+        map = sum(aps)/len(aps) # mean average precision
         maps.append({"k": k, "mAP": map})
         total_time = time.time()-start_time
         time_str = time.strftime('%H:%M:%S', time.gmtime(total_time))
         print(f"K: {k:>{len(str(N))}} | mAP: {map:.5f} | Time: {time_str}")
+    maps = pd.DataFrame(maps)
 
     # Export the mAP values
     dataset_name = os.path.basename(os.path.dirname(args.path))
     model_name = os.path.basename(os.path.dirname(os.path.dirname(args.path)))
     output_dir = os.path.join(EVAL_DIR, model_name,dataset_name)
     os.makedirs(output_dir, exist_ok=True)
-    print(f"Results are exported to {output_dir}")
     results_name = os.path.splitext(os.path.basename(args.path))[0]
-    maps = pd.DataFrame(maps)
-    maps.to_csv(os.path.join(output_dir, f"{results_name}.csv"),index=False)
+    output_path = os.path.join(output_dir, f"{results_name}.csv")
+    print(f"Results are exported to {output_path}")
+    maps.to_csv(output_path, index=False)
+
+    #############
+    print("Done!")

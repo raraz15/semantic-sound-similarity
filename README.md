@@ -6,3 +6,8 @@ Our goal is to use deep embeddings for improving the similar sounds functionalit
 
 Advisors: Dmitry Bogdanov, Pablo Alonso
 Collaboration with: Frederic Font, Alastair Porter
+
+TODO:
+1) more evaluation metrics
+    MR1
+    ncdg
