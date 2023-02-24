@@ -52,7 +52,7 @@ if __name__=="__main__":
     parser.add_argument("-N", type=int, default=100, 
                         help="Number of PCA components to keep. -1 to do not apply.")
     parser.add_argument("--no-normalization",
-                        action="store_false", 
+                        action="store_true", 
                         help="Do not normalize clip embedding at the end.")
     parser.add_argument('--plot-scree', action='store_true', 
                         help="Plot variance contributions of PCA components.")
