@@ -81,7 +81,7 @@ if __name__=="__main__":
 
     # Create the output dir
     n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
-    output_dir = f"{args.path}-Agg_{args.a}-PCA_{n_components}"
+    output_dir = f"{args.path}-Agg_{args.a}-PCA_{n_components}-Norm_{not args.no_normalization}"
     os.makedirs(output_dir, exist_ok=True)
     print(f"Output directory: {output_dir}")
 
