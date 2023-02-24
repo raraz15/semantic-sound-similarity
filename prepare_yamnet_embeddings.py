@@ -2,18 +2,14 @@ import os
 import argparse
 import time
 import glob
-import yaml
 import json
-from pathlib import Path
 
 import numpy as np
 from sklearn.decomposition import PCA
 
 AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
 
-# In a preproccesing script,
 # TODO: energy based frame filtering (at audio input)
-# TODO: PCA
 
 def get_file_name(path):
     return os.path.splitext(os.path.basename(path))[0]
@@ -75,12 +71,12 @@ if __name__=="__main__":
                                               aggregation=args.a)
             embeddings.append(clip_embedding)
     embeddings = np.array(embeddings)
-    print(f"{len(embeddings)} embeddings were read.")
     total_time = time.time()-start_time
+    print(f"{len(embeddings)} embeddings were read.")
     print(f"Total pre-processing time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
     # Create the output dir
-    n_components = args.N if args.N!=-1 else embeddings.shape[1]
+    n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
     output_dir = f"{args.path}-Agg_{args.a}-PCA_{n_components}"
     os.makedirs(output_dir, exist_ok=True)
     print(f"Output directory: {output_dir}...")
