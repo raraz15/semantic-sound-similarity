@@ -96,7 +96,7 @@ if __name__=="__main__":
     print(f"mAP results are exported to {output_path}")
 
     # Calculate MR1
-    print("Calculating MR1...")
+    print("\nCalculating MR1...")
     start_time = time.time()
     mr1 = []
     for query_fname in fnames:
