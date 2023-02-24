@@ -67,7 +67,6 @@ def select_subset(output):
                 embed[feat].append(feat_dct[stat])
     return embed
 
-# TODO: remove AUDIO_PATH?
 # TODO: whiten PCA??
 if __name__=="__main__":
 
@@ -94,12 +93,12 @@ if __name__=="__main__":
         fnames += [get_file_name(embed_path).split("-")[0]]
         # Load the features and select the subset
         feat_dict = load_yaml(embed_path)
-        embed = select_subset(feat_dict)
-        embeddings += [embed]
+        embeddings += [select_subset(feat_dict)]
     total_time = time.time()-start_time
     print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
-    SUBSET_KEYS = list(embeddings[0].keys()) # List of all included features
+    # List of all included features
+    SUBSET_KEYS = list(embeddings[0].keys())
     print(f"{len(SUBSET_KEYS)} features selected.")
 
     # Create and store a Scaler for each feature
@@ -131,21 +130,12 @@ if __name__=="__main__":
     for i in range(len(embeddings)):
         embeddings[i] = np.array([embeddings[i][k] for k in SUBSET_KEYS]).reshape(-1)
     embeddings = np.array(embeddings)
-    #embeddings = np.array([np.array([embed[k] for k in SUBSET_KEYS]).reshape(-1) for embed in embeddings])
-    total_time = time.time()-start_time
-    print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
-
-    # Apply PCA
-    print("Applying PCA...")
-    start_time = time.time()
-    n_components = args.N if not args.plot_scree else None # Keep None for plotting scree
-    pca = PCA(n_components=n_components)
-    embeddings = pca.fit_transform(embeddings)
     total_time = time.time()-start_time
     print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
 
     # Create the output dir
-    output_dir = f"{args.path}-PCA_{args.N}"
+    n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
+    output_dir = f"{args.path}-PCA_{n_components}"
     os.makedirs(output_dir, exist_ok=True)
     print(f"Exporting the embeddings to: {output_dir}")
 
@@ -156,6 +146,8 @@ if __name__=="__main__":
         model = os.path.basename(args.path)
         data = os.path.basename(os.path.dirname(args.path))
         title=f'FSD50K.{data} - {model} Embeddings PCA Scree Plot'
+        pca = PCA(n_components=None, copy=True)
+        pca.fit(embeddings)
         PC_values = np.arange(pca.n_components_) + 1
         cumsum_variance = 100*np.cumsum(pca.explained_variance_ratio_)
         fig,ax = plt.subplots(figsize=(15,8), constrained_layout=True)
@@ -169,7 +161,16 @@ if __name__=="__main__":
         figure_path = os.path.join(output_dir, f'FSD50K.{data}-{model}-scree_plot.jpeg')
         fig.savefig(figure_path)
 
+    # Apply PCA
+    print("Applying PCA to each embedding...")
+    start_time = time.time()
+    pca = PCA(n_components=n_components)
+    embeddings = pca.fit_transform(embeddings)
+    total_time = time.time()-start_time
+    print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+
     # Export the transformed embeddings
+    print("Exporting the embeddings...")
     for fname,embed in zip(fnames,embeddings):
         embed = {"audio_path": os.path.join(AUDIO_DIR,f"{fname}.wav"),
                 "embeddings": embed.tolist()}
