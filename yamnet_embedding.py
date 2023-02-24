@@ -32,6 +32,7 @@ def create_embeddings(model, audio):
         return None
 
 # TODO: effect of zero padding short clips?
+# TODO: energy based frame filtering (at audio input)
 def process_audio(model_embeddings, audio_path, output_dir):
     """ Reads the audio of given path, creates the embeddings and exports."""
     # Load the audio file

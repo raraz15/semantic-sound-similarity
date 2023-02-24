@@ -7,6 +7,7 @@ import glob
 import json
 import argparse
 
+import numpy as np
 from essentia.standard import EasyLoader, TensorflowPredictVGGish
 
 TRIM_DUR = 30
@@ -31,12 +32,17 @@ def get_clip_embedding(model, audio):
         embedding = None
     return embedding
 
+# TODO: energy based frame filtering (at audio input)
+# TODO: effect of zero padding short clips?
 def process_audio(model_embeddings, audio_path, output_dir=""):
 
     # Load the audio file
     loader = EasyLoader()
     loader.configure(filename=audio_path, sampleRate=SAMPLE_RATE, endTime=TRIM_DUR, replayGain=0)
     audio = loader()
+    # Zero pad short clips
+    if audio.shape[0] < SAMPLE_RATE:
+        audio = np.concatenate((audio, np.zeros((SAMPLE_RATE-audio.shape[0]))))
     # Process
     embedding = get_clip_embedding(model_embeddings, audio)
     # Save results
