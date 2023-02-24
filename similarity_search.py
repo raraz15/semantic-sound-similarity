@@ -85,10 +85,10 @@ if __name__=="__main__":
     # Create the export directory
     model_name = os.path.basename(args.path)
     dataset_name = os.path.basename(os.path.dirname(args.path))
-    export_dir = os.path.join(ANALYSIS_DIR, dataset_name, model_name)
-    output_path = os.path.join(export_dir, f"{args.search}-results.json")
+    output_dir = os.path.join(ANALYSIS_DIR, dataset_name, model_name, args.search)
+    output_path = os.path.join(output_dir, "similarity_results.json")
     print(f"Exporting analysis results to: {output_path}")
-    os.makedirs(export_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     # Export results to a json file
     results_dict = {}
@@ -111,7 +111,7 @@ if __name__=="__main__":
     #        s = np.round(similarities[j],3) # round for display
     #        string += f"\n{'Q'+str(n):>{indent}} | {audio_paths[j]:<{str_len}} | {s}"
     #    string += "\n\n"
-    #with open(os.path.join(export_dir, f"{args.search}-{args.a}-results.txt"), "w") as outfile:
+    #with open(os.path.join(output_dir, f"{args.search}-{args.a}-results.txt"), "w") as outfile:
     #    outfile.write(string)
 
     ##############

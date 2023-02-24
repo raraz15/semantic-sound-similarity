@@ -76,12 +76,12 @@ if __name__=="__main__":
     maps = pd.DataFrame(maps)
 
     # Export the mAP values
-    dataset_name = os.path.basename(os.path.dirname(args.path))
+    search_name = os.path.basename(os.path.dirname(args.path))
     model_name = os.path.basename(os.path.dirname(os.path.dirname(args.path)))
-    output_dir = os.path.join(EVAL_DIR, model_name,dataset_name)
+    dataset_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(args.path))))
+    output_dir = os.path.join(EVAL_DIR, dataset_name, model_name, search_name)
     os.makedirs(output_dir, exist_ok=True)
-    results_name = os.path.splitext(os.path.basename(args.path))[0]
-    output_path = os.path.join(output_dir, f"{results_name}.csv")
+    output_path = os.path.join(output_dir, "evaluation_results.csv")
     print(f"Results are exported to {output_path}")
     maps.to_csv(output_path, index=False)
 
