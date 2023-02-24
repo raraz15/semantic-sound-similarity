@@ -15,6 +15,7 @@ EMBED_DIR="${DATA_DIR}/embeddings/${DATASET_NAME}/${MODEL_NAME}"
 SIMILARITY_DIR="${DATA_DIR}/similarity_results/${DATASET_NAME}/${MODEL_NAME}"
 EVAL_DIR="${DATA_DIR}/evaluation_results/${DATASET_NAME}/${MODEL_NAME}"
 
+echo "======================================================================="
 echo "Working with:"
 echo $EMBED_DIR
 echo $SIMILARITY_DIR
@@ -41,6 +42,7 @@ echo
 #############################################################################
 
 # Prepare the embeddings
+echo "======================================================================="
 echo "Preparation"
 python prepare_yamnet_embeddings.py -p=$EMBED_DIR -a=$1 -N=$2 $3
 EMBED_DIR="${EMBED_DIR}-${SUFFIX}"
@@ -50,6 +52,7 @@ echo
 #############################################################################
 
 # Perform similarity search
+echo "======================================================================="
 echo "Similarity Search"
 python similarity_search.py -p=$EMBED_DIR -s=$4
 SIMILARITY_PATH="${SIMILARITY_DIR}-${SUFFIX}/${4}/similarity_results.json"
@@ -59,6 +62,7 @@ echo
 #############################################################################
 
 # Evaluate
+echo "======================================================================="
 echo "Evaluation"
 python evaluate.py -p=$SIMILARITY_PATH
 echo
