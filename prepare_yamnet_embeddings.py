@@ -85,7 +85,7 @@ if __name__=="__main__":
     n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
     output_dir = f"{args.path}-Agg_{args.a}-PCA_{n_components}"
     os.makedirs(output_dir, exist_ok=True)
-    print(f"Output directory: {output_dir}...")
+    print(f"Output directory: {output_dir}")
 
     # Scree plot
     # TODO: is this PCA effecting data?
@@ -108,6 +108,7 @@ if __name__=="__main__":
         ax.set_ylabel('% Cumulative Variance Explained', fontsize=15)
         ax.grid()
         figure_path = os.path.join(output_dir, f'FSD50K.{data}-{model}-scree_plot.jpeg')
+        print(f"Exported the figure to: {figure_path}")
         fig.savefig(figure_path)
 
     # Apply PCA if specified

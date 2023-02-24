@@ -48,7 +48,7 @@ if __name__=="__main__":
                         help="Type of similarity search algorithm.")
     parser.add_argument('-N', 
                         type=int, 
-                        default=205, 
+                        default=150, 
                         help="Number of queries to return.")
     args=parser.parse_args()
 
@@ -74,7 +74,7 @@ if __name__=="__main__":
     similarity_scores, similarity_indices = [], []
     for i,query in enumerate(embeddings):
         if i%1000==0:
-            print(f"[{i:>{len(str(1000))}}/{len(embeddings)}]")
+            print(f"[{i:>{len(str(len(embeddings)))}}/{len(embeddings)}]")
         similarities, indices = search_similar_sounds(query, embeddings, args.N, args.search)
         similarity_scores.append(similarities)
         similarity_indices.append(indices)
