@@ -73,16 +73,17 @@ if __name__=="__main__":
         total_time = time.time()-start_time
         time_str = time.strftime('%H:%M:%S', time.gmtime(total_time))
         print(f"K: {k:>{len(str(N))}} | mAP: {map:.5f} | Time: {time_str}")
+    maps = pd.DataFrame(maps)
 
     # Export the mAP values
     dataset_name = os.path.basename(os.path.dirname(args.path))
     model_name = os.path.basename(os.path.dirname(os.path.dirname(args.path)))
     output_dir = os.path.join(EVAL_DIR, model_name,dataset_name)
     os.makedirs(output_dir, exist_ok=True)
-    print(f"Results are exported to {output_dir}")
     results_name = os.path.splitext(os.path.basename(args.path))[0]
-    maps = pd.DataFrame(maps)
-    maps.to_csv(os.path.join(output_dir, f"{results_name}.csv"),index=False)
+    output_path = os.path.join(output_dir, f"{results_name}.csv")
+    print(f"Results are exported to {output_path}")
+    maps.to_csv(output_path, index=False)
 
     #############
     print("Done!")
