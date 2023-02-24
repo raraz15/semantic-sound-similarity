@@ -79,7 +79,7 @@ if __name__=="__main__":
         similarity_scores.append(similarities)
         similarity_indices.append(indices)
     total_time = time.time()-start_time
-    print(f"Total computation time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"Total computation time: {time.strftime('%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(embeddings):.3f} sec.")
 
     # Create the export directory

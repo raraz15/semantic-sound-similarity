@@ -77,7 +77,7 @@ if __name__=="__main__":
     embeddings = np.array(embeddings)
     total_time = time.time()-start_time
     print(f"{len(embeddings)} embeddings were read.")
-    print(f"Total pre-processing time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"Total pre-processing time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Create the output dir
     n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
@@ -116,14 +116,14 @@ if __name__=="__main__":
         pca = PCA(n_components=n_components)
         embeddings = pca.fit_transform(embeddings)
         total_time = time.time()-start_time
-        print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+        print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Normalize at the end if specified
     if not args.no_normalization:
         print("Normalizing embeddings...")
         start_time = time.time()
         embeddings = np.array([normalize_embedding(embed) for embed in embeddings])
-        print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+        print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Export the transformed embeddings
     print("Exporting the embeddings...")

@@ -80,7 +80,7 @@ if __name__=="__main__":
             print(f"[{i:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")
         process_audio(model_embeddings, audio_path, output_dir)
     total_time = time.time()-start_time
-    print(f"\nTotal time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"\nTotal time: {time.strftime('%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(audio_paths):.2f} sec.")
 
     #############
