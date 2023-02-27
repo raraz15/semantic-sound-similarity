@@ -48,6 +48,8 @@ def R1(query_labels, result, df):
         if counter > 0:
             return i
 
+# TODO: MR1 NaNs
+# TODO: ncdg
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description=__doc__, 
