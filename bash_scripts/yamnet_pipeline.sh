@@ -52,8 +52,8 @@ echo
 echo "======================================================================="
 echo "Preparation"
 python prepare_yamnet_embeddings.py -p=$EMBED_DIR -a=$1 -N=$2 $3
-EMBED_DIR="${EMBED_DIR}-${SUFFIX}"
-echo $EMBED_DIR
+PREP_EMBED_DIR="${EMBED_DIR}-${SUFFIX}"
+echo $PREP_EMBED_DIR
 echo
 
 #############################################################################
@@ -61,7 +61,7 @@ echo
 # Perform similarity search
 echo "======================================================================="
 echo "Similarity Search"
-python similarity_search.py -p=$EMBED_DIR -s=$4
+python similarity_search.py -p=$PREP_EMBED_DIR -s=$4
 SIMILARITY_PATH="${SIMILARITY_DIR}-${SUFFIX}/${4}/similarity_results.json"
 echo $SIMILARITY_PATH
 echo
