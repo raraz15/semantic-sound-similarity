@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SCRIPT="/home/roguz/freesound/freesound-perceptual_similarity/bash_scripts/"
-export PATH="$SCRIPT:$PATH"
+SCRIPT_DIR="/home/roguz/freesound/freesound-perceptual_similarity/bash_scripts/"
+export PATH="$SCRIPT_DIR:$PATH"
 
 #############################################################################
 
