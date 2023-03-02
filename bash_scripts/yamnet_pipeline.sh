@@ -18,9 +18,9 @@ MODEL_NAME="audioset-yamnet_v1"
 
 #############################################################################
 
-EMBED_DIR="${DATA_DIR}/embeddings/${DATASET_NAME}/${MODEL_NAME}"
-SIMILARITY_DIR="${DATA_DIR}/similarity_results/${DATASET_NAME}/${MODEL_NAME}"
-EVAL_DIR="${DATA_DIR}/evaluation_results/${DATASET_NAME}/${MODEL_NAME}"
+EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME/$MODEL_NAME"
+SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$MODEL_NAME"
+EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$MODEL_NAME"
 
 echo "======================================================================="
 echo "Working with:"
@@ -36,12 +36,12 @@ if [[ $2 == -1 ]]; then
 else
     N=$2
 fi
-echo "N=${N}"
+echo "N=$N"
 
 if [[ $3 == "--no-normalization" ]]; then
-    SUFFIX="Agg_${1}-PCA_${N}-Norm_False"
+    SUFFIX="Agg_$1-PCA_$N-Norm_False"
 else
-    SUFFIX="Agg_${1}-PCA_${N}-Norm_True"
+    SUFFIX="Agg_$1-PCA_$N-Norm_True"
 fi
 echo $SUFFIX
 echo
@@ -52,7 +52,7 @@ echo
 echo "======================================================================="
 echo "Preparation"
 python prepare_yamnet_embeddings.py -p=$EMBED_DIR -a=$1 -N=$2 $3
-PREP_EMBED_DIR="${EMBED_DIR}-${SUFFIX}"
+PREP_EMBED_DIR="$EMBED_DIR-$SUFFIX"
 echo $PREP_EMBED_DIR
 echo
 
@@ -62,7 +62,7 @@ echo
 echo "======================================================================="
 echo "Similarity Search"
 python similarity_search.py -p=$PREP_EMBED_DIR -s=$4
-SIMILARITY_PATH="${SIMILARITY_DIR}-${SUFFIX}/${4}/similarity_results.json"
+SIMILARITY_PATH="$SIMILARITY_DIR-$SUFFIX/$4/similarity_results.json"
 echo $SIMILARITY_PATH
 echo
 
