@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Takes extracted yamnet embeddings and prepares them, searches for similar-
+# ity, and performs the evaluation pipeline.
+# $1 = aggregation
+# $2 = N_PCA
+# $3 = normalization
+# $4 = search type
+
 source ~/.bashrc
 source ps/bin/activate
 
