@@ -2,7 +2,7 @@
 
 # Takes prepared embeddings, searches for similarity, and performs the evalu-
 # ation pipeline.
-# $1 = Prepared embedding name
+# $1 = Prepared embedding suffix
 # $4 = search type
 
 source ~/.bashrc
@@ -19,7 +19,7 @@ MODEL_NAME="audioset-yamnet_v1"
 EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME"
 SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$MODEL_NAME"
 EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$MODEL_NAME"
-PREP_EMBED_DIR="$EMBED_DIR/$1"
+PREP_EMBED_DIR="$EMBED_DIR/$MODEL_NAME-$1"
 
 echo "======================================================================="
 echo "Working with:"
@@ -34,7 +34,7 @@ echo
 echo "======================================================================="
 echo "Similarity Search"
 python similarity_search.py -p=$PREP_EMBED_DIR -s=$2
-SIMILARITY_PATH="$SIMILARITY_DIR-$SUFFIX/$2/similarity_results.json"
+SIMILARITY_PATH="$SIMILARITY_DIR-$1/$2/similarity_results.json"
 echo $SIMILARITY_PATH
 echo
 
