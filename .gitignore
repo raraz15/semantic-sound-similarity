@@ -15,6 +15,8 @@ __pycache__/*
 */.ipynb_checkpoints/*
 
 *.csv
+*.png
+*.jpeg
 *.ipynb
 freesound_api.json
 queries.json
