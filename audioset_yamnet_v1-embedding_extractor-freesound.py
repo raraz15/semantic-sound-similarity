@@ -66,7 +66,7 @@ if __name__=="__main__":
     parser.add_argument('-p', '--path', type=str, required=True, 
                         help='Path to an audio file or a directory containing audio files.')
     parser.add_argument('-o', '--output-dir', type=str, default=EMBEDDINGS_DIR, 
-                        help="Save output files to a directory.")
+                        help="Save output files to a directory. Empty string for next to audio.")
     args=parser.parse_args()
 
     # Configure the embedding model

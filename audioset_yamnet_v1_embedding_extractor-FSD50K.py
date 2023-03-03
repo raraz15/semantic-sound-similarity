@@ -1,6 +1,5 @@
-"""Takes a csv file specifying audio file names and computes embeddings 
-using audioset-yamnet_v1. All frame embeddings are exported without
-aggregation."""
+"""Takes a FSD50K csv file specifying audio file names and computes embeddings 
+using audioset-yamnet_v1. All frame embeddings are exported without aggregation."""
 
 import os
 import time

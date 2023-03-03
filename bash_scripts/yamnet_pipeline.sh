@@ -51,7 +51,7 @@ echo
 # Prepare the embeddings
 echo "======================================================================="
 echo "Preparation"
-python prepare_yamnet_embeddings.py -p=$EMBED_DIR -a=$1 -N=$2 $3
+python audioset_yamnet_v1-embedding_prepare.py -p=$EMBED_DIR -a=$1 -N=$2 $3
 PREP_EMBED_DIR="$EMBED_DIR-$SUFFIX"
 echo $PREP_EMBED_DIR
 echo
