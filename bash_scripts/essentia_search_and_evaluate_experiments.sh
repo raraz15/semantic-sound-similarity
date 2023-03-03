@@ -5,6 +5,20 @@ export PATH="$SCRIPT_DIR:$PATH"
 
 #############################################################################
 
-essentia_search_and_evaluate.sh "PCA_100" "nn"
-essentia_search_and_evaluate.sh "PCA_200" "nn"
-essentia_search_and_evaluate.sh "PCA_846" "nn"
+DATA_DIR="/home/roguz/freesound/freesound-perceptual_similarity/data"
+DATASET_NAME="eval"
+MODEL_NAME="fs-essentia-extractor_legacy"
+
+EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME"
+
+#############################################################################
+for file in "$EMBED_DIR/"*; do # for each embedding dir
+    f=$(basename -- "$file")  # get the basename=embed_name
+    if [[ $f == "$MODEL_NAME-"* ]]; then # if the embed contains model-
+        echo "======================================================================="
+        echo $f
+        readarray -d - -t strarr <<< $f # Split from -
+        SUFFIX="${strarr[3]}"     # 3rd is the PCA for essentia
+        essentia_search_and_evaluate.sh $SUFFIX "nn"
+    fi
+done
