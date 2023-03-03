@@ -19,6 +19,6 @@ for file in "$EMBED_DIR/"*; do # for each embedding dir
         echo "======================================================================="
         echo $f
         SUFFIX="${f/$MODEL_NAME-/""}" # Strip model name to get the suffix
-        yamnet-search_evaluate.sh $SUFFIX "nn"
+        yamnet-search_evaluate.sh $SUFFIX
     fi
 done
