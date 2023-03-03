@@ -48,6 +48,7 @@ def R1(query_labels, result, df):
         if counter > 0:
             return i
 
+# TODO: MR1@K
 # TODO: MR1 NaNs
 # TODO: ncdg
 if __name__=="__main__":
