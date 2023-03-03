@@ -5,6 +5,16 @@ source ps/bin/activate
 
 #############################################################################
 
+if [ $# == 0 ]; then
+    echo "Description: Takes extracted essentia embeddings and prepares them, 
+    searches for similarity, and performs the evaluation pipeline."
+    echo "Usage: $0 param1"
+    echo "param1: N_PCA"
+    exit 0
+fi
+
+#############################################################################
+
 DATA_DIR="/home/roguz/freesound/freesound-perceptual_similarity/data"
 DATASET_NAME="eval"
 MODEL_NAME="fs-essentia-extractor_legacy"
@@ -46,8 +56,8 @@ echo
 # Perform similarity search
 echo "======================================================================="
 echo "Similarity Search"
-python similarity_search.py -p=$EMBED_DIR -s=$2
-SIMILARITY_PATH="$SIMILARITY_DIR-PCA_$N/${2}/similarity_results.json"
+python similarity_search.py -p=$EMBED_DIR -s=nn
+SIMILARITY_PATH="$SIMILARITY_DIR-PCA_$N/nn/similarity_results.json"
 echo $SIMILARITY_PATH
 echo
 

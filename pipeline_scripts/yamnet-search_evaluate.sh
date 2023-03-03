@@ -1,12 +1,18 @@
 #!/bin/bash
 
-# Takes prepared embeddings, searches for similarity, and performs the evalu-
-# ation pipeline.
-# $1 = Prepared embedding suffix
-# $2 = search type
-
 source ~/.bashrc
 source ps/bin/activate
+
+#############################################################################
+
+if [ $# == 0 ]; then
+    echo "Description: Takes prepared embeddings, searches for similarity, 
+    and performs the evaluation pipeline."
+    echo "Usage: $0 param1 param2"
+    echo "param1: suffix of prepared embedding"
+    echo "param2: search_type"
+    exit 0
+fi
 
 #############################################################################
 

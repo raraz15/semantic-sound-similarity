@@ -1,12 +1,17 @@
 #!/bin/bash
 
-# Takes prepared embeddings, searches for similarity, and performs the evalu-
-# ation pipeline.
-# $1 = Prepared embedding suffix
-# $2 = search type
-
 source ~/.bashrc
 source ps/bin/activate
+
+#############################################################################
+
+if [ $# == 0 ]; then
+    echo "Description: Takes prepared embeddings, searches for similarity, 
+    and performs the evaluation pipeline."
+    echo "Usage: $0 param1"
+    echo "param1: suffix of prepared embedding"
+    exit 0
+fi
 
 #############################################################################
 
@@ -35,8 +40,8 @@ echo
 # Perform similarity search
 echo "======================================================================="
 echo "Similarity Search"
-python similarity_search.py -p=$PREP_EMBED_DIR -s=$2
-SIMILARITY_PATH="$SIMILARITY_DIR-$1/$2/similarity_results.json"
+python similarity_search.py -p=$PREP_EMBED_DIR -s=nn
+SIMILARITY_PATH="$SIMILARITY_DIR-$1/nn/similarity_results.json"
 echo $SIMILARITY_PATH
 echo
 

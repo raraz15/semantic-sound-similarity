@@ -1,14 +1,21 @@
 #!/bin/bash
 
-# Takes extracted yamnet embeddings and prepares them, searches for similar-
-# ity, and performs the evaluation pipeline.
-# $1 = aggregation
-# $2 = N_PCA
-# $3 = normalization
-# $4 = search type
-
 source ~/.bashrc
 source ps/bin/activate
+
+#############################################################################
+
+if [ $# == 0 ]; then
+    echo "Description: Takes extracted yamnet embeddings and prepares them, 
+    searches for similarity, and performs the evaluation pipeline."
+    echo "Usage: $0 param1 param2 param3 param4"
+    echo "param1: aggregation"
+    echo "param2: N_PCA"
+    echo "param2: N_PCA"
+    echo "param3: normalization"
+    echo "param4: search type"
+    exit 0
+fi
 
 #############################################################################
 
