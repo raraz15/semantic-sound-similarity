@@ -3,7 +3,7 @@
 # Takes prepared embeddings, searches for similarity, and performs the evalu-
 # ation pipeline.
 # $1 = Prepared embedding suffix
-# $4 = search type
+# $2 = search type
 
 source ~/.bashrc
 source ps/bin/activate
