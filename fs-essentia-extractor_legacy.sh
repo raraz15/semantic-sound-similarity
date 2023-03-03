@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source ~/.bashrc
-
 #############################################################################
 
 EXTRACTOR="fs-essentia-extractor_legacy"
