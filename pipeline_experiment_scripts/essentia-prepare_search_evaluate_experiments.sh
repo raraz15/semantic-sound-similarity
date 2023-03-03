@@ -5,9 +5,9 @@ export PATH="$SCRIPT_DIR:$PATH"
 
 #############################################################################
 
-essentia_pipeline.sh 100 "nn"
-essentia_pipeline.sh 100 "dot"
-essentia_pipeline.sh 200 "nn"
-essentia_pipeline.sh -1 "nn"
+essentia-prepare_search_evaluate.sh 100 "nn"
+essentia-prepare_search_evaluate.sh 100 "dot"
+essentia-prepare_search_evaluate.sh 200 "nn"
+essentia-prepare_search_evaluate.sh -1 "nn"
 
 #############################################################################
