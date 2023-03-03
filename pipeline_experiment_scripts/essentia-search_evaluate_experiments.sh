@@ -13,7 +13,7 @@ EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME"
 
 #############################################################################
 for file in "$EMBED_DIR/"*; do # for each embedding dir
-    f=$(basename -- "$file")  # get the basename=embed_name
+    f=$(basename -- "$file")   # get the basename=embed_name
     if [[ $f == "$MODEL_NAME-"* ]]; then # if the embed contains model-
         echo "======================================================================="
         echo $f
