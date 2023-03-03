@@ -59,7 +59,7 @@ if __name__=="__main__":
     args=parser.parse_args()
 
     # Read all the json files in the tree
-    embed_paths = glob.glob(os.path.join(args.path, "**", "*.json"), recursive=True)
+    embed_paths = glob.glob(os.path.join(args.path, "*.json"))
     print(f"{len(embed_paths)} embeddings were found in the directory.")
 
     # Load the embeddings and process them
@@ -77,11 +77,11 @@ if __name__=="__main__":
     embeddings = np.array(embeddings)
     total_time = time.time()-start_time
     print(f"{len(embeddings)} embeddings were read.")
-    print(f"Total pre-processing time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"Total pre-processing time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Create the output dir
     n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
-    output_dir = f"{args.path}-Agg_{args.a}-PCA_{n_components}"
+    output_dir = f"{args.path}-Agg_{args.a}-PCA_{n_components}-Norm_{not args.no_normalization}"
     os.makedirs(output_dir, exist_ok=True)
     print(f"Output directory: {output_dir}")
 
@@ -116,14 +116,14 @@ if __name__=="__main__":
         pca = PCA(n_components=n_components)
         embeddings = pca.fit_transform(embeddings)
         total_time = time.time()-start_time
-        print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+        print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Normalize at the end if specified
     if not args.no_normalization:
         print("Normalizing embeddings...")
         start_time = time.time()
         embeddings = np.array([normalize_embedding(embed) for embed in embeddings])
-        print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+        print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Export the transformed embeddings
     print("Exporting the embeddings...")

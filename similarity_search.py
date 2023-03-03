@@ -48,12 +48,12 @@ if __name__=="__main__":
                         help="Type of similarity search algorithm.")
     parser.add_argument('-N', 
                         type=int, 
-                        default=150, 
+                        default=90, 
                         help="Number of queries to return.")
     args=parser.parse_args()
 
     # Read all the json files in the tree
-    embed_paths = glob.glob(os.path.join(args.path, "**", "*.json"), recursive=True)
+    embed_paths = glob.glob(os.path.join(args.path, "*.json"))
     print(f"{len(embed_paths)} embeddings were found in the directory.")
 
     # Load the embeddings
@@ -79,16 +79,16 @@ if __name__=="__main__":
         similarity_scores.append(similarities)
         similarity_indices.append(indices)
     total_time = time.time()-start_time
-    print(f"Total computation time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"Total computation time: {time.strftime('%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(embeddings):.3f} sec.")
 
     # Create the export directory
     model_name = os.path.basename(args.path)
     dataset_name = os.path.basename(os.path.dirname(args.path))
-    export_dir = os.path.join(ANALYSIS_DIR, dataset_name, model_name)
-    output_path = os.path.join(export_dir, f"{args.search}-results.json")
+    output_dir = os.path.join(ANALYSIS_DIR, dataset_name, model_name, args.search)
+    output_path = os.path.join(output_dir, "similarity_results.json")
     print(f"Exporting analysis results to: {output_path}")
-    os.makedirs(export_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     # Export results to a json file
     results_dict = {}
@@ -111,7 +111,7 @@ if __name__=="__main__":
     #        s = np.round(similarities[j],3) # round for display
     #        string += f"\n{'Q'+str(n):>{indent}} | {audio_paths[j]:<{str_len}} | {s}"
     #    string += "\n\n"
-    #with open(os.path.join(export_dir, f"{args.search}-{args.a}-results.txt"), "w") as outfile:
+    #with open(os.path.join(output_dir, f"{args.search}-{args.a}-results.txt"), "w") as outfile:
     #    outfile.write(string)
 
     ##############

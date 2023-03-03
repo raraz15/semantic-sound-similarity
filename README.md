@@ -7,7 +7,10 @@ Our goal is to use deep embeddings for improving the similar sounds functionalit
 Advisors: Dmitry Bogdanov, Pablo Alonso
 Collaboration with: Frederic Font, Alastair Porter
 
+contact: oguza97@gmail.com
+
 TODO:
-1) more evaluation metrics
-    MR1
-    ncdg
+- ncdg metric
+- YAMNET median, max
+- VGGish
+- Fonseca, L3, ...

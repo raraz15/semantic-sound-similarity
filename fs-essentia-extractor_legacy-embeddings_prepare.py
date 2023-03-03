@@ -81,7 +81,7 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     # Read all the embeddins
-    embed_paths = glob.glob(os.path.join(args.path, "**", "*.yaml"), recursive=True)
+    embed_paths = glob.glob(os.path.join(args.path, "*.yaml"))
     print(f"{len(embed_paths)} embeddings found.")
 
     # Create the initial embeddings from model outputs
@@ -95,7 +95,7 @@ if __name__=="__main__":
         feat_dict = load_yaml(embed_path)
         embeddings += [select_subset(feat_dict)]
     total_time = time.time()-start_time
-    print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # List of all included features
     SUBSET_KEYS = list(embeddings[0].keys())
@@ -112,7 +112,7 @@ if __name__=="__main__":
         scaler.fit(data)
         scalers.append((feat,scaler))
     total_time = time.time()-start_time
-    print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Normalize each feature independently
     print("Normalizing each feature independently...")
@@ -122,7 +122,7 @@ if __name__=="__main__":
             d = np.array(embeddings[i][key]).reshape(1,-1)
             embeddings[i][key] = scaler.transform(d).reshape(-1)
     total_time = time.time()-start_time
-    print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Concat all normalized features, make sure same order is followed
     print("Concatanating all the features....")
@@ -131,7 +131,7 @@ if __name__=="__main__":
         embeddings[i] = np.array([embeddings[i][k] for k in SUBSET_KEYS]).reshape(-1)
     embeddings = np.array(embeddings)
     total_time = time.time()-start_time
-    print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+    print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Create the output dir
     n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
@@ -168,7 +168,7 @@ if __name__=="__main__":
         pca = PCA(n_components=n_components)
         embeddings = pca.fit_transform(embeddings)
         total_time = time.time()-start_time
-        print(f"Total time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
+        print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Export the transformed embeddings
     print("Exporting the embeddings...")

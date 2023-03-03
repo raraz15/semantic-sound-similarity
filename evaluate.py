@@ -18,6 +18,7 @@ def get_labels(fname, df):
     """Returns the set of labels of the fname from the dataframe."""
     return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
 
+# TODO: remove counts
 def calculate_average_precision(query_labels, result, df):
     """We define a retrieved document relevant when there is
     at least a match."""
@@ -38,6 +39,18 @@ def calculate_average_precision(query_labels, result, df):
     ap = average_precision_score(y_true, y_score)
     return ap, counts
 
+def R1(query_labels, result, df):
+    for i,ref_result in enumerate(result):
+        ref_fname = list(ref_result.keys())[0]
+        ref_labels = get_labels(ref_fname, df)
+        # Find where the first match is
+        counter = len(query_labels.intersection(ref_labels))
+        if counter > 0:
+            return i
+
+# TODO: MR1@K
+# TODO: MR1 NaNs
+# TODO: ncdg
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description=__doc__, 
@@ -57,6 +70,13 @@ if __name__=="__main__":
     fnames = list(results_dict.keys())
     N = len(results_dict[fnames[0]]) # Number of returned results for each query
 
+    # Create the output directory
+    search_name = os.path.basename(os.path.dirname(args.path))
+    model_name = os.path.basename(os.path.dirname(os.path.dirname(args.path)))
+    dataset_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(args.path))))
+    output_dir = os.path.join(EVAL_DIR, dataset_name, model_name, search_name)
+    os.makedirs(output_dir, exist_ok=True)
+
     # Calculate mAP@k for various values
     print("Calculating mAP@K for various K values...")
     maps = []
@@ -70,20 +90,31 @@ if __name__=="__main__":
             aps.append(ap)
         map = sum(aps)/len(aps) # mean average precision
         maps.append({"k": k, "mAP": map})
-        total_time = time.time()-start_time
-        time_str = time.strftime('%H:%M:%S', time.gmtime(total_time))
+        time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
         print(f"K: {k:>{len(str(N))}} | mAP: {map:.5f} | Time: {time_str}")
+    # Export
     maps = pd.DataFrame(maps)
-
-    # Export the mAP values
-    dataset_name = os.path.basename(os.path.dirname(args.path))
-    model_name = os.path.basename(os.path.dirname(os.path.dirname(args.path)))
-    output_dir = os.path.join(EVAL_DIR, model_name,dataset_name)
-    os.makedirs(output_dir, exist_ok=True)
-    results_name = os.path.splitext(os.path.basename(args.path))[0]
-    output_path = os.path.join(output_dir, f"{results_name}.csv")
-    print(f"Results are exported to {output_path}")
+    output_path = os.path.join(output_dir, "mAP.csv")
     maps.to_csv(output_path, index=False)
+    print(f"mAP results are exported to {output_path}")
+
+    # Calculate MR1
+    print("\nCalculating MR1...")
+    start_time = time.time()
+    mr1 = []
+    for query_fname in fnames:
+        query_labels = get_labels(query_fname, df)
+        result = results_dict[query_fname]
+        mr1.append(R1(query_labels, result, df))
+    mr1 = [x for x in mr1 if x] # Remove entries with no matches
+    mr1 = sum(mr1)/len(mr1)
+    time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
+    print(f"MR1: {mr1:.1f} | Time: {time_str}")
+    # Export
+    output_path = os.path.join(output_dir, "MR1.txt")
+    with open(output_path, "w") as outfile:
+        outfile.write(str(mr1))
+    print(f"MR1 results are exported to {output_path}")
 
     #############
     print("Done!")
