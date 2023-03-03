@@ -24,6 +24,8 @@ EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME/$MODEL_NAME"
 SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$MODEL_NAME"
 EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$MODEL_NAME"
 
+#############################################################################
+
 echo "======================================================================="
 echo "Working with:"
 echo $EMBED_DIR
