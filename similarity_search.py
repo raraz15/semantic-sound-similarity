@@ -9,7 +9,7 @@ import glob
 
 import numpy as np
 
-ANALYSIS_DIR = "data/similarity_results"
+from directories import ANALYSIS_DIR
 
 def dot_product_search(query, corpus, N):
     """Computes pairwise dot product similarities and returns the indices of top N"""

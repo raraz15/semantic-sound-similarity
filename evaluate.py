@@ -1,4 +1,5 @@
-"""Compute evaluation metrics for the similarity search result of an embedding model over a dataset."""
+"""Compute evaluation metrics for the similarity search result 
+of an embedding model over a dataset."""
 
 import os
 import time
@@ -11,9 +12,8 @@ import pandas as pd
 
 from sklearn.metrics import average_precision_score
 
-from directories import GT_PATH
+from directories import GT_PATH, EVAL_DIR
 
-EVAL_DIR = "data/evaluation_results"
 
 def get_labels(fname, df):
     """Returns the set of labels of the fname from the dataframe."""
