@@ -6,7 +6,7 @@ export PATH="$SCRIPT_DIR:$PATH"
 #############################################################################
 
 DATA_DIR="/home/roguz/freesound/freesound-perceptual_similarity/data"
-DATASET_NAME="eval"
+DATASET_NAME="FSD50K.eval_audio"
 MODEL_NAME="audioset-yamnet_v1"
 
 EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME"
