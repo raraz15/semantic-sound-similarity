@@ -7,7 +7,7 @@ mkdir -p $MODELS_DIR
 
 echo "====================================================================================================="
 echo "Downloading VGGish model"
-YAMNET_DIR="${MODELS_DIR}yamnet/"
+YAMNET_DIR="${MODELS_DIR}audioset-yamnet/"
 echo $YAMNET_DIR
 mkdir -p $YAMNET_DIR
 
