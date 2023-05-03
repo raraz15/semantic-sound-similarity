@@ -12,7 +12,7 @@ import json
 import numpy as np
 from sklearn.decomposition import PCA
 
-AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
+from directories import AUDIO_DIR
 
 def get_file_name(path):
     return os.path.splitext(os.path.basename(path))[0]

@@ -8,8 +8,7 @@ import random
 
 import pandas as pd
 
-#GT_PATH = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
-GT_PATH = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
+from directories import GT_PATH
 
 # TODO: print labels
 if __name__=="__main__":

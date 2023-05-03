@@ -11,13 +11,13 @@ import pandas as pd
 
 from essentia.standard import EasyLoader, TensorflowPredictVGGish
 
+from directories import AUDIO_DIR, GT_PATH
+
 TRIM_DUR = 30
 SAMPLE_RATE = 16000
 ANALYZER_NAME = 'audioset-yamnet_v1'
 MODEL_PATH = "models/audioset-yamnet/audioset-yamnet-1.pb"
 EMBEDDINGS_DIR = f"data/embeddings/eval/{ANALYZER_NAME}"
-AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
-GT_DIR = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
 
 # TODO: only discard non-floatable frames?
 def create_embeddings(model, audio):
@@ -53,7 +53,7 @@ if __name__=="__main__":
 
     parser=argparse.ArgumentParser(description=__doc__, 
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p', '--path', type=str, default=GT_DIR, 
+    parser.add_argument('-p', '--path', type=str, default=GT_PATH, 
                         help='Path to csv file containing fnames.')
     args=parser.parse_args()
 

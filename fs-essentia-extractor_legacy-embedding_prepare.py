@@ -15,6 +15,8 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.decomposition import PCA
 
+from directories import AUDIO_DIR
+
 # Use these statistics for each feature
 PCA_DESCRIPTORS = [
     "mean",
@@ -35,8 +37,6 @@ MBAND_FEATURES = [
     "scvalleys",
     "spectral_contrast"
 ]
-
-AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
 
 def get_file_name(path):
     return os.path.splitext(os.path.basename(path))[0]
