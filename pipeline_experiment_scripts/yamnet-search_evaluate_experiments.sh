@@ -22,3 +22,5 @@ for file in "$EMBED_DIR/"*; do # for each embedding dir
         yamnet-search_evaluate.sh $SUFFIX
     fi
 done
+
+#############################################################################
