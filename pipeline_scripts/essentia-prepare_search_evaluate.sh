@@ -47,7 +47,7 @@ echo "N=$N"
 # Prepare the embeddings
 echo "======================================================================="
 echo "Preparation"
-python fs-essentia-extractor_legacy-embeddings_prepare.py -p=$EMBED_DIR -N=$1
+python fs-essentia-extractor_legacy-embedding_prepare.py -p=$EMBED_DIR -N=$1
 EMBED_DIR="$EMBED_DIR-PCA_$N"
 echo $EMBED_DIR
 echo
