@@ -4,10 +4,10 @@ then applies PCA to reduce the dimensions and finally normalizes by the
 length."""
 
 import os
-import argparse
 import time
 import glob
 import json
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import numpy as np
 from sklearn.decomposition import PCA
@@ -40,8 +40,8 @@ def normalize_embedding(embeds):
 
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description=__doc__, 
-                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser=ArgumentParser(description=__doc__, 
+                                   formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('-p', '--path', type=str, required=True, 
                         help='Directory containing embedding.json files.')
     parser.add_argument("-a", "-aggregation", 

@@ -4,12 +4,12 @@ the Gaia feature preprocessing with Python. Namely, select a subset
  dimensionality reduction with PCA."""
 
 import os
-import argparse
 import time
 import glob
 import yaml
 import json
 from pathlib import Path
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
@@ -70,8 +70,8 @@ def select_subset(output):
 # TODO: whiten PCA??
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description=__doc__, 
-                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser=ArgumentParser(description=__doc__, 
+                                   formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('-p', '--path', type=str, required=True, 
                         help='Directory containing fs-essentia-extractor_legacy embeddings.')
     parser.add_argument("-N", type=int, default=100, 

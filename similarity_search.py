@@ -3,9 +3,9 @@ searches for similar sounds using user defined strategies."""
 
 import os
 import time
-import argparse
 import json
 import glob
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import numpy as np
 
@@ -37,8 +37,8 @@ def search_similar_sounds(query, corpus, N, algo="dot"):
 # TODO: delete text output, only json ? (remove pretty_print counters as well)
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description=__doc__, 
-                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser=ArgumentParser(description=__doc__, 
+                                   formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('-p', '--path', type=str, required=True, 
                         help='Directory containing embedding.json files.')
     parser.add_argument("-s", "--search", 

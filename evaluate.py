@@ -3,10 +3,10 @@ of an embedding model over a dataset."""
 
 import os
 import time
-import argparse
 import json
 import warnings
 warnings.filterwarnings("ignore") # Ignore 0 precision warnings
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import pandas as pd
 
@@ -54,8 +54,8 @@ def R1(query_labels, result, df):
 # TODO: ncdg
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description=__doc__, 
-                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser=ArgumentParser(description=__doc__, 
+                                   formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('-p', '--path', type=str, required=True, 
                         help='Path to results.json file.')
     parser.add_argument('-M', type=int, default=15, 

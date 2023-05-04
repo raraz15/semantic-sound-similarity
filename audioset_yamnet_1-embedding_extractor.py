@@ -4,7 +4,7 @@ using audioset-yamnet_v1. All frame embeddings are exported without aggregation.
 import os
 import time
 import json
-import argparse
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import numpy as np
 import pandas as pd
@@ -51,8 +51,8 @@ def process_audio(model_embeddings, audio_path, output_dir):
 
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description=__doc__, 
-                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser=ArgumentParser(description=__doc__, 
+                                   formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('-p', '--path', type=str, default=GT_PATH, 
                         help='Path to csv file containing fnames.')
     args=parser.parse_args()
