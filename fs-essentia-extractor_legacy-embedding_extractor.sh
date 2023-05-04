@@ -2,9 +2,12 @@
 
 #############################################################################
 
+# set this to where FSD50K.eval_audio is located
+DATASET_NAME="FSD50K.eval_audio"
+AUDIO_DIR="/data/FSD50K/${DATASET_NAME}/"
+
 EXTRACTOR="fs-essentia-extractor_legacy"
-AUDIO_DIR="/data/FSD50K/FSD50K.eval_audio/"
-OUTPUT_DIR="/home/roguz/freesound-perceptual_similarity/data/embeddings/FSD50K.eval_audio/${EXTRACTOR}/"
+OUTPUT_DIR="$(pwd)/data/embeddings/${DATASET_NAME}/${EXTRACTOR}/"
 
 #############################################################################
 

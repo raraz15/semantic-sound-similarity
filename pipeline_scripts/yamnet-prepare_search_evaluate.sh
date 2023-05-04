@@ -17,7 +17,7 @@ fi
 
 #############################################################################
 
-DATA_DIR="/home/roguz/freesound/freesound-perceptual_similarity/data"
+DATA_DIR="$(pwd)/data"
 DATASET_NAME="FSD50K.eval_audio"
 MODEL_NAME="audioset-yamnet-1"
 

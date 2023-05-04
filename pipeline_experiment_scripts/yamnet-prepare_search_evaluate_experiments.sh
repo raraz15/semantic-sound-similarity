@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR="/home/roguz/freesound/freesound-perceptual_similarity/pipeline_scripts/"
+SCRIPT_DIR="$(pwd)/pipeline_scripts/"
 export PATH="$SCRIPT_DIR:$PATH"
 
 #############################################################################
