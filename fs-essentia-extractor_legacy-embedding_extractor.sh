@@ -4,7 +4,7 @@
 
 EXTRACTOR="fs-essentia-extractor_legacy"
 AUDIO_DIR="/data/FSD50K/FSD50K.eval_audio/"
-OUTPUT_DIR="/home/roguz/freesound-perceptual_similarity/data/embeddings/${EXTRACTOR}/FSD50K.eval_audio/"
+OUTPUT_DIR="/home/roguz/freesound-perceptual_similarity/data/embeddings/FSD50K.eval_audio/${EXTRACTOR}/"
 
 #############################################################################
 
