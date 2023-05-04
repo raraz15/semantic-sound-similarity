@@ -3,6 +3,7 @@ AUDIO_DIR = "/data/FSD50K/FSD50K.eval_audio"
 GT_PATH = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
 
 # These directories point automatically to your local machine
-EMBEDDINGS_DIR = "data/embeddings/FSD50K.eval_audio/{}"
+EMBEDDINGS_DIR = "data/embeddings/FSD50K.eval_audio"
 ANALYSIS_DIR = "data/similarity_results"
 EVAL_DIR = "data/evaluation_results"
+MODELS_DIR = "data/models"

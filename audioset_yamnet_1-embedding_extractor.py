@@ -11,13 +11,13 @@ import pandas as pd
 
 from essentia.standard import EasyLoader, TensorflowPredictVGGish
 
-from directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
+from directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR, MODELS_DIR
 
 TRIM_DUR = 30
 SAMPLE_RATE = 16000
-ANALYZER_NAME = 'audioset-yamnet_v1'
-MODEL_PATH = "models/audioset-yamnet/audioset-yamnet-1.pb"
-EMBEDDINGS_DIR = EMBEDDINGS_DIR.format(ANALYZER_NAME)
+ANALYZER_NAME = 'audioset-yamnet-1'
+MODEL_PATH = f"{MODELS_DIR}/{ANALYZER_NAME}.pb"
+EMBEDDINGS_DIR = f"{EMBEDDINGS_DIR}/{ANALYZER_NAME}"
 
 # TODO: only discard non-floatable frames?
 def create_embeddings(model, audio):
@@ -68,16 +68,15 @@ if __name__=="__main__":
     print(f"There are {len(audio_paths)} audio files to process.")
 
     # Create the output directory
-    output_dir = EMBEDDINGS_DIR
-    os.makedirs(output_dir, exist_ok=True)
-    print(f"Exporting the embeddings to: {output_dir}")
+    os.makedirs(EMBEDDINGS_DIR, exist_ok=True)
+    print(f"Exporting the embeddings to: {EMBEDDINGS_DIR}")
 
     # Process each audio
     start_time = time.time()
     for i,audio_path in enumerate(audio_paths):
         if i%1000==0:
             print(f"[{i:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")
-        process_audio(model_embeddings, audio_path, output_dir)
+        process_audio(model_embeddings, audio_path, EMBEDDINGS_DIR)
     total_time = time.time()-start_time
     print(f"\nTotal time: {time.strftime('%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(audio_paths):.2f} sec.")
