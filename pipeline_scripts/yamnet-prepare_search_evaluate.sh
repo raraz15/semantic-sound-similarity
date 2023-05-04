@@ -10,7 +10,6 @@ if [ $# == 0 ]; then
     echo "Usage: $0 param1 param2 param3 param4"
     echo "param1: aggregation"
     echo "param2: N_PCA"
-    echo "param2: N_PCA"
     echo "param3: normalization"
     echo "param4: search type"
     exit 0
@@ -20,7 +19,7 @@ fi
 
 DATA_DIR="/home/roguz/freesound/freesound-perceptual_similarity/data"
 DATASET_NAME="FSD50K.eval_audio"
-MODEL_NAME="audioset-yamnet_v1"
+MODEL_NAME="audioset-yamnet-1"
 
 #############################################################################
 
@@ -57,7 +56,7 @@ echo
 # Prepare the embeddings
 echo "======================================================================="
 echo "Preparation"
-python audioset_yamnet_v1-embedding_prepare.py -p=$EMBED_DIR -a=$1 -N=$2 $3
+python prepare_embeddings.py -p=$EMBED_DIR -a=$1 -N=$2 $3
 PREP_EMBED_DIR="$EMBED_DIR-$SUFFIX"
 echo $PREP_EMBED_DIR
 echo

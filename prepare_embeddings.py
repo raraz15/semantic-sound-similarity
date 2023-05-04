@@ -1,4 +1,4 @@
-"""Takes frame level yamnet embeddings and processes them for similarity
+"""Takes frame level model embeddings and processes them for similarity
 search. First aggregates frame level embeddings into clip level embeddings
 then applies PCA to reduce the dimensions and finally normalizes by the
 length."""
