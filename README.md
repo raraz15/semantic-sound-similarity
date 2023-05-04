@@ -10,8 +10,10 @@ Collaboration with: Frederic Font, Alastair Porter
 contact: oguza97@gmail.com
 
 TODO:
-- Use a single python script for all Essentia-Tensorflow models
 - ncdg metric
 - YAMNET median, max
 - VGGish
-- Fonseca, L3, PANN...
+- Models
+    - FSD-SINet
+    - L3
+    - PANs
