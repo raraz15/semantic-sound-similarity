@@ -53,10 +53,16 @@ if __name__=="__main__":
                         help="Number of PCA components to keep. -1 to do not apply.")
     parser.add_argument("--no-normalization",
                         action="store_true", 
-                        help="Do not normalize clip embedding at the end.")
+                        help="Do not normalize the final clip embedding.")
+    parser.add_argument("--normalization",
+                        action="store_true", 
+                        help="Normalize the final clip embedding.")
     parser.add_argument('--plot-scree', action='store_true', 
                         help="Plot variance contributions of PCA components.")
     args=parser.parse_args()
+
+    if args.normalization and args.no_normalization:
+        raise ValueError("Cannot specify both --normalization and --no-normalization")
 
     # Read all the json files in the tree
     embed_paths = glob.glob(os.path.join(args.path, "*.json"))
@@ -119,7 +125,7 @@ if __name__=="__main__":
         print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Normalize at the end if specified
-    if not args.no_normalization:
+    if (not args.no_normalization) or args.normalization:
         print("Normalizing embeddings...")
         start_time = time.time()
         embeddings = np.array([normalize_embedding(embed) for embed in embeddings])
