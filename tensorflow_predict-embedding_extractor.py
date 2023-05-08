@@ -60,6 +60,8 @@ if __name__=="__main__":
     # Read the config file
     with open(args.config, "r") as json_file:
         config = json.load(json_file)
+    print("Config:")
+    print(json.dumps(config, indent=4))
 
     # Configure the embedding model
     model_path = os.path.join(MODELS_DIR, f"{config['model_name']}.pb")
@@ -67,6 +69,9 @@ if __name__=="__main__":
         model_embeddings = TensorflowPredictVGGish(graphFilename=model_path, 
                                                 input="melspectrogram", 
                                                 output="embeddings")
+    elif "audioset-vggish" in config['model_name']:
+        model_embeddings = TensorflowPredictVGGish(graphFilename=model_path, 
+                                                output="model/vggish/embeddings")
     elif "fsd-sinet" in config['model_name']:
         model_embeddings = TensorflowPredictFSDSINet(graphFilename=model_path,
                                                     output="model/global_max_pooling1d/Max")

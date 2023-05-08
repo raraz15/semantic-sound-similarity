@@ -6,7 +6,7 @@ mkdir -p $MODELS_DIR
 ############################################################################################################
 
 echo "====================================================================================================="
-echo "Downloading VGGish model"
+echo "Downloading YAMNet model"
 
 urls=(
     "https://essentia.upf.edu/models/audio-event-recognition/yamnet/audioset-yamnet-1.pb"\
@@ -19,6 +19,22 @@ for url in ${urls[@]}; do
 done
 
 ############################################################################################################
+
+echo "====================================================================================================="
+echo "Downloading VGGish model"
+
+urls=(
+    "https://essentia.upf.edu/models/feature-extractors/vggish/audioset-vggish-3.pb"\
+    "https://essentia.upf.edu/models/feature-extractors/vggish/audioset-vggish-3.json"\
+)
+
+for url in ${urls[@]}; do
+    echo "$url"
+    wget $url -P $MODELS_DIR
+done
+
+############################################################################################################
+
 
 echo
 echo "====================================================================================================="
