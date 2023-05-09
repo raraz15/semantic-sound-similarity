@@ -9,11 +9,12 @@ Collaboration with: Frederic Font, Alastair Porter
 
 contact: oguza97@gmail.com
 
-TODO:
-- ncdg metric
-- YAMNET median, max
-- VGGish
+## TODO:
+- Metrics
+    - Control computations
+        - Is the mAP true as it is (1 intersection)?
+        - ncdg metric
 - Models
-    - FSD-SINet
     - L3
     - PANs
+- Try Different Aggregations
