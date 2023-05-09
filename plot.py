@@ -48,7 +48,7 @@ def plot_map(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_dir=FIGURE
     # Plot the maps
     fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, 
                             figsize=(6*n_cols,6*n_rows), constrained_layout=True)
-    fig.suptitle(model, fontsize=20, weight='bold')
+    fig.suptitle(f"{model} - MAP@K Values on {DATASET_NAME}", fontsize=20, weight='bold')
     for n,k in enumerate(k_values):
 
         row, col = n//n_cols, n%n_cols
@@ -122,7 +122,7 @@ def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
 
     # Plot the MR1s
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(model, fontsize=20, weight='bold')
+    fig.suptitle(f"{model} - MR1 Values on {DATASET_NAME}", fontsize=20, weight='bold')
     ax.set_title("MR1 Values of Embedding Aggregations and Search Algorithms", fontsize=17)
     xticks, max_val = [], []
     for i in range(len(variation_paths)):
@@ -183,8 +183,7 @@ def plot_map_comparisons_single_variation(models, eval_dir=EVAL_DIR, save_fig=Fa
     K = df.k.to_numpy()
 
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle("Model Comparison", fontsize=20, weight='bold')
-
+    fig.suptitle(f"MAP@K Values of Models on {DATASET_NAME}", fontsize=20, weight='bold')
     for i in range(len(K)):
         for j,(model_name,map) in enumerate(maps):
             ax.bar(i+positions[j], 
@@ -231,7 +230,7 @@ def plot_map_comparisons(models, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIG
 
     fig,axs = plt.subplots(nrows=1, ncols=n_variations, 
                            figsize=(18,6), constrained_layout=True)
-    fig.suptitle("Model Comparison", fontsize=20, weight='bold')
+    fig.suptitle(f"MAP@K Values of Models on {DATASET_NAME}", fontsize=20, weight='bold')
     for i in range(n_variations):
 
         # Read all the maps for all variations of model i
