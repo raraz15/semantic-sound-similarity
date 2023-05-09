@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(pwd)/pipeline_scripts/"
+DATA_DIR="$(pwd)/data"
 export PATH="$SCRIPT_DIR:$PATH"
 
 #############################################################################
@@ -15,9 +16,7 @@ fi
 
 #############################################################################
 
-DATA_DIR="$(pwd)/data"
 DATASET_NAME="FSD50K.eval_audio"
-
 EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME"
 
 #############################################################################

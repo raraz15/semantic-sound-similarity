@@ -18,32 +18,32 @@ fi
 
 #############################################################################
 
-DATA_DIR="$(pwd)/data"
+MODEL_NAME=$1
 DATASET_NAME="FSD50K.eval_audio"
 
 #############################################################################
 
-EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME/$1"
-SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$1"
-EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$1"
+DATA_DIR="$(pwd)/data"
+EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME/$MODEL_NAME"
+SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$MODEL_NAME"
+EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$MODEL_NAME"
 
 echo "======================================================================="
-echo "Working with:"
+echo "Input Directory:"
 echo $EMBED_DIR
-echo $SIMILARITY_DIR
-echo $EVAL_DIR
 echo
 
 #############################################################################
 
+# Deal with No PCA case
 if [[ $3 == -1 ]]; then
-    if [[ $1 == "fsd-sinet-vgg41-tlpf-1" ]]; then
+    if [[ $MODEL_NAME == "fsd-sinet-vgg41-tlpf-1" ]]; then
         N=256
-    elif [[ $1 == "fsd-sinet-vgg42-aps-1" ]]; then
+    elif [[ $MODEL_NAME == "fsd-sinet-vgg42-aps-1" ]]; then
         N=512
-    elif [[ $1 == "fsd-sinet-vgg42-tlpf_aps-1" ]]; then
+    elif [[ $MODEL_NAME == "fsd-sinet-vgg42-tlpf_aps-1" ]]; then
         N=512
-    elif [[ $1 == "fsd-sinet-vgg42-tlpf-1" ]]; then
+    elif [[ $MODEL_NAME == "fsd-sinet-vgg42-tlpf-1" ]]; then
         N=512
     else
         echo "Wrong FSD-SINet name"
@@ -52,15 +52,17 @@ if [[ $3 == -1 ]]; then
 else
     N=$3
 fi
-echo "N=$N"
-
 if [[ $4 == "--no-normalization" ]]; then
     SUFFIX="Agg_$2-PCA_$N-Norm_False"
 else
     SUFFIX="Agg_$2-PCA_$N-Norm_True"
 fi
-echo $SUFFIX
-echo
+PREP_EMBED_DIR="$EMBED_DIR-$SUFFIX"
+
+echo "Output Directories:"
+echo $PREP_EMBED_DIR
+echo $SIMILARITY_DIR
+echo $EVAL_DIR
 
 #############################################################################
 
@@ -68,7 +70,6 @@ echo
 echo "======================================================================="
 echo "Preparation"
 python prepare_embeddings.py -p=$EMBED_DIR -a=$2 -N=$3 $4
-PREP_EMBED_DIR="$EMBED_DIR-$SUFFIX"
 echo $PREP_EMBED_DIR
 echo
 

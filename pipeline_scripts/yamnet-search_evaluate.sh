@@ -15,24 +15,25 @@ fi
 
 #############################################################################
 
-DATA_DIR="$(pwd)/data"
-DATASET_NAME="FSD50K.eval_audio"
 MODEL_NAME="audioset-yamnet-1"
+DATASET_NAME="FSD50K.eval_audio"
 
 #############################################################################
 
+DATA_DIR="$(pwd)/data"
 EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME"
 SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$MODEL_NAME"
 EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$MODEL_NAME"
 PREP_EMBED_DIR="$EMBED_DIR/$MODEL_NAME-$1"
 
 echo "======================================================================="
-echo "Working with:"
+echo "Input Directory:"
 echo $PREP_EMBED_DIR
+echo
+echo "Output Directories:"
 echo $SIMILARITY_DIR
 echo $EVAL_DIR
 echo
-
 #############################################################################
 
 # Perform similarity search
