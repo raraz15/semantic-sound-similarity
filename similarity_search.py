@@ -38,8 +38,10 @@ def search_similar_sounds(query, corpus, N, algo="dot"):
 if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
-                                   formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p', '--path', type=str, required=True, 
+                        formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-p', '--path', 
+                        type=str, 
+                        required=True, 
                         help='Directory containing embedding.json files.')
     parser.add_argument("-s", "--search", 
                         type=str, 

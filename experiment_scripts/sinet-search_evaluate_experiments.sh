@@ -31,4 +31,8 @@ for file in "$EMBED_DIR/"*; do # for each embedding dir
     fi
 done
 
+# Compare the results of the experiments
+python plot.py --model=$1
+
+
 #############################################################################

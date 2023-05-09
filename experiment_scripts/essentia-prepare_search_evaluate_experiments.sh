@@ -14,4 +14,7 @@ for v in ${variable[@]}; do
   essentia-prepare_search_evaluate.sh $v
 done
 
+# Compare the results of the experiments
+python plot.py --model=$MODEL_NAME
+
 #############################################################################

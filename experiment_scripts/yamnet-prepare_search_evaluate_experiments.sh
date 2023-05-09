@@ -25,4 +25,7 @@ for v1 in ${variable1[@]}; do
     done
 done
 
+# Compare the results of the experiments
+python plot.py --model=audioset-yamnet-1
+
 #############################################################################
