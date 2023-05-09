@@ -46,7 +46,8 @@ def plot_map(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_dir=FIGURE
     n_rows = len(k_values)//n_cols
 
     # Plot the maps
-    fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(6*n_cols,6*n_rows), constrained_layout=True)
+    fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, 
+                            figsize=(6*n_cols,6*n_rows), constrained_layout=True)
     fig.suptitle(model, fontsize=20, weight='bold')
     for n,k in enumerate(k_values):
 
@@ -63,8 +64,18 @@ def plot_map(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_dir=FIGURE
                         label = "nearest neighbors"
                 else:
                     label = ""
-                axs[row,col].bar(z+positions[j], height=map, width=delta*0.8, label=label, color=colors[j], edgecolor='k')
-                axs[row,col].text(z+positions[j], map+0.01, f"{map:.3f}", ha='center', va='bottom', fontsize=10)
+                axs[row,col].bar(z+positions[j], 
+                                height=map, 
+                                width=delta*0.8, 
+                                label=label, 
+                                color=colors[j], 
+                                edgecolor='k')
+                axs[row,col].text(z+positions[j], 
+                                map+0.01, 
+                                f"{map:.3f}", 
+                                ha='center', 
+                                va='bottom', 
+                                fontsize=10)
 
         axs[row,col].set_title(f"k={k}", fontsize=17, weight='bold')
         axs[row,col].tick_params(axis='y', which='major', labelsize=11)
@@ -74,7 +85,8 @@ def plot_map(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_dir=FIGURE
         axs[row,col].grid()
         axs[row,col].set_ylabel("MAP@K", fontsize=15)
         axs[row,col].set_xlabel("Processing Parameters", fontsize=15)
-        axs[row,col].legend(fontsize=11, loc=4, title="Search Algorithms", title_fontsize=12, fancybox=True)
+        axs[row,col].legend(fontsize=11, loc=4, title="Search Algorithms", 
+                            title_fontsize=12, fancybox=True)
         axs[row,col].set_ylim([0,1])
     if save_fig:
         os.makedirs(save_dir, exist_ok=True)
@@ -126,8 +138,18 @@ def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
                     label = "nearest neighbors"
             else:
                 label = ""
-            ax.bar(i+positions[j], height=mr1, width=0.35, label=label, color=colors[j], edgecolor='k')
-            ax.text(i+positions[j], mr1+0.01, f"{mr1:.2f}", ha='center', va='bottom', fontsize=10)
+            ax.bar(i+positions[j], 
+                height=mr1, 
+                width=0.35, 
+                label=label, 
+                color=colors[j], 
+                edgecolor='k')
+            ax.text(i+positions[j], 
+                    mr1+0.01, 
+                    f"{mr1:.2f}", 
+                    ha='center', 
+                    va='bottom', 
+                    fontsize=10)
 
     ax.tick_params(axis='y', which='major', labelsize=11)
     ax.tick_params(axis='x', which='major', labelsize=11)
@@ -135,11 +157,67 @@ def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
     ax.set_yticks(np.arange(0,max(max_val)+0.5,0.5))
     ax.set_ylabel("MR1@90", fontsize=15) # TODO: read K
     ax.set_xlabel("Processing Parameters", fontsize=15)
-    ax.legend(loc=1, fontsize=11, title="Search Algorithms", title_fontsize=12, fancybox=True)
+    ax.legend(loc=1, fontsize=11, title="Search Algorithms", 
+              title_fontsize=12, fancybox=True)
     ax.grid()
     if save_fig:
         os.makedirs(save_dir, exist_ok=True)
         fig.savefig(os.path.join(save_dir, f"{model}-MR1.png"))
+    plt.show()
+
+def plot_map_comparisons_single_variation(models, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
+    """Takes a list of models and plots the MAP@K for all the variations of the model.
+    Each model must be a tupple of (model_name, [variations], search_algorithm)"""
+
+    # Determine Some Parameters
+    positions = np.linspace(-0.25, 0.25, len(models))
+    delta = positions[1]-positions[0]
+
+    maps = []
+    for model in models:
+        model_dir = os.path.join(eval_dir, model[0])
+        results_dir = os.path.join(model_dir, model[1])
+        map_path = os.path.join(results_dir, "mAP.csv")
+        df = pd.read_csv(map_path)
+        maps.append((model[0], df.mAP.to_numpy()))
+    K = df.k.to_numpy()
+
+    fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
+    fig.suptitle("Model Comparison", fontsize=20, weight='bold')
+
+    for i in range(len(K)):
+        for j,(model_name,map) in enumerate(maps):
+            ax.bar(i+positions[j], 
+                    map[i], 
+                    label=model_name if i==0 else "", 
+                    width=delta*0.85, 
+                    color=colors[j], 
+                    edgecolor='k'
+                    )
+            ax.text(i+positions[j], 
+                    map[i]+0.01, 
+                    f"{map[i]:.2f}", 
+                    ha='center', 
+                    va='bottom', 
+                    fontsize=8, 
+                    weight='bold'
+                    )
+
+    # Set the plot parameters
+    ax.set_yticks(np.arange(0,1.05,0.05))
+    ax.set_xticks(np.arange(i+1), K)
+    ax.tick_params(axis='x', which='major', labelsize=13)
+    ax.tick_params(axis='y', which='major', labelsize=11)
+    ax.set_xlabel("K", fontsize=15)
+    ax.set_ylabel("MAP@K", fontsize=15)
+    ax.set_ylim([0,1])
+    ax.set_title(models[0][0].split("-")[-1].replace("_"," "), fontsize=17)
+    ax.grid()
+    ax.legend(fontsize=10, title="Models", title_fontsize=11, fancybox=True)
+    if save_fig:
+        os.makedirs(save_dir, exist_ok=True)
+        names = "-".join([model[0] for model in models])
+        fig.savefig(os.path.join(save_dir, f"{names}-mAP_comparison_k15.png"))
     plt.show()
 
 def plot_map_comparisons(models, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
@@ -207,7 +285,9 @@ def plot_map_comparisons(models, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIG
     if save_fig:
         os.makedirs(save_dir, exist_ok=True)
         names = "-".join([model[0] for model in models])
-        fig.savefig(os.path.join(save_dir, f"{names}-mAP_comparison.png"))
+        fig_path =os.path.join(save_dir, f"{names}-mAP_comparison.png")
+        print(f"Saving figure to {fig_path}")
+        fig.savefig(fig_path)
     plt.show()
 
 if __name__=="__main__":
@@ -218,6 +298,9 @@ if __name__=="__main__":
                         type=str, 
                         required=True, 
                         help='Name of the model.')
+    parser.add_argument("--compare",
+                        type=list,
+                        default=None,)
     args=parser.parse_args()
 
     plot_map(args.model, save_fig=True)
