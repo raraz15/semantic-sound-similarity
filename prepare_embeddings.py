@@ -12,7 +12,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import numpy as np
 from sklearn.decomposition import PCA
 
-from directories import AUDIO_DIR
+from directories import AUDIO_DIR, FIGURES_DIR
 
 def get_file_name(path):
     return os.path.splitext(os.path.basename(path))[0]
@@ -111,8 +111,8 @@ if __name__=="__main__":
         ax.set_xlabel('Number of Principal Components Selected', fontsize=15)
         ax.set_ylabel('% Cumulative Variance Explained', fontsize=15)
         ax.grid()
-        figure_path = os.path.join(output_dir, f'FSD50K.{data}-{model}-scree_plot.jpeg')
-        print(f"Exported the figure to: {figure_path}")
+        figure_path = os.path.join(FIGURES_DIR, f'{data}-{model}-scree_plot.jpeg')
+        print(f"Exported the scree plot to: {figure_path}")
         fig.savefig(figure_path)
 
     # Apply PCA if specified
