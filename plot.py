@@ -7,8 +7,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from directories import FIGURES_DIR, EVAL_DIR
+DATASET_NAME = "FSD50K.eval_audio"
+EVAL_DIR = os.path.join(EVAL_DIR, DATASET_NAME)
 
-colors = ["r", "g", "b", "y", "c", "m", "k"]
+colors = ["g", "b", "r", "y", "c", "m", "k"]
 
 def plot_map(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_dir=FIGURES_DIR):
     """Takes a model name and plots the MAP@K for all the variations of the model."""
@@ -32,43 +34,55 @@ def plot_map(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_dir=FIGURE
                 map = pd.read_csv(map_path)
                 full_model_name = model_dir.split("/")[-1]
                 variation = "-".join(full_model_name.split("-")[-3:])
-                map_dict[k][search].append((variation, map[map.k==k].mAP.to_numpy()))
+                map_dict[k][search].append((variation, map[map.k==k].mAP.to_numpy()[0]))
+
+    # Determine some plot parameters
+    if len(searches)>1:
+        positions = np.linspace(-0.20, 0.20, len(searches))
+        delta = positions[1]-positions[0]
+    else:
+        positions = [0]
+        delta = 1
+    n_rows = len(k_values)//n_cols
 
     # Plot the maps
-    n_rows = len(k_values)//n_cols
-    fig, axs = plt.subplots(nrows=n_rows,ncols=n_cols,figsize=(6*n_cols,6*n_rows),constrained_layout=True)
+    fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(6*n_cols,6*n_rows), constrained_layout=True)
     fig.suptitle(model, fontsize=20, weight='bold')
     for n,k in enumerate(k_values):
-        axs[n//n_cols, n%n_cols].set_title(f"k={k}", fontsize=17, weight='bold')
+
+        row, col = n//n_cols, n%n_cols
         xticks = []
-        for z in range(len(map_dict[k]["dot"])):
-            variation = map_dict[k]["dot"][z][0]
-            dot_val = map_dict[k]["dot"][z][1]
-            nn_val = map_dict[k]["nn"][z][1]
-            xticks.append(variation)
-            if z==0:
-                leg0,leg1 = "dot product", "nearest neighbors"
-            else:
-                leg0,leg1 = "", ""
-            axs[n//n_cols, n%n_cols].bar(z-0.2, height=dot_val, width=0.35, label=leg0, color="g", edgecolor='k')
-            axs[n//n_cols, n%n_cols].bar(z+0.2, height=nn_val, width=0.35 ,label=leg1, color="b", edgecolor='k')
-            axs[n//n_cols, n%n_cols].text(z-0.2, dot_val+0.01, f"{dot_val[0]:.3f}", ha='center', va='bottom', fontsize=10)
-            axs[n//n_cols, n%n_cols].text(z+0.2, nn_val+0.01, f"{nn_val[0]:.3f}", ha='center', va='bottom', fontsize=10)
-        axs[n//n_cols, n%n_cols].tick_params(axis='y', which='major', labelsize=11)
-        axs[n//n_cols, n%n_cols].tick_params(axis='x', which='major', labelsize=10)
-        axs[n//n_cols, n%n_cols].set_xticks(np.arange(len(xticks)), xticks, rotation=20)
-        axs[n//n_cols, n%n_cols].set_yticks(np.arange(0,1.05,0.05))
-        axs[n//n_cols, n%n_cols].grid()
-        axs[n//n_cols, n%n_cols].set_ylabel("MAP@K", fontsize=15)
-        axs[n//n_cols, n%n_cols].set_xlabel("Processing Parameters", fontsize=15)
-        axs[n//n_cols, n%n_cols].legend(fontsize=11, loc=4, title="Search Algorithms", title_fontsize=12, fancybox=True)
-        axs[n//n_cols, n%n_cols].set_ylim([0,1])
+        for j,search in enumerate(map_dict[k].keys()):
+            for z,(variation,map) in enumerate(map_dict[k][search]):
+                if j==0:
+                    xticks.append(variation)
+                if z==0:
+                    if search=="dot":
+                        label = "dot product"
+                    elif search=="nn":
+                        label = "nearest neighbors"
+                else:
+                    label = ""
+                axs[row,col].bar(z+positions[j], height=map, width=delta*0.8, label=label, color=colors[j], edgecolor='k')
+                axs[row,col].text(z+positions[j], map+0.01, f"{map:.3f}", ha='center', va='bottom', fontsize=10)
+
+        axs[row,col].set_title(f"k={k}", fontsize=17, weight='bold')
+        axs[row,col].tick_params(axis='y', which='major', labelsize=11)
+        axs[row,col].tick_params(axis='x', which='major', labelsize=10)
+        axs[row,col].set_xticks(np.arange(len(xticks)), xticks, rotation=20)
+        axs[row,col].set_yticks(np.arange(0,1.05,0.05))
+        axs[row,col].grid()
+        axs[row,col].set_ylabel("MAP@K", fontsize=15)
+        axs[row,col].set_xlabel("Processing Parameters", fontsize=15)
+        axs[row,col].legend(fontsize=11, loc=4, title="Search Algorithms", title_fontsize=12, fancybox=True)
+        axs[row,col].set_ylim([0,1])
     if save_fig:
         os.makedirs(save_dir, exist_ok=True)
         fig.savefig(os.path.join(save_dir, f"{model}-mAP.png"))
     plt.show()
 
 def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
+    """Takes a model name and plots the MR1 for all the variations of the model."""
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir,f"{model}-*")))
@@ -88,22 +102,33 @@ def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
             variation = "-".join(full_model_name.split("-")[-3:])
             mr1_dict[search].append((variation, mr1))
 
+    # Determine some plot parameters
+    if len(searches)>1:
+        positions = np.linspace(-0.2, 0.2, len(searches))
+    else:
+        positions = [0]
+
+    # Plot the MR1s
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     fig.suptitle(model, fontsize=20, weight='bold')
     ax.set_title("MR1 Values of Embedding Aggregations and Search Algorithms", fontsize=17)
     xticks, max_val = [], []
-    for z in range(len(variation_paths)):
-        variation = mr1_dict["dot"][z][0]
-        dot_val = mr1_dict["dot"][z][1]
-        nn_val = mr1_dict["nn"][z][1]
-        max_val += [dot_val,nn_val]
-        xticks.append(variation)
-        if z==0:
-            leg0,leg1 = "Dot Product", "Nearest Neighbors"
-        else:
-            leg0,leg1 = "", ""
-        ax.bar(z-0.2, height=dot_val, width=0.35, label=leg0, color="g", edgecolor='k')
-        ax.bar(z+0.2, height=nn_val, width=0.35 ,label=leg1, color="b", edgecolor='k')
+    for i in range(len(variation_paths)):
+        for j,search in enumerate(searches):
+            variation, mr1 = mr1_dict[search][i]
+            max_val += [mr1]
+            if j%len(searches)==0:
+                xticks.append(variation)
+            if i==0:
+                if search=="dot":
+                    label = "dot product"
+                elif search=="nn":
+                    label = "nearest neighbors"
+            else:
+                label = ""
+            ax.bar(i+positions[j], height=mr1, width=0.35, label=label, color=colors[j], edgecolor='k')
+            ax.text(i+positions[j], mr1+0.01, f"{mr1:.2f}", ha='center', va='bottom', fontsize=10)
+
     ax.tick_params(axis='y', which='major', labelsize=11)
     ax.tick_params(axis='x', which='major', labelsize=11)
     ax.set_xticks(np.arange(len(xticks)), xticks)
@@ -197,3 +222,4 @@ if __name__=="__main__":
 
     plot_map(args.model, save_fig=True)
     plot_mr1(args.model, save_fig=True)
+    print("Done!")
