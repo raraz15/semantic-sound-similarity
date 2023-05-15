@@ -51,20 +51,6 @@ def display_query_and_similar_sound(fname, df, similarity_dict, N=15, header=Non
                 st.caption(f"Labels: {labels}")
                 st.audio(audio, sample_rate=SAMPLE_RATE)
 
-def sample_sound(df, similarity_dict, fnames, N=15):
-
-    idx = random.randint(0,len(similarity_dict))
-    fname = fnames[idx]
-    display_query_and_similar_sound(fname, df, similarity_dict, N=N)
-
-def get_subset(sound_class, df, similarity_dict, N=15):
-
-    fnames_of_class = df[df.labels.str.contains(sound_class)].fname.to_list()
-    idx = random.randint(0,len(fnames_of_class))
-    fname = str(fnames_of_class[idx])
-    header = f"Random Sound Containing '{sound_class}' Label"
-    display_query_and_similar_sound(fname, df, similarity_dict, N=N, header=header)
-
 def get_subsets(sound_classes, df, similarity_dict, N=15):
 
     indices = df.labels.str.contains(sound_classes[0])
@@ -79,7 +65,6 @@ def get_subsets(sound_classes, df, similarity_dict, N=15):
     fname = str(fnames_of_class[idx])
     header = f"Random Sound Containing '{', '.join(sound_classes)}' Label(s)"
     display_query_and_similar_sound(fname, df, similarity_dict, N=N, header=header)
-
 
 if __name__=="__main__":
 
