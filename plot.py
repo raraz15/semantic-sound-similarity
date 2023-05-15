@@ -61,7 +61,7 @@ def plot_map_at_all_k(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_d
         for j,search in enumerate(map_dict[k].keys()):
             for z,(variation,map) in enumerate(map_dict[k][search]):
                 if j==0:
-                    xticks.append(variation)
+                    xticks.append(variation.replace("-","\n"))
                 if z==0:
                     if search=="dot":
                         label = "Dot Product"
@@ -85,7 +85,7 @@ def plot_map_at_all_k(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_d
         axs[row,col].set_title(f"k={k} (Page {k//15})", fontsize=17, weight='bold')
         axs[row,col].tick_params(axis='y', which='major', labelsize=11)
         axs[row,col].tick_params(axis='x', which='major', labelsize=10)
-        axs[row,col].set_xticks(np.arange(len(xticks)), xticks, rotation=20)
+        axs[row,col].set_xticks(np.arange(len(xticks)), xticks) #, rotation=20
         axs[row,col].set_yticks(np.arange(0,1.05,0.05))
         axs[row,col].grid()
         axs[row,col].set_ylabel("mAP@k (↑)", fontsize=15)
@@ -221,7 +221,7 @@ def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
             variation, mr1 = mr1_dict[search][i]
             max_val += [mr1]
             if j%len(searches)==0:
-                xticks.append(variation)
+                xticks.append(variation.replace("-","\n"))
             if i==0:
                 if search=="dot":
                     label = "Dot Product"
@@ -465,6 +465,5 @@ if __name__=="__main__":
     args=parser.parse_args()
 
     plot_map_at_15(args.model, save_fig=True, save_dir=args.save_dir)
-    plot_map_at_all_k(args.model, save_fig=True, save_dir=args.save_dir)
     plot_mr1(args.model, save_fig=True, save_dir=args.save_dir)
     print("Done!")
