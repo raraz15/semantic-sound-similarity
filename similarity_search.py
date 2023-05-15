@@ -34,7 +34,7 @@ def search_similar_sounds(query, corpus, N, algo="dot"):
         raise NotImplementedError
 
 # TODO: for large sound collections, write the output when a row is complete
-# TODO: delete text output, only json ? (remove pretty_print counters as well)
+# TODO: output format should be a list of lists in a dict
 if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
@@ -103,18 +103,6 @@ if __name__=="__main__":
             results_dict[query_fname].append({ref_fname: float(score)})
     with open(output_path, "w") as outfile:
         json.dump(results_dict, outfile, indent=4)
-
-    ## Write the top args.N sounds for each sound to a text file
-    #string = ""
-    #indent = len(str(args.N))+1 # pretty print
-    #for i,(similarities,indices) in enumerate(zip(similarity_scores,similarity_indices)):
-    #    string += f"{'T':>{indent}} | {audio_paths[i]}"
-    #    for n,j in enumerate(indices):
-    #        s = np.round(similarities[j],3) # round for display
-    #        string += f"\n{'Q'+str(n):>{indent}} | {audio_paths[j]:<{str_len}} | {s}"
-    #    string += "\n\n"
-    #with open(os.path.join(output_dir, f"{args.search}-{args.a}-results.txt"), "w") as outfile:
-    #    outfile.write(string)
 
     ##############
     print("Done!")
