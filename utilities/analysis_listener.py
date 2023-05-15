@@ -65,6 +65,22 @@ def get_subset(sound_class, df, similarity_dict, N=15):
     header = f"Random Sound Containing '{sound_class}' Label"
     display_query_and_similar_sound(fname, df, similarity_dict, N=N, header=header)
 
+def get_subsets(sound_classes, df, similarity_dict, N=15):
+
+    indices = df.labels.str.contains(sound_classes[0])
+    if len(sound_classes)>1:
+        for sound_class in sound_classes[1:]:
+            indices = indices & df.labels.str.contains(sound_class)
+    fnames_of_class = df[indices].fname.to_list()
+    if fnames_of_class==[]:
+        st.error("No sound found containing all the selected labels. Choose Again.")
+        return
+    idx = random.randint(0,len(fnames_of_class))
+    fname = str(fnames_of_class[idx])
+    header = f"Random Sound Containing '{', '.join(sound_classes)}' Label(s)"
+    display_query_and_similar_sound(fname, df, similarity_dict, N=N, header=header)
+
+
 if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
@@ -93,23 +109,12 @@ if __name__=="__main__":
     all_labels = sorted(list(set([y for x in df.labels.to_list() for y in x.split(", ")])))
 
     st.title("Freesound Sound Similarity Results")
-    st.text(f"Embeddings: {embeddings}")
-    st.text(f"Search Method: {search}")
-    st.text(f"Dataset: FSD50K.eval_audio")
+    st.text(f"Embeddings: {embeddings} - Search Method: {search} - Dataset: FSD50K.eval_audio")
 
-    st.header("Click Below To Sample a Random Sound.")
-    st.button(label=":loud_sound:", 
-            key="sample", 
-            on_click=sample_sound, 
-            args=(df, similarity_dict, fnames), 
-            kwargs={"N":args.N}
-            )
-
-    st.header("Choose a Sound Category and Click.")
-    sound_class = st.selectbox("Sound Classes", options=all_labels)
-    print(type(sound_class))
-    st.button(label=":sound:", 
-            on_click=get_subset, 
-            args=(sound_class, df, similarity_dict), 
+    st.header("Choose Sound Categories and Click The Speaker Icon.")
+    sound_classes = st.multiselect("Sound Classes", options=all_labels)
+    st.button(label=":speaker:", 
+            on_click=get_subsets, 
+            args=(sound_classes, df, similarity_dict), 
             kwargs={"N":args.N}
             )
