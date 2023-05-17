@@ -17,7 +17,7 @@ fi
 
 # Define here the variables of the experiment
 variable1=("max" "median")
-variable2=(100 -1)
+variable2=(200)
 variable3=("--no-normalization" "--normalization")
 variable4=("dot" "nn")
 
