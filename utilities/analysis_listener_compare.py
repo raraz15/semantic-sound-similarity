@@ -8,24 +8,21 @@ import random
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 import streamlit as st
-
-from essentia.standard import MonoLoader
-
 import pandas as pd
 
 from directories import *
 
 SAMPLE_RATE = 16000
 
+FREESOUND_STRING = '<iframe frameborder="0" scrolling="no" src="https://freesound.org/embed/sound/iframe/{}/simple/medium/" width="481" height="86"></iframe>'
+
 st.set_page_config(page_title="Sound Similarity", page_icon=":loud_sound:", layout="wide")
 
 def display_query_and_similar_sound(fname, df, results, N=15, header=None):
 
-    query_path = os.path.join(AUDIO_DIR, f"{fname}.wav")
     labels =  df[df.fname==int(fname)].labels.values[0]
     if header is not None:
         st.header(header)
@@ -33,9 +30,7 @@ def display_query_and_similar_sound(fname, df, results, N=15, header=None):
         st.subheader("Query Sound")
         st.caption(f"Sound ID: {fname}")
         st.caption(f"Labels: {labels}")
-        audio = MonoLoader(filename=query_path,
-                            sampleRate=SAMPLE_RATE)()
-        st.audio(audio, sample_rate=SAMPLE_RATE)
+        st.components.v1.html(FREESOUND_STRING.format(fname))
     st.divider()
     st.subheader(f"Top {N} Similar Sounds for each Embedding")
     with st.container():
@@ -49,18 +44,16 @@ def display_query_and_similar_sound(fname, df, results, N=15, header=None):
                 variant = "Agg"+"".join(variant)
             with columns[i]:
                 st.subheader(model_name)
-                st.subheader(variant)
+                for v in variant.split("-"):
+                    st.subheader(v)
                 st.subheader(f"{model['search']} Search")
             for j,result in  enumerate(model["results"][fname][:N]):
                 fname = list(result.keys())[0]
                 labels = df[df.fname==int(fname)].labels.values[0]
-                audio_path = os.path.join(AUDIO_DIR, f"{fname}.wav")
-                audio = MonoLoader(filename=audio_path,
-                                    sampleRate=SAMPLE_RATE)()
                 with columns[i]:
                     st.write(f"Ranking: {j+1} - Score: {list(result.values())[0]:.3f}")
                     st.caption(f"Labels: {labels}")
-                    st.audio(audio, sample_rate=SAMPLE_RATE) ############
+                    st.components.v1.html(FREESOUND_STRING.format(fname))
 
 def get_subsets(sound_classes, df, results, N=15):
 
@@ -89,11 +82,13 @@ if __name__=="__main__":
                         help='Similarity Result Path 2.')
     parser.add_argument("-p3", "--path3", type=str, default=None, 
                         help='Similarity Result Path 3.')
+    parser.add_argument("-p4", "--path4", type=str, default=None, 
+                        help='Similarity Result Path 4.')
     parser.add_argument('-N', type=int, default=15, 
                         help="Number of top entries to display.")
     args=parser.parse_args()
 
-    paths = [path for path in [args.path0, args.path1, args.path2, args.path3] if path is not None]
+    paths = [path for path in [args.path0, args.path1, args.path2, args.path3, args.path4] if path is not None]
 
     # Read the meta data
     df = pd.read_csv(GT_PATH)
