@@ -92,7 +92,7 @@ if __name__=="__main__":
         map = sum(aps)/len(aps) # mean average precision
         maps.append({"k": k, "mAP": map})
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
-        print(f"K: {k:>{len(str(N))}} | mAP: {map:.5f} | Time: {time_str}")
+        print(f"k: {k:>{len(str(N))}} | mAP@k: {map:.5f} | Time: {time_str}")
     # Export
     maps = pd.DataFrame(maps)
     output_path = os.path.join(output_dir, "mAP.csv")
