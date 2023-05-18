@@ -10,7 +10,8 @@ from directories import FIGURES_DIR, EVAL_DIR
 DATASET_NAME = "FSD50K.eval_audio"
 EVAL_DIR = os.path.join(EVAL_DIR, DATASET_NAME)
 
-COLORS = ["g", "b", "r", "y", "m", "c", "k"]
+from matplotlib.colors import TABLEAU_COLORS
+COLORS = list(TABLEAU_COLORS.values())
 
 #####################################################################################
 # Single Model Plots
@@ -100,7 +101,7 @@ def plot_map_at_all_k(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_d
         fig.savefig(fig_path)
     plt.show()
 
-def plot_map_at_15(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
+def plot_map_at_15(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR, D=0.215):
     """Takes a model name and plots the mAP@k for all the variations of the model."""
 
     # Find all the variation_paths of the model
@@ -128,22 +129,25 @@ def plot_map_at_15(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DI
 
     # Determine some plot parameters
     if len(searches)>1:
-        positions = np.linspace(-0.20, 0.20, len(searches))
+        positions = np.linspace(-D, D, len(searches))
         delta = positions[1]-positions[0]
     else:
         positions = [0]
         delta = 1
 
     # Plot the maps
-    fig, ax = plt.subplots(figsize=(15,6), constrained_layout=True)
-    fig.suptitle(f"Embedding Processing and Search Algorithm Performances by mAP Values"
+    fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
+    fig.suptitle(f"Embedding Processing and Search Algorithm Performances by mAP"
                  f"\n{model} Evaluated on {DATASET_NAME}", fontsize=20, weight='bold')
     k = 15
     xticks = []
     for j,search in enumerate(map_dict[k].keys()):
         for z,(variation,map) in enumerate(map_dict[k][search]):
             if j==0:
-                xticks.append(variation.replace("-","\n"))
+                if "essentia" not in variation:
+                    xticks.append(variation.replace("-","\n").replace("Agg_", ""))
+                else:
+                    xticks.append(variation.replace("essentia-extractor_legacy-", ""))
             if z==0:
                 if search=="dot":
                     label = "Dot Product"
@@ -153,7 +157,7 @@ def plot_map_at_15(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DI
                 label = ""
             ax.bar(z+positions[j], 
                             height=map, 
-                            width=delta*0.8, 
+                            width=delta*0.6, 
                             label=label, 
                             color=COLORS[j], 
                             edgecolor='k')
@@ -164,16 +168,16 @@ def plot_map_at_15(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DI
                             va='bottom', 
                             fontsize=10)
 
-    ax.set_title(f"k={k} (Page 1)", fontsize=17)
+    ax.set_title(f"Page 1 Results", fontsize=17)
     ax.tick_params(axis='y', which='major', labelsize=11)
     ax.tick_params(axis='x', which='major', labelsize=10)
     ax.set_xticks(np.arange(len(xticks)), xticks)
     ax.set_yticks(np.arange(0,1.05,0.05))
     ax.grid()
-    ax.set_ylabel("mAP@k (↑)", fontsize=15)
+    ax.set_ylabel("mAP@15 (↑)", fontsize=15)
     ax.set_xlabel("Processing Parameters", fontsize=15)
-    ax.legend(fontsize=11, loc=4, title="Search Algorithms", 
-                        title_fontsize=12, fancybox=True)
+    ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
+                        title_fontsize=10, fancybox=True)
     ax.set_ylim([0,1])
     if save_fig:
         os.makedirs(save_dir, exist_ok=True)
@@ -181,7 +185,6 @@ def plot_map_at_15(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DI
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
     plt.show()
-
 
 def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
     """Takes a model name and plots the MR1 for all the variations of the model."""
@@ -221,7 +224,7 @@ def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
             variation, mr1 = mr1_dict[search][i]
             max_val += [mr1]
             if j%len(searches)==0:
-                xticks.append(variation.replace("-","\n"))
+                xticks.append(variation.replace("-","\n").replace("Agg_", ""))
             if i==0:
                 if search=="dot":
                     label = "Dot Product"
@@ -244,13 +247,13 @@ def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
 
     # Set the plot parameters
     ax.tick_params(axis='y', which='major', labelsize=11)
-    ax.tick_params(axis='x', which='major', labelsize=11)
+    ax.tick_params(axis='x', which='major', labelsize=10)
     ax.set_xticks(np.arange(len(xticks)), xticks)
     ax.set_yticks(np.arange(0,max(max_val)+0.5,0.5))
      # TODO: read K
     ax.set_ylabel("MR1@90 (↓)", fontsize=15)
     ax.set_xlabel("Embedding Processing Parameters", fontsize=15)
-    ax.legend(loc=1, fontsize=11, title="Search Algorithms", 
+    ax.legend(loc=4, fontsize=11, title="Search Algorithms", 
               title_fontsize=12, fancybox=True)
     ax.grid()
     if save_fig:
@@ -318,12 +321,12 @@ def plot_mr1_comparisons_single_variation(models, eval_dir=EVAL_DIR, save_fig=Fa
 def get_model_name(full_name):
     return full_name.split("-PCA")[0].split("-Agg")[0]
 
-def plot_map_comparisons_single_variation(models, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
+def plot_map_comparisons_single_variation(models, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR, fig_name=""):
     """Takes a list of models and plots the mAP@k for all the variations of the model.
     Each model must be a tupple of (model_name, [variations], search_algorithm)"""
 
     # Determine Some Parameters
-    positions = np.linspace(-0.25, 0.25, len(models))
+    positions = np.linspace(-0.4, 0.4, len(models))
     delta = positions[1]-positions[0]
 
     # Read the mAP for each model
@@ -337,44 +340,49 @@ def plot_map_comparisons_single_variation(models, eval_dir=EVAL_DIR, save_fig=Fa
     K = df.k.to_numpy()
 
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(f"Embedding Performances using mAP@k values on {DATASET_NAME} Set", fontsize=20, weight='bold')
-    ax.set_title("For each model, the best performing processing parameters are used", fontsize=15)
-    for i in range(len(K)):
-        for j,(model_name,search,map) in enumerate(maps):
-            ax.bar(i+positions[j], 
-                    map[i], 
-                    #label=model_name+f" {search}" if i==0 else "", 
-                    label=get_model_name(model_name) if i==0 else "",
-                    width=delta*0.85, 
-                    color=COLORS[j], 
-                    edgecolor='k'
-                    )
-            ax.text(i+positions[j], 
-                    map[i]+0.01, 
-                    f"{map[i]:.2f}", 
-                    ha='center', 
-                    va='bottom', 
-                    fontsize=10, 
-                    weight='bold'
-                    )
+    fig.suptitle(f"Embedding Performances using mAP@15 values on {DATASET_NAME}", fontsize=20, weight='bold')
+    #ax.set_title("For each model, the best performing processing parameters are used", fontsize=15)
+    ax.set_title("Page 1 Results", fontsize=15)
+    #for i in range(len(K)):
+    for j,(model_name,search,map) in enumerate(maps):
+        ax.bar(0+positions[j], 
+                map[0], 
+                #label=model_name+f" {search}" if 0==0 else "", 
+                label=get_model_name(model_name) if 0==0 else "",
+                width=delta*0.80, 
+                color=COLORS[j], 
+                edgecolor='k'
+                )
+        ax.text(0+positions[j], 
+                map[0]+0.01, 
+                f"{map[0]:.3f}", 
+                ha='center', 
+                va='bottom', 
+                fontsize=10, 
+                weight='bold'
+                )
 
     # Set the plot parameters
     ax.set_yticks(np.arange(0,1.05,0.05))
     #ax.set_xticks(np.arange(i+1), K)
-    ax.set_xticks(np.arange(1,i+2))
-    ax.tick_params(axis='x', which='major', labelsize=13)
+    #ax.set_xticks(np.arange(1,i+2))
+    ax.tick_params(axis='x', which='major', labelsize=0)
     ax.tick_params(axis='y', which='major', labelsize=11)
     #ax.set_xlabel("K (Similarity Rank)", fontsize=15)
-    ax.set_xlabel("Page", fontsize=15)
-    ax.set_ylabel("mAP@k (↑)", fontsize=15)
+    ax.set_xlabel("Embedding, Search Combinations", fontsize=15)
+    #ax.set_xlabel("Page", fontsize=15)
+    ax.set_ylabel("mAP@15 (↑)", fontsize=15)
     ax.set_ylim([0,1])
     #ax.set_title(models[0][0].split("-")[-1].replace("_"," "), fontsize=17)
     ax.grid()
-    ax.legend(fontsize=10, title="Embedding, Search Combinations", title_fontsize=11, fancybox=True)
+    ax.legend(loc="best", fontsize=10, title_fontsize=11, fancybox=True)
     if save_fig:
         os.makedirs(save_dir, exist_ok=True)
-        names = "-".join([model[0] for model in models])
-        fig_path = os.path.join(save_dir, f"{names}-mAP_comparison_k15.png")
+        if fig_name == "":
+            names = "-".join([model[0] for model in models])
+            fig_path = os.path.join(save_dir, f"{names}-mAP_comparison_k15.png")
+        else:
+            fig_path = os.path.join(save_dir, fig_name+".png")
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
     plt.show()
