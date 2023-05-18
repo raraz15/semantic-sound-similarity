@@ -37,12 +37,20 @@ def display_query_and_similar_sound(fname, df, results, N=15, header=None):
                             sampleRate=SAMPLE_RATE)()
         st.audio(audio, sample_rate=SAMPLE_RATE)
     st.divider()
-    st.subheader(f"Top {N} Similar Sounds")
+    st.subheader(f"Top {N} Similar Sounds for each Embedding")
     with st.container():
         columns = st.columns(len(results))
         for i, model in enumerate(results):
+            if "Agg" not in model['embeddings']:
+                model_name, variant = model['embeddings'].split("-PCA")
+                variant = "PCA"+"".join(variant)
+            else:
+                model_name, variant = model['embeddings'].split("-Agg")
+                variant = "Agg"+"".join(variant)
             with columns[i]:
-                st.subheader(f"{model['embeddings']} - {model['search']}")
+                st.subheader(model_name)
+                st.subheader(variant)
+                st.subheader(f"{model['search']} Search")
             for j,result in  enumerate(model["results"][fname][:N]):
                 fname = list(result.keys())[0]
                 labels = df[df.fname==int(fname)].labels.values[0]
@@ -50,9 +58,9 @@ def display_query_and_similar_sound(fname, df, results, N=15, header=None):
                 audio = MonoLoader(filename=audio_path,
                                     sampleRate=SAMPLE_RATE)()
                 with columns[i]:
-                    st.write(f"Ranking: {j+1}")
+                    st.write(f"Ranking: {j+1} - Score: {list(result.values())[0]:.3f}")
                     st.caption(f"Labels: {labels}")
-                    st.audio(audio, sample_rate=SAMPLE_RATE)
+                    st.audio(audio, sample_rate=SAMPLE_RATE) ############
 
 def get_subsets(sound_classes, df, results, N=15):
 
@@ -73,13 +81,13 @@ if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
                         formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--path0", type=str, default=None, 
+    parser.add_argument("-p0", "--path0", type=str, default=None, 
                         help='Similarity Result Path 0.')
-    parser.add_argument("--path1", type=str, default=None, 
+    parser.add_argument("-p1", "--path1", type=str, default=None, 
                         help='Similarity Result Path 1.')
-    parser.add_argument("--path2", type=str, default=None, 
+    parser.add_argument("-p2", "--path2", type=str, default=None, 
                         help='Similarity Result Path 2.')
-    parser.add_argument("--path3", type=str, default=None, 
+    parser.add_argument("-p3", "--path3", type=str, default=None, 
                         help='Similarity Result Path 3.')
     parser.add_argument('-N', type=int, default=15, 
                         help="Number of top entries to display.")

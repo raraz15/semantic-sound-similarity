@@ -47,7 +47,7 @@ def display_query_and_similar_sound(fname, df, similarity_dict, N=15, header=Non
             audio = MonoLoader(filename=audio_path,
                                 sampleRate=SAMPLE_RATE)()
             with columns[i//5]:
-                st.write(f"Ranking: {i+1}")
+                st.write(f"Ranking: {i+1} - Score: {list(result.values())[0]:.3f}")
                 st.caption(f"Labels: {labels}")
                 st.audio(audio, sample_rate=SAMPLE_RATE)
 
