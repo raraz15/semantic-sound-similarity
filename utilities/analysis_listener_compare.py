@@ -13,6 +13,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import streamlit as st
 import pandas as pd
 
+from evaluate import calculate_average_precision
 from directories import *
 
 SAMPLE_RATE = 16000
@@ -49,11 +50,13 @@ def display_query_and_similar_sound(fname, df, results, N=15, header=None):
                 for v in variant.split("-"):
                     st.subheader(v)
                 st.subheader(f"{model['search']} Search")
+                ap = calculate_average_precision(fname, results[i]['results'][fname], df)
+                st.write(f"Average Precision@15 for this result is: {ap:.3f}")
             for j,result in  enumerate(model["results"][fname][:N]):
-                fname = list(result.keys())[0]
+                fname = result["file_name"]
                 labels = df[df.fname==int(fname)].labels.values[0]
                 with columns[i]:
-                    st.write(f"Ranking: {j+1} - Score: {list(result.values())[0]:.3f}")
+                    st.write(f"Ranking: {j+1} - Score: {result['score']:.3f}")
                     st.caption(f"Labels: {labels}")
                     st.components.v1.html(FREESOUND_STRING.format(fname))
 

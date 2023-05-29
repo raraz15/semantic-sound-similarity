@@ -19,26 +19,22 @@ def get_labels(fname, df):
     """Returns the set of labels of the fname from the dataframe."""
     return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
 
-# TODO: remove counts
 def calculate_average_precision(query_labels, result, df):
     """We define a retrieved document relevant when there is
     at least a match."""
-    y_true, y_score, counts = [], [], []
+    y_true, y_score = [], []
     for ref_result in result:
-        ref_fname = list(ref_result.keys())[0]
-        ref_score = list(ref_result.values())[0]
-        y_score.append(ref_score)
-        ref_labels = get_labels(ref_fname, df)
+        y_score.append(ref_result["score"])
+        ref_labels = get_labels(ref_result["file_name"], df)
         # Find how many labels are shared
         counter = len(query_labels.intersection(ref_labels))
-        counts.append(counter)
         if counter > 0:
             y_true.append(1)
         else:
             y_true.append(0)
     # Calculate the average prediction
     ap = average_precision_score(y_true, y_score)
-    return ap, counts
+    return ap
 
 def R1(query_labels, result, df):
     for i,ref_result in enumerate(result):
@@ -49,7 +45,7 @@ def R1(query_labels, result, df):
         if counter > 0:
             return i
 
-# TODO: MR1@K
+# TODO: macro AP, micro AP
 # TODO: MR1 NaNs
 # TODO: ncdg
 if __name__=="__main__":
@@ -87,9 +83,9 @@ if __name__=="__main__":
         for query_fname in fnames:
             query_labels = get_labels(query_fname, df)
             result = results_dict[query_fname][:k] # Cutoff at k
-            ap, _ = calculate_average_precision(query_labels, result, df)
+            ap = calculate_average_precision(query_labels, result, df)
             aps.append(ap)
-        map = sum(aps)/len(aps) # mean average precision
+        map = sum(aps)/len(aps) # mean average precision @k
         maps.append({"k": k, "mAP": map})
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
         print(f"k: {k:>{len(str(N))}} | mAP@k: {map:.5f} | Time: {time_str}")

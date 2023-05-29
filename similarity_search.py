@@ -100,7 +100,8 @@ if __name__=="__main__":
         for j in indices:
             score = similarities[j]
             ref_fname = os.path.splitext(os.path.basename(audio_paths[j]))[0]
-            results_dict[query_fname].append({ref_fname: float(score)})
+            results_dict[query_fname].append({"file_name": ref_fname, 
+                                              "score": float(score)})
     with open(output_path, "w") as outfile:
         json.dump(results_dict, outfile, indent=4)
 
