@@ -97,7 +97,7 @@ if __name__=="__main__":
     for i,(similarities,indices) in enumerate(zip(similarity_scores,similarity_indices)):
         query_fname = os.path.splitext(os.path.basename(audio_paths[i]))[0]
         results_dict[query_fname] = []
-        for n,j in enumerate(indices):
+        for j in indices:
             score = similarities[j]
             ref_fname = os.path.splitext(os.path.basename(audio_paths[j]))[0]
             results_dict[query_fname].append({ref_fname: float(score)})

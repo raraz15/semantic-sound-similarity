@@ -17,7 +17,9 @@ from directories import *
 
 SAMPLE_RATE = 16000
 
-FREESOUND_STRING = '<iframe frameborder="0" scrolling="no" src="https://freesound.org/embed/sound/iframe/{}/simple/medium/" width="481" height="86"></iframe>'
+FREESOUND_STRING = '<iframe frameborder="0" scrolling="no" \
+                    src="https://freesound.org/embed/sound/iframe/{}/simple/medium/" \
+                    width="481" height="86"></iframe>'
 
 st.set_page_config(page_title="Sound Similarity", page_icon=":loud_sound:", layout="wide")
 
@@ -57,6 +59,7 @@ def display_query_and_similar_sound(fname, df, results, N=15, header=None):
 
 def get_subsets(sound_classes, df, results, N=15):
 
+    # Get the subset of sounds containing all the selected labels
     indices = df.labels.str.contains(sound_classes[0])
     if len(sound_classes)>1:
         for sound_class in sound_classes[1:]:
