@@ -10,6 +10,11 @@ Collaboration with: Frederic Font, Alastair Porter
 contact: oguza97@gmail.com
 
 ## TODO:
+- Count number of files
+- macro vs micro mAP
+- Sounds that are not maximally imilar to themselves
+- Lower PCA
+- Change PCA naming convention
 - Metrics
     - Control computations
         - Is the mAP true as it is (1 intersection)?
@@ -17,4 +22,7 @@ contact: oguza97@gmail.com
 - Models
     - L3
     - PANs
+    - PAST
+
 - Try Different Aggregations
+- Normalize audio
