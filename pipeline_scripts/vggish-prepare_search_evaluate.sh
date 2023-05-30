@@ -68,7 +68,6 @@ echo "======================================================================="
 echo "Similarity Search"
 python similarity_search.py -p=$PREP_EMBED_DIR -s=$4
 SIMILARITY_PATH="$SIMILARITY_DIR-$SUFFIX/$4/similarity_results.json"
-echo $SIMILARITY_PATH
 echo
 
 #############################################################################

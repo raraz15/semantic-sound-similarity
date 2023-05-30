@@ -5,16 +5,9 @@ eval_dir="/home/roguz/freesound/freesound-perceptual_similarity/data/similarity_
 
 searches=("dot" "nn")
 for file in "$eval_dir/"*; do # for each embedding dir
-
-    if [[ "$file" == *"fs-essentia-extractor_legacy"* ]]; then
+    if [[ "$file" == *"audioset-yamnet-1"* ]]; then
         results_dir="$file/nn/similarity_results.json"
         echo $results_dir
         python evaluate.py -p=$results_dir
-    else
-        for search in ${searches[@]}; do
-            results_dir="$file/$search/similarity_results.json"
-            echo $results_dir
-            python evaluate.py -p=$results_dir
-        done
     fi
 done
