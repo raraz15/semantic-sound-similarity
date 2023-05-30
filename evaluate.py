@@ -10,32 +10,67 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import pandas as pd
 
-from sklearn.metrics import average_precision_score
-
 from directories import GT_PATH, EVAL_DIR
 
 def get_labels(fname, df):
     """Returns the set of labels of the fname from the dataframe."""
     return set(df[df["fname"]==int(fname)]["labels"].values[0].split(", "))
 
-# TODO: use your own method because nearest neighbors does not work with this score
+def precision_at_k(y_true, k):
+    # k is an index
+    return sum(y_true[:k+1])/(k+1)
+
+def average_precision(relevance):
+    """ Calculate the average prediction for a list of relevance values."""
+
+    # Number of relevant documents
+    total_relevant = sum(relevance)
+    # If there are no relevant documents, return 0
+    if total_relevant==0:
+        return 0
+    else:
+        # Calculate average precision
+        return sum([rel_k*precision_at_k(relevance,k) for k,rel_k in enumerate(relevance)]) / total_relevant
+
 def calculate_average_precision(query_fname, result, df):
-    """We define a retrieved document relevant when there is
-    at least a match."""
+    """Calculates the average precision@k for a query and its results, where
+    k is the length of the results. A result is considered relevant if it has
+    at least one label in common with the query."""
+
+    # Get the labels of the query
     query_labels = get_labels(query_fname, df)
-    # Evaluate if each document is relevant
-    y_true, y_score = [], []
+    # Evaluate the relevance of each retrieved document
+    relevance = []
     for ref_result in result:
-        y_score.append(ref_result["score"])
-        ref_labels = get_labels(ref_result["result_fname"], df)
-        # Find how many labels are shared
+        ref_fname = ref_result["result_fname"]
+        ref_labels = get_labels(ref_fname, df)
+        # Find if a retrieved element is relevant
         if len(query_labels.intersection(ref_labels)) > 0:
-            y_true.append(1)
+            relevance.append(1)
         else:
-            y_true.append(0)
+            relevance.append(0)
     # Calculate the average prediction
-    ap = average_precision_score(y_true, y_score)
-    return ap
+    return average_precision(relevance)
+
+def test_ap():
+    """Test the average precision function."""
+
+    results = [
+            [1,1,0,0,0,0], 
+            [0,0,0,0,1,1], 
+            [0,1,0,1,0,0], 
+            ]
+    
+    aps = [
+        1.0,
+        0.266,
+        0.5,
+    ]
+    
+    for i,result in enumerate(results):
+        delta = average_precision(result)-aps[i]
+        if abs(delta)>0.001:
+            print("Error")
 
 # TODO: MR1 NaNs
 def R1(query_fname, result, df):
@@ -59,6 +94,9 @@ if __name__=="__main__":
     parser.add_argument('-M', type=int, default=15, 
                         help="MAP@k calculation increments.")
     args=parser.parse_args()
+
+    # Test the average precision function
+    test_ap()
 
     # Read the ground truth annotations
     df = pd.read_csv(GT_PATH)
