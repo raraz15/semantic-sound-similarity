@@ -14,7 +14,7 @@ from directories import GT_PATH, EVAL_DIR
 
 def get_labels(fname, df):
     """Returns the set of labels of the fname from the dataframe."""
-    return set(df[df["fname"]==int(fname)]["labels"].values[0].split(", "))
+    return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
 
 def precision_at_k(y_true, k):
     # k is an index
