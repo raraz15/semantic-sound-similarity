@@ -53,7 +53,7 @@ def display_query_and_similar_sound(fname, df, results, N=15, header=None):
                 ap = calculate_average_precision(fname, results[i]['results'][fname], df)
                 st.write(f"Average Precision@15 for this result is: {ap:.3f}")
             for j,result in  enumerate(model["results"][fname][:N]):
-                fname = result["file_name"]
+                fname = result["result_fname"]
                 labels = df[df.fname==int(fname)].labels.values[0]
                 with columns[i]:
                     st.write(f"Ranking: {j+1} - Score: {result['score']:.3f}")
