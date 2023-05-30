@@ -14,21 +14,21 @@ from sklearn.metrics import average_precision_score
 
 from directories import GT_PATH, EVAL_DIR
 
-
 def get_labels(fname, df):
     """Returns the set of labels of the fname from the dataframe."""
-    return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
+    return set(df[df["fname"]==int(fname)]["labels"].values[0].split(", "))
 
-def calculate_average_precision(query_labels, result, df):
+def calculate_average_precision(query_fname, result, df):
     """We define a retrieved document relevant when there is
     at least a match."""
+    query_labels = get_labels(query_fname, df)
+    # Evaluate if each document is relevant
     y_true, y_score = [], []
     for ref_result in result:
         y_score.append(ref_result["score"])
         ref_labels = get_labels(ref_result["file_name"], df)
         # Find how many labels are shared
-        counter = len(query_labels.intersection(ref_labels))
-        if counter > 0:
+        if len(query_labels.intersection(ref_labels)) > 0:
             y_true.append(1)
         else:
             y_true.append(0)
@@ -38,7 +38,7 @@ def calculate_average_precision(query_labels, result, df):
 
 def R1(query_labels, result, df):
     for i,ref_result in enumerate(result):
-        ref_fname = list(ref_result.keys())[0]
+        ref_fname = ref_result["file_name"]
         ref_labels = get_labels(ref_fname, df)
         # Find where the first match is
         counter = len(query_labels.intersection(ref_labels))
@@ -81,9 +81,8 @@ if __name__=="__main__":
         start_time = time.time()
         aps = []
         for query_fname in fnames:
-            query_labels = get_labels(query_fname, df)
             result = results_dict[query_fname][:k] # Cutoff at k
-            ap = calculate_average_precision(query_labels, result, df)
+            ap = calculate_average_precision(query_fname, result, df)
             aps.append(ap)
         map = sum(aps)/len(aps) # mean average precision @k
         maps.append({"k": k, "mAP": map})
