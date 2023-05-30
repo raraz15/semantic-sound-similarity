@@ -18,14 +18,16 @@ fi
 
 MODEL_NAME=$1
 DATASET_NAME="FSD50K.eval_audio"
+EMBED_NAME="$MODEL_NAME-$2"
 
 #############################################################################
 
 DATA_DIR="$(pwd)/data"
 EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME"
-SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$MODEL_NAME"
-EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$MODEL_NAME"
-PREP_EMBED_DIR="$EMBED_DIR/$MODEL_NAME-$2"
+PREP_EMBED_DIR="$EMBED_DIR/$EMBED_NAME"
+
+SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$EMBED_NAME/$3"
+EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$EMBED_NAME/$3"
 
 echo "======================================================================="
 echo "Input Directory:"
@@ -42,7 +44,7 @@ echo
 echo "======================================================================="
 echo "Similarity Search"
 python similarity_search.py -p=$PREP_EMBED_DIR -s=$3
-SIMILARITY_PATH="$SIMILARITY_DIR-$2/$3/similarity_results.json"
+SIMILARITY_PATH="$SIMILARITY_DIR/similarity_results.json"
 echo $SIMILARITY_PATH
 echo
 
