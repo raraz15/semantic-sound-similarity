@@ -101,7 +101,7 @@ def plot_map_at_all_k(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_d
         fig.savefig(fig_path)
     plt.show()
 
-def plot_map_at_15(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR, D=0.215):
+def plot_map_at_15(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR, D=0.25):
     """Takes a model name and plots the mAP@k for all the variations of the model."""
 
     # Find all the variation_paths of the model
@@ -262,6 +262,46 @@ def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
     plt.show()
+
+def plot_label_based_map(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
+    """Takes an embedding name and plots the label-based mAP@15 for only that variation."""
+
+    # Find all the variation_paths of the model
+    variation_paths = sorted(glob.glob(os.path.join(eval_dir,f"{model}-*")))
+    # Read one variation's folder to get the searches
+    searches = os.listdir(variation_paths[0])
+
+    # Read the label-based mAP@15
+    for variation_path in variation_paths:
+        for search in searches:
+
+            embedding_search = os.path.basename(variation_path) + "-" + search
+
+            # Read the label-based mAP@15
+            map_path = os.path.join(variation_path, search, "label_based_mAP_at_15.csv")
+            label_maps = pd.read_csv(map_path)
+            k = label_maps.k.to_list()[0] # All k values are the same # TODO: read K or fix?
+            # Separate the labels and maps
+            labels = label_maps.label.to_list()
+            maps = label_maps.mAP.to_list()
+
+            # Plot the label-based mAP@15
+            N = 10 # Number of rows
+            delta = len(label_maps) // N
+            fig, ax = plt.subplots(figsize=(18, 24), nrows=N, constrained_layout=True)
+            fig.suptitle(f"{embedding_search} mAP Values of Individual Classes", fontsize=16)
+            for i in range(N):
+                ax[i].bar([label.replace("_","\n") for label in labels[i*delta:(i+1)*delta]], 
+                        [count for count in maps[i*delta:(i+1)*delta]])
+                ax[i].set_yticks(np.arange(0, 1.1, 0.2))
+                ax[i].grid()
+                ax[i].set_ylim([0, 1.1])
+                ax[i].set_ylabel("mAP@{}".format(k))
+            if save_fig:
+                os.makedirs(save_dir, exist_ok=True)
+                fig_path = os.path.join(save_dir, f"{embedding_search}-label_based_mAP_at_15.png")
+                print(f"Saving figure to {fig_path}")
+                fig.savefig(fig_path)
 
 #####################################################################################
 # Multiple Model Plots
@@ -473,5 +513,6 @@ if __name__=="__main__":
     args=parser.parse_args()
 
     plot_map_at_15(args.model, save_fig=True, save_dir=args.save_dir)
+    plot_label_based_map(args.model, save_fig=True, save_dir=args.save_dir)
     plot_mr1(args.model, save_fig=True, save_dir=args.save_dir)
     print("Done!")

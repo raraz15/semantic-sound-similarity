@@ -10,19 +10,15 @@ Collaboration with: Frederic Font, Alastair Porter
 contact: oguza97@gmail.com
 
 ## TODO:
-- Count number of files
-- macro vs micro mAP
-- Sounds that are not maximally imilar to themselves
 - Lower PCA
 - Change PCA naming convention
 - Metrics
-    - Control computations
-        - Is the mAP true as it is (1 intersection)?
-        - ncdg metric
+    - Leaf vs node mAP
+    - ncdg metric
+    - macro vs micro mAP
+    - Once u decide on final comparisons, MR1 with no k
 - Models
     - L3
     - PANs
     - PAST
-
-- Try Different Aggregations
 - Normalize audio

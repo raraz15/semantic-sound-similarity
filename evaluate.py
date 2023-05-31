@@ -14,14 +14,17 @@ from directories import GT_PATH, EVAL_DIR
 
 def get_labels(fname, df):
     """Returns the set of labels of the fname from the dataframe."""
+
     return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
 
 def precision_at_k(y_true, k):
-    # k is an index
+    """Calculate precision@k where k is in range(0,len(y_true))."""
+
     return sum(y_true[:k+1])/(k+1)
 
 def average_precision(relevance):
-    """ Calculate the average prediction for a list of relevance values."""
+    """Calculate the average prediction for a list of relevance values.
+    relevance: list of relevance values (1: relevant, 0: not relevant)"""
 
     # Number of relevant documents
     total_relevant = sum(relevance)
@@ -31,6 +34,20 @@ def average_precision(relevance):
     else:
         # Calculate average precision
         return sum([rel_k*precision_at_k(relevance,k) for k,rel_k in enumerate(relevance)]) / total_relevant
+
+def test_ap():
+    """Test the average precision function."""
+
+    results = [
+            [[0,0,0,0,0,0], 0.0],
+            [[1,1,0,0,0,0], 1.0],
+            [[0,0,0,0,1,1], 0.266],
+            [[0,1,0,1,0,0], 0.5],
+            ]
+    for result,answer in results:
+        delta = average_precision(result)-answer
+        if abs(delta)>0.001:
+            print("Error")
 
 def calculate_average_precision(query_fname, result, df):
     """Calculates the average precision@k for a query and its results, where
@@ -52,25 +69,44 @@ def calculate_average_precision(query_fname, result, df):
     # Calculate the average prediction
     return average_precision(relevance)
 
-def test_ap():
-    """Test the average precision function."""
+def calculate_map_at_k(results_dict, df, k):
+    """Calculates the mean average precision for the whole dataset."""
 
-    results = [
-            [1,1,0,0,0,0], 
-            [0,0,0,0,1,1], 
-            [0,1,0,1,0,0], 
-            ]
-    
-    aps = [
-        1.0,
-        0.266,
-        0.5,
-    ]
-    
-    for i,result in enumerate(results):
-        delta = average_precision(result)-aps[i]
-        if abs(delta)>0.001:
-            print("Error")
+    aps = [] # Average precision for the current k
+    for query_fname, result in results_dict.items():
+        aps.append(calculate_average_precision(query_fname, 
+                                                result[:k], # Cutoff at k
+                                                df)
+                                                )
+    map_at_k = sum(aps)/len(aps) # mean average precision for the whole dataset
+    return map_at_k
+
+def label_based_map(results_dict, df, k=15):
+    """Calculates the average precision@k for each label in the query_fname."""
+
+    # Get all the labels from the df
+    labels = set([label for labels in df["labels"].apply(lambda x: x.split(",")).to_list() for label in labels])
+    # Calculate the average precision for each label
+    label_maps = []
+    for label in list(labels):
+        # Get the fnames containing this label
+        fnames_with_label = df[df["labels"].apply(lambda x: label in x)]["fname"].to_list()
+        # Calculate the ap for each fname
+        aps = []
+        for query_fname in fnames_with_label:
+            result = results_dict[str(query_fname)][:k] # Cutoff at k
+            ap = calculate_average_precision(query_fname, result, df)
+            aps.append(ap)
+        # mAP@k
+        map = sum(aps)/len(aps)
+        # Append the label and its map
+        label_maps.append((label, map))
+    # Sort the label maps by the mAP
+    label_maps = sorted(label_maps, key=lambda x: x[1], reverse=True)
+    # Convert to dict
+    label_maps = [{"label": label, "mAP": map, "k": k} for label,map in label_maps]
+
+    return label_maps
 
 # TODO: MR1 NaNs
 def R1(query_fname, result, df):
@@ -83,7 +119,7 @@ def R1(query_fname, result, df):
             return i # Return the rank of the first match
     return None # No match
 
-# TODO: macro AP, micro AP
+# TODO: micro AP
 # TODO: ncdg
 if __name__=="__main__":
 
@@ -101,11 +137,12 @@ if __name__=="__main__":
     # Read the ground truth annotations
     df = pd.read_csv(GT_PATH)
 
-    # Read one similarity search result to get the N
+    # Read the results
+    results_dict = {}
     with open(args.path, "r") as infile:
         for jline in infile:
             result_dict = json.loads(jline)
-            break
+            results_dict[result_dict["query_fname"]] = result_dict["results"]
     N = len(result_dict["results"]) # Number of returned results for each query
 
     # Create the output directory
@@ -120,22 +157,24 @@ if __name__=="__main__":
     maps = []
     for k in range(args.M, ((N//args.M)+1)*args.M, args.M):
         start_time = time.time()
-        aps = [] # Average precision for the current k
-        with open(args.path, "r") as infile:
-            for jline in infile:
-                result_dict = json.loads(jline)
-                query_fname = result_dict["query_fname"]
-                result = result_dict["results"][:k] # Cutoff at k
-                aps.append(calculate_average_precision(query_fname, result, df))
-        map_k = sum(aps)/len(aps) # mean average precision @k for the whole dataset
-        maps.append({"k": k, "mAP": map_k})
+        map_at_k = calculate_map_at_k(results_dict, df, k)
+        maps.append({"k": k, "mAP": map_at_k})
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
-        print(f"k: {k:>{len(str(N))}} | mAP@k: {map_k:.5f} | Time: {time_str}")
+        print(f"k: {k:>{len(str(N))}} | mAP@k: {map_at_k:.5f} | Time: {time_str}")
     # Export the mAPs to CSV
     maps = pd.DataFrame(maps)
     output_path = os.path.join(output_dir, "mAP.csv")
     maps.to_csv(output_path, index=False)
     print(f"mAP@k results are exported to {output_path}")
+
+    # Calculate label-based mAP@15
+    print("Calculating label-based mAP@15...")
+    label_based_map_at_15 = label_based_map(results_dict, df, k=15)
+    # Export the label-based mAP@15 to CSV
+    label_based_map_at_15 = pd.DataFrame(label_based_map_at_15)
+    output_path = os.path.join(output_dir, "label_based_mAP_at_15.csv")
+    label_based_map_at_15.to_csv(output_path, index=False)
+    print(f"label-based mAP@15 results are exported to {output_path}")
 
     # Calculate MR1
     print("\nCalculating MR1...")
