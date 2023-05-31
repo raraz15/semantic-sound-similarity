@@ -302,6 +302,7 @@ def plot_label_based_map(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGU
                 fig_path = os.path.join(save_dir, f"{embedding_search}-label_based_mAP_at_15.png")
                 print(f"Saving figure to {fig_path}")
                 fig.savefig(fig_path)
+                plt.close()
 
 #####################################################################################
 # Multiple Model Plots
