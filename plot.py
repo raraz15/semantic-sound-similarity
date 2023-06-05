@@ -28,7 +28,6 @@ def plot_map_at_all_k(model, eval_dir=EVAL_DIR, n_cols=3,
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir,f"{model}-*")))
-
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
     # Read one map to get the k values
@@ -60,8 +59,7 @@ def plot_map_at_all_k(model, eval_dir=EVAL_DIR, n_cols=3,
     fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, 
                             figsize=(6*n_cols,6*n_rows), constrained_layout=True)
     fig.suptitle(f"Embedding Processing and Search Algorithm Performances by mAP Values"
-                 f"\n{model} Evaluated on {DATASET_NAME}", fontsize=20, weight='bold')
-    #fig.suptitle(f"{model} - mAP@k Values on {DATASET_NAME}", fontsize=20, weight='bold')
+                 f"\n{model} Evaluated on {DATASET_NAME}", fontsize=19, weight='bold')
     for n,k in enumerate(map_dict.keys()):
 
         row, col = n//n_cols, n%n_cols
@@ -114,26 +112,20 @@ def plot_map_at_15(model, eval_dir=EVAL_DIR, D=0.25,
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir,f"{model}-*")))
-
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
     # Read one map to get the k values
     map_path = os.path.join(variation_paths[0], searches[0], "mAP.csv")
-    k_values = pd.read_csv(map_path).k.to_list()
 
     # Read all the maps
-    map_dict = {}
-    for k in k_values:
-        if k!=15:
-            continue
-        map_dict[k] = {search: [] for search in searches}
-        for search in searches:
-            for model_dir in variation_paths:
-                map_path = os.path.join(model_dir, search, "mAP.csv")
-                map = pd.read_csv(map_path)
-                full_model_name = model_dir.split("/")[-1]
-                variation = "-".join(full_model_name.split("-")[-3:])
-                map_dict[k][search].append((variation, map[map.k==k].mAP.to_numpy()[0]))
+    map_dict = {search: [] for search in searches}
+    for search in searches:
+        for model_dir in variation_paths:
+            map_path = os.path.join(model_dir, search, "mAP.csv")
+            map = pd.read_csv(map_path)
+            full_model_name = model_dir.split("/")[-1]
+            variation = "-".join(full_model_name.split("-")[-3:])
+            map_dict[search].append((variation, map[map.k==15].mAP.to_numpy()[0]))
 
     # Determine some plot parameters
     if len(searches)>1:
@@ -146,11 +138,10 @@ def plot_map_at_15(model, eval_dir=EVAL_DIR, D=0.25,
     # Plot the maps
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     fig.suptitle(f"Embedding Processing and Search Algorithm Performances by mAP"
-                 f"\n{model} Evaluated on {DATASET_NAME}", fontsize=20, weight='bold')
-    k = 15
+                 f"\n{model} Evaluated on {DATASET_NAME}", fontsize=19, weight='bold')
     xticks = []
-    for j,search in enumerate(map_dict[k].keys()):
-        for z,(variation,map) in enumerate(map_dict[k][search]):
+    for j,search in enumerate(map_dict.keys()):
+        for z,(variation,map) in enumerate(map_dict[search]):
             if j==0:
                 if "essentia" not in variation:
                     xticks.append(variation.replace("-","\n").replace("Agg_", ""))
@@ -200,7 +191,6 @@ def plot_map_at_all_k(model, eval_dir=EVAL_DIR, n_cols=3,
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir,f"{model}-*")))
-
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
     # Read one map to get the k values
@@ -232,8 +222,8 @@ def plot_map_at_all_k(model, eval_dir=EVAL_DIR, n_cols=3,
     fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, 
                             figsize=(6*n_cols,6*n_rows), constrained_layout=True)
     fig.suptitle(f"Embedding Processing and Search Algorithm Performances by mAP Values"
-                 f"\n{model} Evaluated on {DATASET_NAME}", fontsize=20, weight='bold')
-    #fig.suptitle(f"{model} - mAP@k Values on {DATASET_NAME}", fontsize=20, weight='bold')
+                 f"\n{model} Evaluated on {DATASET_NAME}", fontsize=19, weight='bold')
+    #fig.suptitle(f"{model} - mAP@k Values on {DATASET_NAME}", fontsize=19, weight='bold')
     for n,k in enumerate(map_dict.keys()):
 
         row, col = n//n_cols, n%n_cols
@@ -286,7 +276,6 @@ def plot_av_label_based_map_at_15(model, eval_dir=EVAL_DIR, D=0.25,
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, f"{model}-*")))
-
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
 
@@ -313,7 +302,7 @@ def plot_av_label_based_map_at_15(model, eval_dir=EVAL_DIR, D=0.25,
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     fig.suptitle(f"Embedding Processing and Search Algorithm Performances by "
                 f" Average Label-Based mAP\n{model} Evaluated on {DATASET_NAME}", 
-                fontsize=20, weight='bold')
+                fontsize=19, weight='bold')
     xticks = []
     for j,search in enumerate(map_dict.keys()):
         for z,(variation,map) in enumerate(map_dict[search]):
@@ -366,7 +355,6 @@ def plot_mr1(model, eval_dir=EVAL_DIR,
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir,f"{model}-*")))
-
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
 
@@ -391,7 +379,7 @@ def plot_mr1(model, eval_dir=EVAL_DIR,
 
     # Plot the MR1s
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(f"Embedding Processing and Search Algorithm Performances by MR1 Values", fontsize=20, weight='bold')
+    fig.suptitle(f"Embedding Processing and Search Algorithm Performances by MR1 Values", fontsize=19, weight='bold')
     ax.set_title(f"{model} Evaluated on {DATASET_NAME}", fontsize=18)
     xticks, max_val = [], []
     for i in range(len(variation_paths)):
@@ -501,7 +489,7 @@ def plot_mr1_comparisons_single_variation(models, eval_dir=EVAL_DIR,
 
     # Plot the MR1s
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(f"Embedding Performances using MR1 values Evaluated on {DATASET_NAME} Set", fontsize=20, weight='bold')
+    fig.suptitle(f"Embedding Performances using MR1 values Evaluated on {DATASET_NAME} Set", fontsize=19, weight='bold')
     ax.set_title("For each model, the best performing processing parameters are used", fontsize=15)
     for i,(model_name,search,mr1) in enumerate(mr1s):
             ax.bar(i, 
@@ -556,7 +544,7 @@ def plot_map_comparisons_single_variation(models, eval_dir=EVAL_DIR, fig_name=""
     K = df.k.to_numpy()
 
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(f"Embedding Performances using mAP@15 values on {DATASET_NAME}", fontsize=20, weight='bold')
+    fig.suptitle(f"Embedding Performances using mAP@15 values on {DATASET_NAME}", fontsize=19, weight='bold')
     #ax.set_title("For each model, the best performing processing parameters are used", fontsize=15)
     ax.set_title("Page 1 Results", fontsize=15)
     #for i in range(len(K)):
@@ -616,7 +604,7 @@ def plot_map_comparisons(models, eval_dir=EVAL_DIR,
     fig,axs = plt.subplots(nrows=1, ncols=n_variations, 
                            figsize=(18,6), constrained_layout=True)
     fig.suptitle(f"Embedding Performances using mAP@k values Evaluated on \{DATASET_NAME} Set", 
-                 fontsize=20, weight='bold')
+                 fontsize=19, weight='bold')
     for i in range(n_variations):
 
         # Read all the maps for all variations of model i
@@ -694,8 +682,8 @@ def plot_av_label_based_map_comparisons(models, eval_dir=EVAL_DIR, fig_name="",
         maps.append((model[0], model[1], map))
 
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(f"Embedding Performances of Average Label-Based mAP@15 values on {DATASET_NAME}", fontsize=20, weight='bold')
-    #ax.set_title("For each model, the best performing processing parameters are used", fontsize=15)
+    fig.suptitle(f"Embedding Performances using Average Label-Based mAP@15 values on {DATASET_NAME}", 
+                 fontsize=19, weight='bold')
     ax.set_title("Page 1 Results", fontsize=15)
     for j,(model_name,search,map) in enumerate(maps):
         ax.bar(0+positions[j], 
