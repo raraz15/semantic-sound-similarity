@@ -14,9 +14,16 @@ from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
 #####################################################################################
+# Utility Functions
+
+def get_model_name(full_name):
+    return full_name.split("-PCA")[0].split("-Agg")[0]
+
+#####################################################################################
 # Single Model Plots
 
-def plot_map_at_all_k(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_dir=FIGURES_DIR):
+def plot_map_at_all_k(model, eval_dir=EVAL_DIR, n_cols=3, 
+                      save_fig=False, save_dir=FIGURES_DIR):
     """Takes a model name and plots the mAP@k for all the variations of the model."""
 
     # Find all the variation_paths of the model
@@ -101,7 +108,8 @@ def plot_map_at_all_k(model, eval_dir=EVAL_DIR, n_cols=3, save_fig=False, save_d
         fig.savefig(fig_path)
     plt.show()
 
-def plot_map_at_15(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR, D=0.25):
+def plot_map_at_15(model, eval_dir=EVAL_DIR, D=0.25, 
+                   save_fig=False, save_dir=FIGURES_DIR):
     """Takes a model name and plots the mAP@k for all the variations of the model."""
 
     # Find all the variation_paths of the model
@@ -186,7 +194,8 @@ def plot_map_at_15(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DI
         fig.savefig(fig_path)
     plt.show()
 
-def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
+def plot_mr1(model, eval_dir=EVAL_DIR, 
+             save_fig=False, save_dir=FIGURES_DIR):
     """Takes a model name and plots the MR1 for all the variations of the model."""
 
     # Find all the variation_paths of the model
@@ -263,7 +272,8 @@ def plot_mr1(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
         fig.savefig(fig_path)
     plt.show()
 
-def plot_label_based_map(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
+def plot_label_based_map(model, eval_dir=EVAL_DIR, 
+                         save_fig=False, save_dir=FIGURES_DIR):
     """Takes an embedding name and plots the label-based mAP@15 for only that variation."""
 
     # Find all the variation_paths of the model
@@ -308,7 +318,8 @@ def plot_label_based_map(model, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGU
 # Multiple Model Plots
 
 # TODO: check MR1@90
-def plot_mr1_comparisons_single_variation(models, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
+def plot_mr1_comparisons_single_variation(models, eval_dir=EVAL_DIR, 
+                                          save_fig=False, save_dir=FIGURES_DIR):
     """Takes a list of models and plots the mAP@k for all the variations of the model.
     Each model must be a tupple of (model_name, [variations], search_algorithm)"""
 
@@ -359,10 +370,8 @@ def plot_mr1_comparisons_single_variation(models, eval_dir=EVAL_DIR, save_fig=Fa
         fig.savefig(fig_path)
     plt.show()
 
-def get_model_name(full_name):
-    return full_name.split("-PCA")[0].split("-Agg")[0]
-
-def plot_map_comparisons_single_variation(models, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR, fig_name=""):
+def plot_map_comparisons_single_variation(models, eval_dir=EVAL_DIR, fig_name="", 
+                                          save_fig=False, save_dir=FIGURES_DIR,):
     """Takes a list of models and plots the mAP@k for all the variations of the model.
     Each model must be a tupple of (model_name, [variations], search_algorithm)"""
 
@@ -428,7 +437,8 @@ def plot_map_comparisons_single_variation(models, eval_dir=EVAL_DIR, save_fig=Fa
         fig.savefig(fig_path)
     plt.show()
 
-def plot_map_comparisons(models, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIGURES_DIR):
+def plot_map_comparisons(models, eval_dir=EVAL_DIR, 
+                         save_fig=False, save_dir=FIGURES_DIR):
     """Takes a list of models and plots the mAP@k for all the variations of the model.
     Each model must be a tupple of (model_name, [variations], search_algorithm)"""
 
@@ -498,6 +508,8 @@ def plot_map_comparisons(models, eval_dir=EVAL_DIR, save_fig=False, save_dir=FIG
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
     plt.show()
+
+#####################################################################################
 
 if __name__=="__main__":
 
