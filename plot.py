@@ -509,6 +509,64 @@ def plot_map_comparisons(models, eval_dir=EVAL_DIR,
         fig.savefig(fig_path)
     plt.show()
 
+def plot_av_label_based_map_comparisons(models, eval_dir=EVAL_DIR, fig_name="", 
+                                        save_fig=False, save_dir=FIGURES_DIR):
+
+    # Determine Some Parameters
+    positions = np.linspace(-0.4, 0.4, len(models))
+    delta = positions[1]-positions[0]
+
+    # Read the mAP for each model
+    maps = []
+    for model in models:
+        model_dir = os.path.join(eval_dir, model[0])
+        results_dir = os.path.join(model_dir, model[1])
+        map_path = os.path.join(results_dir, "av_label_based_mAP_at_15.txt")
+        with open(map_path, "r") as f:
+            map = float(f.read())
+        maps.append((model[0], model[1], map))
+
+    fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
+    fig.suptitle(f"Embedding Performances of Average Label-Based mAP@15 values on {DATASET_NAME}", fontsize=20, weight='bold')
+    #ax.set_title("For each model, the best performing processing parameters are used", fontsize=15)
+    ax.set_title("Page 1 Results", fontsize=15)
+    for j,(model_name,search,map) in enumerate(maps):
+        ax.bar(0+positions[j], 
+                map, 
+                label=get_model_name(model_name) if 0==0 else "",
+                width=delta*0.80, 
+                color=COLORS[j], 
+                edgecolor='k'
+                )
+        ax.text(0+positions[j], 
+                map+0.01, 
+                f"{map:.3f}", 
+                ha='center', 
+                va='bottom', 
+                fontsize=10, 
+                weight='bold'
+                )
+
+    # Set the plot parameters
+    ax.set_yticks(np.arange(0,1.05,0.05))
+    ax.tick_params(axis='x', which='major', labelsize=0)
+    ax.tick_params(axis='y', which='major', labelsize=11)
+    ax.set_xlabel("Embedding, Search Combinations", fontsize=15)
+    ax.set_ylabel("mAP@15 (↑)", fontsize=15) # TODO: change name?
+    ax.set_ylim([0,1])
+    ax.grid()
+    ax.legend(loc="best", fontsize=10, title_fontsize=11, fancybox=True)
+    if save_fig:
+        os.makedirs(save_dir, exist_ok=True)
+        if fig_name == "":
+            names = "-".join([model[0] for model in models])
+            fig_path = os.path.join(save_dir, f"{names}-av_label_based_mAP_comparison_k15.png")
+        else:
+            fig_path = os.path.join(save_dir, fig_name+".png")
+        print(f"Saving figure to {fig_path}")
+        fig.savefig(fig_path)
+    plt.show()
+
 #####################################################################################
 
 if __name__=="__main__":
