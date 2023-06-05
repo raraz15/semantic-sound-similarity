@@ -1,5 +1,5 @@
-"""Compute evaluation metrics for the similarity search result 
-of an embedding model over a dataset."""
+""" Compute evaluation metrics for the similarity search result 
+of an embedding over FSD50K.eval_audio."""
 
 import os
 import time
@@ -35,7 +35,7 @@ def average_precision(relevance):
         # Calculate average precision
         return sum([rel_k*precision_at_k(relevance,k) for k,rel_k in enumerate(relevance)]) / total_relevant
 
-def test_ap():
+def test_average_precision():
     """Test the average precision function."""
 
     results = [
@@ -49,10 +49,10 @@ def test_ap():
         if abs(delta)>0.001:
             print("Error")
 
-def calculate_average_precision(query_fname, result, df):
-    """Calculates the average precision@k for a query and its results, where
-    k is the length of the results. A result is considered relevant if it has
-    at least one label in common with the query."""
+def evaluate_relevance(query_fname, result, df, label=None):
+    """ Evaluates the relevance of a result for a query. By default, A result is considered
+    relevant if it has at least one label in common with the query. If a label is provided,
+    a result is considered relevant if it contains the label."""
 
     # Get the labels of the query
     query_labels = get_labels(query_fname, df)
@@ -61,28 +61,43 @@ def calculate_average_precision(query_fname, result, df):
     for ref_result in result:
         ref_fname = ref_result["result_fname"]
         ref_labels = get_labels(ref_fname, df)
-        # Find if a retrieved element is relevant
-        if len(query_labels.intersection(ref_labels)) > 0:
-            relevance.append(1)
+        if label is None:
+            # Find if the retrieved element is relevant
+            if len(query_labels.intersection(ref_labels)) > 0:
+                relevance.append(1)
+            else:
+                relevance.append(0)
         else:
-            relevance.append(0)
-    # Calculate the average prediction
-    return average_precision(relevance)
+            # Find if the retrieved element contains the label
+            if label in ref_labels:
+                relevance.append(1)
+            else:
+                relevance.append(0)
+    return relevance
 
-def calculate_map_at_k(results_dict, df, k):
-    """Calculates the mean average precision for the whole dataset."""
+def calculate_micro_map_at_k(results_dict, df, k):
+    """ Calculates the micro mean average precision for the whole dataset. That is,
+    each element in the dataset is considered a query and the average precision@k
+    is calculated for each of them. Then, the mean of all the average precision@k
+    is calculated."""
 
     aps = [] # Average precision for the current k
     for query_fname, result in results_dict.items():
-        aps.append(calculate_average_precision(query_fname, 
-                                                result[:k], # Cutoff at k
-                                                df)
-                                                )
-    map_at_k = sum(aps)/len(aps) # mean average precision for the whole dataset
+        # Evaluate the relevance of the result
+        relevance = evaluate_relevance(query_fname, result[:k], df) # Cutoff at k
+        # Calculate the average precision
+        ap = average_precision(relevance)
+        aps.append(ap)
+    # mean average precision for the whole dataset
+    map_at_k = sum(aps)/len(aps)
+
     return map_at_k
 
-def label_based_map(results_dict, df, k=15):
-    """Calculates the average precision@k for each label in the query_fname."""
+def calculate_macro_map_at_k(results_dict, df, k=15):
+    """ Calculates the macro mean average precision for the whole dataset. That is,
+    for each label in the dataset, the elements containing that label are considered
+    as queries and the average precision@k is calculated for each of them. Then, the
+    mean of all the average precision@k is calculated."""
 
     # Get all the labels from the df
     labels = set([label for labels in df["labels"].apply(lambda x: x.split(",")).to_list() for label in labels])
@@ -91,13 +106,16 @@ def label_based_map(results_dict, df, k=15):
     for label in list(labels):
         # Get the fnames containing this label
         fnames_with_label = df[df["labels"].apply(lambda x: label in x)]["fname"].to_list()
-        # Calculate the ap for each fname
+        # Calculate the ap for each fname containing the label
         aps = []
         for query_fname in fnames_with_label:
             result = results_dict[str(query_fname)][:k] # Cutoff at k
-            ap = calculate_average_precision(query_fname, result, df)
+            # Evaluate the relevance of the result
+            relevance = evaluate_relevance(query_fname, result, df, label=label)
+            # Calculate the average precision
+            ap = average_precision(relevance)
             aps.append(ap)
-        # mAP@k
+        # mean average precision for the label
         map = sum(aps)/len(aps)
         # Append the label and its map
         label_maps.append((label, map))
@@ -119,7 +137,6 @@ def R1(query_fname, result, df):
             return i # Return the rank of the first match
     return None # No match
 
-# TODO: micro AP
 # TODO: ncdg
 if __name__=="__main__":
 
@@ -127,12 +144,12 @@ if __name__=="__main__":
                                    formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('-p', '--path', type=str, required=True, 
                         help='Path to results.json file.')
-    parser.add_argument('-M', type=int, default=15, 
+    parser.add_argument('--increment', type=int, default=15, 
                         help="MAP@k calculation increments.")
+    parser.add_argument('--metrics', type=str, nargs='+', default=["macro_map", "micro_map", "mr1"], 
+                        help='Metrics to calculate.')
     args=parser.parse_args()
-
-    # Test the average precision function
-    test_ap()
+    args.metrics = [metric.lower() for metric in args.metrics] # Lowercase the metrics
 
     # Read the ground truth annotations
     df = pd.read_csv(GT_PATH)
@@ -152,54 +169,59 @@ if __name__=="__main__":
     output_dir = os.path.join(EVAL_DIR, dataset_name, model_name, search_name)
     os.makedirs(output_dir, exist_ok=True)
 
-    # Calculate mAP@k for various k values
-    print("Calculating mAP@k for various k values...")
-    maps = []
-    for k in range(args.M, ((N//args.M)+1)*args.M, args.M):
+    # Calculate micro mAP@k if required
+    if "micro_map" in args.metrics:
+        print("Calculating micro mAP@k for various k values...")
+        micro_maps = []
+        for k in range(args.increment, ((N//args.increment)+1)*args.increment, args.increment):
+            start_time = time.time()
+            micro_map_at_k = calculate_micro_map_at_k(results_dict, df, k)
+            micro_maps.append({"k": k, "mAP": micro_map_at_k})
+            time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
+            print(f"k: {k:>{len(str(N))}} | micro mAP@k: {micro_map_at_k:.5f} | Time: {time_str}")
+        # Export the mAPs to CSV
+        micro_maps = pd.DataFrame(micro_maps)
+        output_path = os.path.join(output_dir, "micro_mAP.csv")
+        micro_maps.to_csv(output_path, index=False)
+        print(f"micro mAP@k results are exported to {output_path}")
+
+    # Calculate Macro mAP@15 if required
+    if "macro_map" in args.metrics:
+        print("Calculating macro mAP@15...")
         start_time = time.time()
-        map_at_k = calculate_map_at_k(results_dict, df, k)
-        maps.append({"k": k, "mAP": map_at_k})
+        macro_map_at_k = calculate_macro_map_at_k(results_dict, df, k=15)
+        # Take the average of the macro mAP@15
+        av_macro_map_at_k = sum(map(lambda x: x["mAP"], macro_map_at_k))/len(macro_map_at_k)
+        output_path = os.path.join(output_dir, "av_macro_mAP_at_15.txt")
+        with open(output_path, "w") as outfile:
+            outfile.write(str(av_macro_map_at_k))
+        # Export the label-based mAP@15 as csv
+        macro_map_at_k = pd.DataFrame(macro_map_at_k)
+        output_path = os.path.join(output_dir, "macro_mAP_at_15.csv")
+        macro_map_at_k.to_csv(output_path, index=False)
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
-        print(f"k: {k:>{len(str(N))}} | mAP@k: {map_at_k:.5f} | Time: {time_str}")
-    # Export the mAPs to CSV
-    maps = pd.DataFrame(maps)
-    output_path = os.path.join(output_dir, "mAP.csv")
-    maps.to_csv(output_path, index=False)
-    print(f"mAP@k results are exported to {output_path}")
+        print(f"Macro mAP@15 results are exported to {output_path} | Time: {time_str}")
 
-    # Calculate label-based mAP@15
-    print("Calculating label-based mAP@15...")
-    label_based_map_at_15 = label_based_map(results_dict, df, k=15)
-    # Calculate the mean label-based mAP@15
-    av_label_based_map_at_15 = sum(map(lambda x: x["mAP"], label_based_map_at_15))/len(label_based_map_at_15)
-    output_path = os.path.join(output_dir, "av_label_based_mAP_at_15.txt")
-    with open(output_path, "w") as outfile:
-        outfile.write(str(av_label_based_map_at_15))
-    # Export the label-based mAP@15 to CSV
-    label_based_map_at_15 = pd.DataFrame(label_based_map_at_15)
-    output_path = os.path.join(output_dir, "label_based_mAP_at_15.csv")
-    label_based_map_at_15.to_csv(output_path, index=False)
-    print(f"label-based mAP@15 results are exported to {output_path}")
-
-    # Calculate MR1
-    print("\nCalculating MR1...")
-    start_time = time.time()
-    mr1 = []
-    with open(args.path, "r") as infile:
-        for jline in infile:
-            results_dict = json.loads(jline)
-            query_fname = results_dict["query_fname"]
-            result = results_dict["results"]
-            mr1.append(R1(query_fname, result, df))
-    mr1 = [x for x in mr1 if x] # Remove entries with no matches
-    mr1 = sum(mr1)/len(mr1)
-    time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
-    print(f"MR1: {mr1:.1f} | Time: {time_str}")
-    # Export the MR1s to txt
-    output_path = os.path.join(output_dir, "MR1.txt")
-    with open(output_path, "w") as outfile:
-        outfile.write(str(mr1))
-    print(f"MR1 results are exported to {output_path}")
+    # Calculate MR1 if requested
+    if "mr1" in args.metrics:
+        print("\nCalculating MR1...")
+        start_time = time.time()
+        mr1 = []
+        with open(args.path, "r") as infile:
+            for jline in infile:
+                results_dict = json.loads(jline)
+                query_fname = results_dict["query_fname"]
+                result = results_dict["results"]
+                mr1.append(R1(query_fname, result, df))
+        mr1 = [x for x in mr1 if x] # Remove entries with no matches
+        mr1 = sum(mr1)/len(mr1)
+        time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
+        print(f"MR1: {mr1:.1f} | Time: {time_str}")
+        # Export the MR1s to txt
+        output_path = os.path.join(output_dir, "MR1.txt")
+        with open(output_path, "w") as outfile:
+            outfile.write(str(mr1))
+        print(f"MR1 results are exported to {output_path}")
 
     #############
     print("Done!")
