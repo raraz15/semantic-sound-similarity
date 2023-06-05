@@ -17,13 +17,13 @@ from evaluate import calculate_average_precision
 from directories import *
 
 FREESOUND_STRING = '<iframe frameborder="0" scrolling="no" \
-                    src="https://freesound.org/embed/sound/iframe/{}/simple/medium/" \
-                    width="481" height="86"></iframe>'
+                    src="https://freesound.org/embed/sound/iframe/{}/simple/small/" \
+                    width="375" height="30"></iframe>'
 
+# Set the page title and icon
 st.set_page_config(page_title="Sound Similarity", page_icon=":loud_sound:", layout="wide")
 
-# TODO: allow mutations?
-@st.cache_resource()
+@st.cache_data(ttl=1800, show_spinner=False)
 def load_gt():
     """Load the ground truth file and return the dataframe and all labels."""
     df = pd.read_csv(GT_PATH)
@@ -31,7 +31,7 @@ def load_gt():
     all_labels = sorted(list(set([y for x in df.labels.to_list() for y in x.split(",")])))
     return df, all_labels
 
-@st.cache_resource
+@st.cache_data(ttl=1800, show_spinner=False)
 def load_results(paths):
     # For each analysis file, load the results
     model_results_dcts = []
@@ -45,10 +45,10 @@ def load_results(paths):
         # Get the search type
         if result_dict["search"]=="nearest_neighbour":
             search = "Nearest Neighbor"
-        elif result_dict["search"]=="dot":
+        elif result_dict["search"]=="dot_product":
             search = "Dot Product"
         else:
-            raise ValueError("Unknown search type.")
+            raise ValueError(f"Unknown search type. {result_dict['search']}")
         # Get the embeddings name
         embeddings_name = os.path.basename(os.path.dirname(os.path.dirname(path)))
         # Append the results
@@ -62,21 +62,34 @@ def load_results(paths):
 
 def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, header=None):
 
-    # Get the labels for the query sound
-    query_labels = df[df.fname==int(query_fname)].labels.values[0].replace(",", ", ")
+    # Display the header if provided
     if header is not None:
         st.header(header)
+
+    # Display the query sound
+    query_labels = df[df.fname==int(query_fname)].labels.values[0] # Get the labels for the query sound
     with st.container():
         st.subheader("Query Sound")
         st.caption(f"Sound ID: {query_fname}")
-        st.caption(f"Labels: {query_labels}")
+        st.write(f"Labels: {query_labels.replace(',', ', ')}")
         st.components.v1.html(FREESOUND_STRING.format(query_fname))
     st.divider()
-    st.subheader(f"Top {N} Similar Sounds for each Embedding")
+
+    # Split the labels into a list
+    query_labels = query_labels.split(",")
+
+    # Display the top N similar sounds for each embedding-search combination
+    st.subheader(f"Top {N} Similar Sounds for each Embedding-Search Combination")
     with st.container():
+
         # Create a column for each embedding-search combination
         columns = st.columns(len(model_result_dcts))
+
+        # Fill columns for each embedding-search combination
         for i, model_result_dct in enumerate(model_result_dcts):
+
+            # Calculate the average precision for the query sound with this embedding
+            ap = calculate_average_precision(query_fname, model_result_dct['results'][query_fname], df)
 
             # Get the model name and variant
             if "Agg" not in model_result_dct['embeddings_name']:
@@ -85,9 +98,6 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
             else:
                 model_name, variant = model_result_dct['embeddings_name'].split("-Agg")
                 variant = "Agg"+"".join(variant)
-            # Calculate the average precision for the query sound with this embedding
-            ap = calculate_average_precision(query_fname, model_result_dct['results'][query_fname], df)
-
             # Display the results for this embedding-search combination
             with columns[i]:
                 # Display the model name, variant and search
@@ -97,13 +107,24 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
                 st.subheader(f"{model_result_dct['search']} Search")
                 # Display the average precision
                 st.write(f"Average Precision@15 for this result is: {ap:.3f}")
+                st.divider()
                 # Display the results
                 for j,result in  enumerate(model_result_dct["results"][query_fname][:N]):
+                    if model_result_dct["search"]=="Nearest Neighbor":
+                        st.write(f"Ranking: {j+1} - Distance: {result['score']:.3f}")
+                    elif model_result_dct["search"]=="Dot Product":
+                        st.write(f"Ranking: {j+1} - Score: {result['score']:.3f}")
                     ref_fname = result["result_fname"]
-                    ref_labels = df[df.fname==int(ref_fname)].labels.values[0].replace(",", ", ")
-                    st.write(f"Ranking: {j+1} - Score: {result['score']:.3f}")
+                    ref_labels = df[df.fname==int(ref_fname)].labels.values[0]
                     st.caption(f"Sound ID: {ref_fname}")
-                    st.caption(f"Labels: {ref_labels}")
+                    # Highlight the common labels between the query and the reference sound
+                    common_labels = list(set(query_labels).intersection(ref_labels.split(",")))
+                    if len(common_labels)>0:
+                        ref_labels += ","
+                        for common_label in common_labels:
+                            ref_labels = re.sub(common_label+",", f"**{common_label}**,", ref_labels)
+                        ref_labels = ref_labels[:-1]
+                    st.write(f"Labels: {ref_labels.replace(',', ', ')}")
                     st.components.v1.html(FREESOUND_STRING.format(ref_fname))
 
 def get_subsets(sound_classes, df, model_results_dcts, N=15):
