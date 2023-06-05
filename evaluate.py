@@ -103,7 +103,7 @@ def label_based_map(results_dict, df, k=15):
         label_maps.append((label, map))
     # Sort the label maps by the mAP
     label_maps = sorted(label_maps, key=lambda x: x[1], reverse=True)
-    # Convert to dict
+    # Convert to list of dicts
     label_maps = [{"label": label, "mAP": map, "k": k} for label,map in label_maps]
 
     return label_maps
@@ -170,6 +170,11 @@ if __name__=="__main__":
     # Calculate label-based mAP@15
     print("Calculating label-based mAP@15...")
     label_based_map_at_15 = label_based_map(results_dict, df, k=15)
+    # Calculate the mean label-based mAP@15
+    av_label_based_map_at_15 = sum(map(lambda x: x["mAP"], label_based_map_at_15))/len(label_based_map_at_15)
+    output_path = os.path.join(output_dir, "av_label_based_mAP_at_15.txt")
+    with open(output_path, "w") as outfile:
+        outfile.write(str(av_label_based_map_at_15))
     # Export the label-based mAP@15 to CSV
     label_based_map_at_15 = pd.DataFrame(label_based_map_at_15)
     output_path = os.path.join(output_dir, "label_based_mAP_at_15.csv")
