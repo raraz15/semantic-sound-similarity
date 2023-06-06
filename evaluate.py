@@ -48,7 +48,7 @@ def evaluate_relevance(query_fname, result, df, label=None):
     return relevance
 
 ####################################################################################
-# Precision Related Metrics
+# Precision with Ranking Related Metrics
 
 def precision_at_k(relevance, k):
     """ Calculate precision@k where k is and index in range(0,len(relevance)). Since relevance
@@ -58,9 +58,10 @@ def precision_at_k(relevance, k):
     return sum(relevance[:k+1])/(k+1)
 
 def average_precision(relevance):
-    """ Calculate the average prediction for a list of relevance values. The average precision
-    is the average of the precision@k values for all relevant documents. If there are no relevant
-    documents, the average precision is defined to be 0. """
+    """ Calculate the average prediction for a list of relevance values. The average 
+    precision is defined as the average of the precision@k values of the relevant 
+    documents. If there are no relevant documents, the average precision is defined 
+    to be 0. """
 
     assert set(relevance).issubset({0,1}), "Relevance values must be 0 or 1"
 
@@ -108,19 +109,20 @@ def calculate_map_at_k(results_dict, df, k):
     map_at_k = sum(aps)/len(aps)
     return map_at_k
 
+####################################################################################
+# Precision without Ranking Related Metrics
+
 # TODO: is this the correct way of doing?
 # TODO: is applying the cutoff at k correct?
-def calculate_micro_and_macro_averaged_precision_at_k(results_dict, df, k=15):
-    """ Calculates the micro and macro mean averaged precision for the whole dataset. 
-    That is, for each label in the dataset, the elements containing that label are 
-    considered as queries and the true positive and false positive rates are calculated 
-    for the result set. If a result contains the query label it is considered as relevant. 
-    Then, all the true positives is divided by the sum of true positives and false positives."""
+def evaluate_label_positive_rates(results_dict, df, k=15):
+    """ For each label in the dataset, the elements containing that label are considered as 
+    queries and the true positive and false positive rates are calculated for the result set. 
+    If a result contains the query label it is considered as relevant. """
 
     # Get all the labels from the df
     labels = set([l for ls in df["labels"].apply(lambda x: x.split(",")).to_list() for l in ls])
     # Calculate true positives and false positives for each label
-    label_rates = []
+    label_positive_rates = []
     for label in labels:
         # Get the fnames containing this label
         fnames_with_label = df[df["labels"].apply(lambda x: label in x)]["fname"].to_list()
@@ -136,11 +138,29 @@ def calculate_micro_and_macro_averaged_precision_at_k(results_dict, df, k=15):
             tps.append(tp)
             fps.append(fp)
         # Append the tp and fp rates
-        label_rates.append((sum(tps), sum(fps)))
-    # Calculate the micro and macro averaged precision
-    micro_ap = sum([tp for tp,_ in label_rates]) / (sum([tp+fp for tp,fp in label_rates]))
-    macro_ap = sum([tp/(tp+fp) for tp,fp in label_rates]) / len(label_rates)
-    return micro_ap, macro_ap
+        label_positive_rates.append([sum(tps), sum(fps), label])
+    return label_positive_rates
+
+def calculate_micro_averaged_precision(label_positive_rates):
+    """ Calculate the micro-averaged precision. That is, the sum of all true positives 
+    divided by the sum of all true positives and false positives."""
+
+    return sum([tp for tp in label_positive_rates]) / (sum([tp+fp for tp,fp in label_positive_rates]))
+
+def calculate_macro_averaged_precision(label_positive_rates):
+    """ Calculate the macro-averaged precision. That is, the average of the precision 
+    for each label."""
+
+    return sum([tp/(tp+fp) for tp,fp in label_positive_rates]) / len(label_positive_rates)
+
+# TODO: is this correct?
+def calculate_weighted_macro_averaged_precision(label_positive_rates):
+    """ Calculate the weighted macro-averaged precision. That is, the average of the precision
+    for each label weighted by the relative support of each label. The support of a label 
+    is the number of elements containing that label."""
+
+    total_support = sum([tp+fp for tp,fp in label_positive_rates])
+    return sum([(tp/(tp+fp))*(tp/total_support) for tp,fp in label_positive_rates])
 
 ####################################################################################
 # Ranking Related Metrics
@@ -169,7 +189,7 @@ if __name__=="__main__":
     parser.add_argument('--increment', type=int, default=15, 
                         help="MAP@k calculation increments.")
     parser.add_argument('--metrics', type=str, nargs='+', 
-                        default=["micro_ap", "macro_ap", "map", "mr1"],
+                        default=["micro_ap", "macro_ap", "weighted_macro_ap", "map", "mr1"],
                         help='Metrics to calculate.')
     args=parser.parse_args()
     args.metrics = [metric.lower() for metric in args.metrics] # Lowercase the metrics
@@ -213,27 +233,45 @@ if __name__=="__main__":
 
     # Calculate Micro and Macro Averaged Precision@15 if required
     if "micro_ap" in args.metrics or "macro_ap" in args.metrics:
-        print("\nCalculating Micro and Macro Averaged Precision@15...")
+        print("\nCalculating the number of True and False Positives ...")
         start_time = time.time()
-        # Calculate the micro and macro averaged precision
-        micro_ap_at_k, macro_ap_at_k = calculate_micro_and_macro_averaged_precision_at_k(results_dict, 
-                                                                                        df, 
-                                                                                        k=15)
-        time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
-        print(f"Micro Averaged Precision@15: {micro_ap_at_k:.5f} \
-              | Macro Averaged Precision@15: {macro_ap_at_k:.5f}")
-        print(f"Time: {time_str}")
-        # Export the aps to txt if required
+        # Calculate positive rates for each label
+        label_positive_rates = evaluate_label_positive_rates(results_dict, df, k=15)
+        # Export the label positive rates to CSV
+        _df = pd.DataFrame(label_positive_rates, columns=["tp", "fp", "label"])
+        output_path = os.path.join(output_dir, "label_positive_rates.csv")
+        _df.to_csv(output_path, index=False)
+        print(f"Label positive rates are exported to {output_path}")
+        # Remove the labels from the label positive rates
+        label_positive_rates = [(tp,fp) for tp,fp,_ in label_positive_rates]
+        # Calculate the micro averaged precision if required
         if "micro_ap" in args.metrics:
+            print("Calculating the micro averaged precision ...")
+            micro_averaged_precision = calculate_micro_averaged_precision(label_positive_rates)
+            print(f"Micro Averaged Precision@15: {micro_averaged_precision:.5f}")
             output_path = os.path.join(output_dir, "micro_averaged_precision_at_15.txt")
             with open(output_path, "w") as outfile:
-                outfile.write(str(micro_ap_at_k))
+                outfile.write(str(micro_averaged_precision))
                 print(f"Results are exported to {output_path}")
+        # Calculate the macro averaged precision if required
         if "macro_ap" in args.metrics:
+            print("Calculating the macro averaged precision ...")
+            macro_averaged_precision = calculate_macro_averaged_precision(label_positive_rates)
+            print(f"Macro Averaged Precision@15: {macro_averaged_precision:.5f}")
             output_path = os.path.join(output_dir, "macro_averaged_precision_at_15.txt")
             with open(output_path, "w") as outfile:
-                outfile.write(str(macro_ap_at_k))
+                outfile.write(str(macro_averaged_precision))
                 print(f"Results are exported to {output_path}")
+        if "weighted_macro_ap" in args.metrics:
+            print("Calculating the weighted macro averaged precision ...")
+            w_macro_averaged_precision = calculate_weighted_macro_averaged_precision(label_positive_rates)
+            print(f"Weighted Macro Averaged Precision@15: {w_macro_averaged_precision:.5f}")
+            output_path = os.path.join(output_dir, "weighted_macro_averaged_precision_at_15.txt")
+            with open(output_path, "w") as outfile:
+                outfile.write(str(w_macro_averaged_precision))
+                print(f"Results are exported to {output_path}")
+        time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
+        print(f"Time: {time_str}")
 
     # Calculate MR1 if requested
     if "mr1" in args.metrics:
