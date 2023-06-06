@@ -1,5 +1,7 @@
 """Script to contain the metrics used for evaluation."""
 
+# TODO: ncdg
+
 ####################################################################################
 # Utilities
 
@@ -133,7 +135,7 @@ def calculate_micro_averaged_precision(label_positive_rates):
     """ Calculate the micro-averaged precision. That is, the sum of all true positives 
     divided by the sum of all true positives and false positives."""
 
-    return sum([tp for tp in label_positive_rates]) / (sum([tp+fp for tp,fp in label_positive_rates]))
+    return sum([tp for tp,_ in label_positive_rates]) / (sum([tp+fp for tp,fp in label_positive_rates]))
 
 def calculate_macro_averaged_precision(label_positive_rates):
     """ Calculate the macro-averaged precision. That is, the average of the precision 
