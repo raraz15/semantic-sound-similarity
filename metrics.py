@@ -10,28 +10,28 @@ def get_labels(fname, df):
 
     return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
 
-def evaluate_relevance(query_fname, result, df, label=None):
+def evaluate_relevance(query_fname, result, df, query_label=None):
     """ Evaluates the relevance of a result for a query. By default, A result is considered
-    relevant if it has at least one label in common with the query. If a label is provided,
-    a result is considered relevant if it contains the label. Relevance: list of relevance 
-    values (1: relevant, 0: not relevant)"""
+    relevant if it has at least one label in common with the query. If a query label is 
+    provided, a result is considered relevant if it contains the label. Relevance: list of 
+    relevance values (1: relevant, 0: not relevant)."""
 
     # Get the labels of the query
-    query_labels = get_labels(query_fname, df)
+    query_item_labels = get_labels(query_fname, df)
     # Evaluate the relevance of each retrieved document
     relevance = []
     for ref_result in result:
         ref_fname = ref_result["result_fname"]
-        ref_labels = get_labels(ref_fname, df)
-        if label is None:
+        ref_item_labels = get_labels(ref_fname, df)
+        if query_label is None:
             # Find if the retrieved element is relevant
-            if len(query_labels.intersection(ref_labels)) > 0:
+            if len(query_item_labels.intersection(ref_item_labels)) > 0:
                 relevance.append(1)
             else:
                 relevance.append(0)
         else:
             # Find if the retrieved element contains the label
-            if label in ref_labels:
+            if query_label in ref_item_labels:
                 relevance.append(1)
             else:
                 relevance.append(0)
@@ -83,9 +83,10 @@ def test_average_precision():
             sys.exit(1)
 
 def calculate_map_at_k(results_dict, df, k):
-    """ Calculates the mean average precision (map) for the whole dataset. That is,
-    each element in the dataset is considered as a query and the average precision@k
-    is calculated for each query result. The mean of all these values is returned."""
+    """ Calculates the mean average precision@k (map@k) for the whole dataset (Micro 
+    metric). That is, each element in the dataset is considered as a query and the 
+    average precision@k is calculated for each query result. The mean of all these 
+    values is returned."""
 
     # Calculate the average precision for each query
     aps = []
