@@ -13,6 +13,8 @@ import pandas as pd
 import metrics
 from directories import GT_PATH, EVAL_DIR
 
+METRICS = ["micro_map", "macro_map", "mr1"]
+
 # TODO: ncdg
 if __name__=="__main__":
 
@@ -23,10 +25,14 @@ if __name__=="__main__":
     parser.add_argument('--increment', type=int, default=15, 
                         help="MAP@k calculation increments.")
     parser.add_argument('--metrics', type=str, nargs='+', 
-                        default=["micro_map", "macro_map", "mr1"], 
+                        default=METRICS, 
                         help='Metrics to calculate.')
     args=parser.parse_args()
-    args.metrics = [metric.lower() for metric in args.metrics] # Lowercase the metrics
+
+    # Check the metrics
+    args.metrics = [metric.lower() for metric in args.metrics]
+    assert set(args.metrics).issubset(set(METRICS)), \
+        f"Invalid metrics. Valid metrics are: {METRICS}"
 
     # Test the average precision function
     metrics.test_average_precision()
@@ -69,18 +75,19 @@ if __name__=="__main__":
         print(f"Results are exported to {output_path}")
 
     # Calculate Macro or Weighted Macro Averaged Precision@15 if required
-    if "macro_ap" in args.metrics or "weighted_macro_ap" in args.metrics:
+    if "macro_map" in args.metrics or "weighted_macro_map" in args.metrics:
 
         start_time = time.time()
 
         # Calculate mAP for each label
         print("\nCalculating macro mAP@15 for each label ...")
-        label_maps = metrics.calculate_map_at_k_for_labels(results_dict, df, k=15)
+        label_maps, columns = metrics.calculate_map_at_k_for_labels(results_dict, df, k=15)
+        # Convert to a dataframe
+        _df = pd.DataFrame(label_maps, columns=columns)
         # Export the label positive rates to CSV
-        _df = pd.DataFrame(label_maps, columns=["map@15", "weighted_map@k", "label"])
         output_path = os.path.join(output_dir, "labels_mAP@15.csv")
         _df.to_csv(output_path, index=False)
-        print(f"Label positive rates are exported to {output_path}")
+        print(f"Results are exported to{output_path}")
 
         # Calculate the macro mAP@15 and weighted macro mAP@15
         print("\nCalculating the macro mAP@15 and weighted macro mAP@15...")
@@ -88,6 +95,7 @@ if __name__=="__main__":
         w_macro_averaged_precision = metrics.calculate_weighted_macro_map(label_maps)
         print(f"Macro mAP@15: {macro_averaged_precision:.5f} |\
                Weighted Macro Averaged Precision@15: {w_macro_averaged_precision:.5f}")
+        # Convert to a dataframe
         _df = pd.DataFrame([{"macro_map@15": macro_averaged_precision,
                             "weighted_macro_map@15": w_macro_averaged_precision}])
         # Export the results
