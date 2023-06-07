@@ -10,9 +10,16 @@ Collaboration with: Frederic Font, Alastair Porter
 contact: oguza97@gmail.com
 
 ## TODO:
-- Lower PCA
-- Change PCA naming convention
+- Understand audioset taxonomy
+    - How many labels
+    - How many example for each label
+        - Is any of the labels contain less than 15 examples?
+- PCA
+    - Lower PCA components
+    - Change PCA naming convention
 - Metrics
+    - Label-based AP:
+        - Consider match only if query label is present
     - Leaf vs node mAP
     - ncdg metric
     - macro vs micro mAP
