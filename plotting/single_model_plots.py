@@ -187,7 +187,11 @@ def plot_map_at_15(model, eval_dir, dataset_name, fig_name="", D=0.25, save_fig=
 # Macro mAP@k
 
 def plot_av_label_based_p_at_15(model, eval_dir, dataset_name, fig_name="", D=0.25, save_fig=False, save_dir=""):
-    """Takes a model name and plots the mAP@k for all the variations of the model."""
+    """ Takes a model name and plots the label-based Precision@15 (Macro Averaged Precision@15) 
+    for all the variations."""
+
+    default_fig_name = f"Embedding Processing and Search Algorithm Performances by Average Label-Based Precision@15\
+        \n{model} Evaluated on {dataset_name}"
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
@@ -212,8 +216,7 @@ def plot_av_label_based_p_at_15(model, eval_dir, dataset_name, fig_name="", D=0.
     else:
         positions = [0]
         delta = 1
-    fig_name = fig_name if fig_name else f"Embedding Processing and Search Algorithm \
-                Performances by Average Label-Based mAP\n{model} Evaluated on {dataset_name}"
+    fig_name = fig_name if fig_name else default_fig_name
 
     # Plot the maps
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
@@ -268,8 +271,10 @@ def plot_av_label_based_p_at_15(model, eval_dir, dataset_name, fig_name="", D=0.
     plt.show()
 
 def plot_label_based_p_at_15(model, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
-    """Takes an embedding name and find all the variations of the model. For each varaiation,
+    """Takes an embedding name and find all the variations of the model. For each variation,
     plots the label-based Precision@15 (Macro Averaged Precision@15)."""
+
+    default_fig_name = f"Label-Based Precision@15 for {model} Evaluated on {dataset_name}"
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
@@ -296,7 +301,7 @@ def plot_label_based_p_at_15(model, eval_dir, dataset_name, fig_name="", save_fi
             N = 10 # Number of rows
             delta = len(precisions) // N
             embedding_search = os.path.basename(variation_path) + "-" + search
-            fig_name = fig_name if fig_name else f"{embedding_search} mAP Values of Individual Classes on {dataset_name}"
+            fig_name = fig_name if fig_name else default_fig_name
 
             # Plot the label-based Precision@15
             fig, ax = plt.subplots(figsize=(18, 24), nrows=N, constrained_layout=True)
