@@ -38,7 +38,7 @@ def evaluate_relevance(query_fname, result, df, query_label=None):
     return relevance
 
 ####################################################################################
-# Precision with Ranking Related Metrics
+# mAP Related Metrics
 
 def precision_at_k(relevance, k):
     """ Calculate precision@k where k is and index in range(0,len(relevance)). Since relevance
@@ -82,7 +82,7 @@ def test_average_precision():
             import sys
             sys.exit(1)
 
-def calculate_map_at_k(results_dict, df, k):
+def calculate_micro_map_at_k(results_dict, df, k):
     """ Calculates the mean average precision@k (map@k) for the whole dataset (Micro 
     metric). That is, each element in the dataset is considered as a query and the 
     average precision@k is calculated for each query result. The mean of all these 
@@ -95,63 +95,57 @@ def calculate_map_at_k(results_dict, df, k):
         relevance = evaluate_relevance(query_fname, result[:k], df) # Cutoff at k
         # Calculate the average precision with the relevance
         ap = average_precision(relevance)
+        # Append the results
         aps.append(ap)
     # Mean average precision for the whole dataset
     map_at_k = sum(aps)/len(aps)
     return map_at_k
 
-####################################################################################
-# Precision without Ranking Related Metrics
-
-# TODO: is this the correct way of doing?
-# TODO: is applying the cutoff at k correct?
-def evaluate_label_positive_rates(results_dict, df, k=15):
-    """ For each label in the dataset, the elements containing that label are considered as 
-    queries and the true positive and false positive rates are calculated for the result set. 
-    If a result contains the query label it is considered as relevant. """
+def calculate_map_at_k_for_labels(results_dict, df, k=15):
+    """ For each label in the dataset, the elements containing that label are considered 
+    as queries and the mean average precision@k (map@k) is calculated. Here, relevance is 
+    defined as: if a result contains the query label it. We also weigh each label's map@k 
+    by the number of elements containing that label divided by total number of elements."""
 
     # Get all the labels from the df
     labels = set([l for ls in df["labels"].apply(lambda x: x.split(",")).to_list() for l in ls])
-    # Calculate true positives and false positives for each label
-    label_positive_rates = []
-    for label in labels:
+    # Calculate map@k for each label and the weighted map@k 
+    label_maps = []
+    for query_label in labels:
         # Get the fnames containing this label
-        fnames_with_label = df[df["labels"].apply(lambda x: label in x)]["fname"].to_list()
+        fnames_with_label = df[df["labels"].apply(lambda x: query_label in x)]["fname"].to_list()
         # For each fname containing the label, calculate the total tp and fp
-        tps, fps = [], []
+        label_aps = []
         for query_fname in fnames_with_label:
+            # Get the result for this query
             result = results_dict[str(query_fname)][:k] # Cutoff at k
             # Evaluate the relevance of the result
-            relevance = evaluate_relevance(query_fname, result, df, label=label)
-            # Calculate the true positive and false positive rates from the relevance
-            tp = sum(relevance)
-            fp = len(relevance)-tp
-            tps.append(tp)
-            fps.append(fp)
-        # Append the tp and fp rates
-        label_positive_rates.append([sum(tps), sum(fps), label])
-    return label_positive_rates
+            relevance = evaluate_relevance(query_fname, result, df, query_label=query_label)
+            # Calculate ap@k for this query
+            ap = average_precision(relevance)
+            # Append the results
+            label_aps.append(ap)
+        # Calculate the mean average precision for this label
+        label_map_at_k = sum(label_aps)/len(label_aps)
+        # Calculate the weighted mean average precision for this label
+        weighted_label_map_at_k = label_map_at_k * len(fnames_with_label)/len(df)
+        # Append the results
+        label_maps.append([label_map_at_k, weighted_label_map_at_k, query_label])
+    # Sort the label maps by the map@k value
+    label_maps.sort(key=lambda x: x[0], reverse=True)
+    return label_maps
 
-def calculate_micro_averaged_precision(label_positive_rates):
-    """ Calculate the micro-averaged precision. That is, the sum of all true positives 
-    divided by the sum of all true positives and false positives."""
+def calculate_macro_map(label_maps):
+    """ Calculates the macro mean average precision (map) for the whole dataset. 
+    That is, the map@k values for each label is averaged."""
 
-    return sum([tp for tp,_ in label_positive_rates]) / (sum([tp+fp for tp,fp in label_positive_rates]))
+    return sum([label_map[0] for label_map in label_maps])/len(label_maps)
 
-def calculate_macro_averaged_precision(label_positive_rates):
-    """ Calculate the macro-averaged precision. That is, the average of the precision 
-    for each label."""
+def calculate_weighted_macro_map(label_maps):
+    """ Calculates the weighted macro mean average precision (map) for the whole
+    dataset. That is, the weighted map@k values for each label is averaged."""
 
-    return sum([tp/(tp+fp) for tp,fp in label_positive_rates]) / len(label_positive_rates)
-
-# TODO: is this correct?
-def calculate_weighted_macro_averaged_precision(label_positive_rates):
-    """ Calculate the weighted macro-averaged precision. That is, the average of the precision
-    for each label weighted by the relative support of each label. The support of a label 
-    is the number of elements containing that label."""
-
-    total_support = sum([tp+fp for tp,fp in label_positive_rates])
-    return sum([(tp/(tp+fp))*(tp/total_support) for tp,fp in label_positive_rates])
+    return sum([label_map[1] for label_map in label_maps])/len(label_maps)
 
 ####################################################################################
 # Ranking Related Metrics
