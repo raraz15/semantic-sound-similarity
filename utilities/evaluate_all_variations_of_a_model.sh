@@ -18,16 +18,16 @@ for file in "$SIMILARITY_DIR/"*; do # for each embedding dir
         echo "$file"
         if [[ "$file" == *"fs-essentia-extractor_legacy-"* ]]; then
             # Run the script
-            python evaluate.py -p=$file/nn/similarity_results.json
+            python evaluate.py -p=$file/nn/similarity_results.json --metrics=$2
         elif [[ "$file" == *"audioset-vggish-3-"* ]]; then
             # Run the script for each search type
             for search in "${searches[@]}"; do
-                python evaluate.py -p=$file/$search/similarity_results.json
+                python evaluate.py -p=$file/$search/similarity_results.json --metrics=$2
             done
         elif [[ "$file" == *"audioset-yamnet-1-"* ]]; then
             # Run the script for each search type
             for search in "${searches[@]}"; do
-                python evaluate.py -p=$file/$search/similarity_results.json
+                python evaluate.py -p=$file/$search/similarity_results.json --metrics=$2
             done
         elif [[ "$file" == *"fsd-sinet-"* ]]; then
             # Determine which type of FSD-SINet model it is
@@ -49,7 +49,7 @@ for file in "$SIMILARITY_DIR/"*; do # for each embedding dir
             if [[ "$found" == 1 ]]; then
                 # Run the script for each search type
                 for search in "${searches[@]}"; do
-                    python evaluate.py -p=$file/$search/similarity_results.json
+                    python evaluate.py -p=$file/$search/similarity_results.json --metrics=$2
                 done
             fi
         fi

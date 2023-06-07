@@ -93,8 +93,8 @@ if __name__=="__main__":
         print("\nCalculating the macro mAP@15 and weighted macro mAP@15...")
         macro_averaged_precision = metrics.calculate_macro_map(label_maps)
         w_macro_averaged_precision = metrics.calculate_weighted_macro_map(label_maps)
-        print(f"Macro mAP@15: {macro_averaged_precision:.5f} |\
-               Weighted Macro Averaged Precision@15: {w_macro_averaged_precision:.5f}")
+        print(f"Macro mAP@15: {macro_averaged_precision:.5f} | "
+              f"Weighted Macro mAP@15: {w_macro_averaged_precision:.5f}")
         # Convert to a dataframe
         _df = pd.DataFrame([{"macro_map@15": macro_averaged_precision,
                             "weighted_macro_map@15": w_macro_averaged_precision}])
