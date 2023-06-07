@@ -1,5 +1,5 @@
-""" Compute evaluation metrics for the similarity search result 
-of an embedding over FSD50K.eval_audio."""
+""" Compute evaluation metrics for the similarity search result of an embedding 
+over FSD50K.eval_audio."""
 
 import os
 import time
@@ -99,22 +99,21 @@ if __name__=="__main__":
 
     # Calculate MR1 if requested
     if "mr1" in args.metrics:
+
+        start_time = time.time()
+
         # Calculate MR1 for each query
         print("\nCalculating MR1...")
-        start_time = time.time()
-        r1s = [metrics.R1(query_fname, result, df) for query_fname, result in results_dict.items()]
-        # Remove entries with no matches
-        r1s = [x for x in r1s if x]
-        # Calculate the mean
-        mr1 = sum(r1s)/len(r1s)
-        time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
-        print(f"MR1: {mr1:.1f} | Time: {time_str}")
+        mr1 = metrics.calculate_MR1(results_dict, df)
 
         # Export the MR1s to txt
         output_path = os.path.join(output_dir, "MR1.txt")
         with open(output_path, "w") as outfile:
             outfile.write(str(mr1))
-        print(f"MR1 results are exported to {output_path}")
+        print(f"Results are exported to {output_path}")
+
+        time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
+        print(f"MR1: {mr1:.1f} | Time: {time_str}")
 
     #############
     print("Done!")
