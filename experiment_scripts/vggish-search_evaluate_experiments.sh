@@ -23,6 +23,6 @@ for file in "$EMBED_DIR/"*; do # for each embedding dir
 done
 
 # Compare the results of the experiments
-python plot.py --model=audioset-vgggish-3
+python plot_evaluation_results.py --model=audioset-vgggish-3
 
 #############################################################################
