@@ -74,8 +74,8 @@ if __name__=="__main__":
         map_at_ks.to_csv(output_path, index=False)
         print(f"Results are exported to {output_path}")
 
-    # Calculate Macro or Weighted Macro Averaged Precision@15 if required
-    if "macro_map" in args.metrics or "weighted_macro_map" in args.metrics:
+    # Calculate Macro and Weighted Macro Averaged Precision@15 if required
+    if "macro_map" in args.metrics:
 
         start_time = time.time()
 
@@ -84,7 +84,7 @@ if __name__=="__main__":
         label_maps, columns = metrics.calculate_map_at_k_for_labels(results_dict, df, k=15)
         # Convert to a dataframe
         _df = pd.DataFrame(label_maps, columns=columns)
-        # Export the label positive rates to CSV
+        # Export the labels' maps to CSV
         output_path = os.path.join(output_dir, "labels_mAP@15.csv")
         _df.to_csv(output_path, index=False)
         print(f"Results are exported to{output_path}")
