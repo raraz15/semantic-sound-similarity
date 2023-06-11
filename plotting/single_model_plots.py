@@ -14,8 +14,11 @@ COLORS = list(TABLEAU_COLORS.values())
 ###################################################################################################
 # Micro-averaged map@k
 
-def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="", D=0.25, save_fig=False, save_dir=""):
+def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and plots the micro-averaged mAP@k for all the variations of the model."""
+
+    default_fig_name = "Embedding Processing and Search Algorithm "+ \
+                f"Performances by mAP Values (Micro-Averaged) \n{model} Evaluated on {dataset_name}"
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
@@ -36,13 +39,12 @@ def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="",
 
     # Determine some plot parameters
     if len(searches)>1:
-        positions = np.linspace(-D, D, len(searches))
+        positions = np.linspace(-0.25, 0.25, len(searches))
         delta = positions[1]-positions[0]
     else:
         positions = [0]
         delta = 1
-    fig_name = fig_name if fig_name else f"Embedding Processing and Search Algorithm"+ \
-                f"Performances by mAP Values (Micro-Averaged) \n{model} Evaluated on {dataset_name}"
+    fig_name = fig_name if fig_name else default_fig_name
 
     # Plot the maps
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
@@ -99,6 +101,9 @@ def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="",
 def plot_map_at_all_k(model, eval_dir, dataset_name, fig_name="", n_cols=3, save_fig=False, save_dir=""):
     """Takes a model name and plots the mAP@k for all the variations of the model."""
 
+    default_fig_name = "Embedding Processing and Search Algorithm" + \
+                f"Performances by mAP Values \n{model} Evaluated on {dataset_name}"
+
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
     # Read one variation's folder to get the searches
@@ -127,8 +132,7 @@ def plot_map_at_all_k(model, eval_dir, dataset_name, fig_name="", n_cols=3, save
         positions = [0]
         delta = 1
     n_rows = len(map_dict.keys())//n_cols
-    fig_name = fig_name if fig_name else f"Embedding Processing and Search Algorithm \
-                Performances by mAP Values \n{model} Evaluated on {dataset_name}"
+    fig_name = fig_name if fig_name else default_fig_name
 
     # Plot the maps
     fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, 
@@ -186,10 +190,10 @@ def plot_map_at_all_k(model, eval_dir, dataset_name, fig_name="", n_cols=3, save
 ####################################################################################################
 # Macro-averaged mAP@k
 
-def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="", D=0.25, save_fig=False, save_dir=""):
+def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and for each variation, plots the Macro-averaged mAP@15."""
 
-    default_fig_name = f"Embedding Processing and Search Algorithm Performances by "+\
+    default_fig_name = "Embedding Processing and Search Algorithm Performances by "+\
                 f"Label-Based mAP@15\n{model} Evaluated on {dataset_name}"
 
     # Find all the variation_paths of the model
@@ -201,15 +205,15 @@ def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="",
     map_dict = {search: [] for search in searches}
     for search in searches:
         for variation_path in variation_paths:
-            map_path = os.path.join(variation_path, search, "macro_map@15.csv")
-            map = pd.read_csv(map_path)["macro_map@15"]
+            map_path = os.path.join(variation_path, search, "macro_mAP@15.csv")
+            map = pd.read_csv(map_path)["macro_map@15"].values[0]
             full_model_name = variation_path.split("/")[-1]
             variation = "-".join(full_model_name.split("-")[-3:])
             map_dict[search].append((variation, map))
 
     # Determine some plot parameters
     if len(searches)>1:
-        positions = np.linspace(-D, D, len(searches))
+        positions = np.linspace(-0.25, 0.25, len(searches))
         delta = positions[1]-positions[0]
     else:
         positions = [0]
@@ -296,7 +300,7 @@ def plot_label_based_map_at_15(model, eval_dir, dataset_name, fig_name="", save_
             # Determine some plot parameters
             N = 10 # Number of rows
             delta = len(maps) // N
-            embedding_search = os.path.basename(variation_path) + "-" + search
+            embedding_search = os.path.basename(variation_path).replace(model+"-", "") + "-" + search
             fig_name = fig_name if fig_name else default_fig_name
 
             # Plot the label-based mAP@15
@@ -327,6 +331,9 @@ def plot_label_based_map_at_15(model, eval_dir, dataset_name, fig_name="", save_
 def plot_mr1(model, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and plots the MR1 for all the variations of the model."""
 
+    default_fig_name = "Embedding Processing and Search Algorithm " +\
+                f"Performances by MR1 Values\n{model} Evaluated on {dataset_name}"
+
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
     # Read one variation's folder to get the searches
@@ -350,9 +357,7 @@ def plot_mr1(model, eval_dir, dataset_name, fig_name="", save_fig=False, save_di
         positions = np.linspace(-0.2, 0.2, len(searches))
     else:
         positions = [0]
-    fig_name = fig_name if fig_name else f"Embedding Processing and Search Algorithm \
-                Performances by MR1 Values\n{model} Evaluated on {dataset_name}"
-
+    fig_name = fig_name if fig_name else default_fig_name
     # Plot the MR1s
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     fig.suptitle(fig_name, fontsize=19, weight='bold')
