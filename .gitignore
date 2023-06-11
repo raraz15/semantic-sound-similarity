@@ -13,5 +13,6 @@ __pycache__/*
 *.ipynb
 freesound_api.json
 queries.json
+TODO.md
 
 *.pyc
