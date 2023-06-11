@@ -87,7 +87,6 @@ def plot_map_comparisons_single_variation(models, eval_dir, dataset_name, fig_na
         map_path = os.path.join(results_dir, "mAP.csv")
         df = pd.read_csv(map_path)
         maps.append((model[0], model[1], df.mAP.to_numpy()))
-    K = df.k.to_numpy()
 
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     fig_name = fig_name if fig_name else f"Embedding Performances using mAP@k values Evaluated on {dataset_name} Set"
@@ -141,82 +140,10 @@ def plot_map_comparisons_single_variation(models, eval_dir, dataset_name, fig_na
         fig.savefig(fig_path)
     plt.show()
 
-def plot_map_comparisons(models, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
-    """Takes a list of models and plots the mAP@k for all the variations of the model.
-    Each model must be a tupple of (model_name, [variations], search_algorithm)"""
+def plot_micro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
+    """Takes a list of [(embedding,search)] and plots all the Micro Averaged mAP@k in the same figure."""
 
-    # Determine Some Parameters
-    positions = np.linspace(-0.25, 0.25, len(models))
-    delta = positions[1]-positions[0]
-    n_variations = len(models[1][1])
-
-    fig,axs = plt.subplots(nrows=1, ncols=n_variations, 
-                           figsize=(18,6), constrained_layout=True)
-    fig_name = fig_name if fig_name else f"Embedding Performances using mAP@k values Evaluated on {dataset_name} Set"
-    fig.suptitle(fig_name, fontsize=19, weight='bold')
-    for i in range(n_variations):
-
-        # Read all the maps for all variations of model i
-        maps = []
-        for model in models:
-            model_dir = os.path.join(eval_dir, dataset_name, f"{model[0]}-{model[1][i]}")
-            results_dir = os.path.join(model_dir, model[2])
-            map_path = os.path.join(results_dir, "mAP.csv")
-            df = pd.read_csv(map_path)
-            maps.append(df.mAP.to_numpy())
-        K = df.k.to_numpy()
-
-        # Plot the maps
-        for j in range(len(K)):
-            for l,map in enumerate(maps):
-                if j==0:
-                    label = models[l][0]
-                else:
-                    label = "" # Only dsiplay labels once
-                axs[i].bar(j+positions[l], 
-                        map[j], 
-                        label=label, 
-                        width=delta*0.85, 
-                        color=COLORS[l], 
-                        edgecolor='k'
-                        )
-                axs[i].text(j+positions[l], 
-                            map[j]+0.01, 
-                            f"{map[j]:.2f}", 
-                            ha='center', 
-                            va='bottom', 
-                            fontsize=8, 
-                            weight='bold')
-
-        # Set the plot parameters
-        axs[i].set_yticks(np.arange(0,1.05,0.05))
-        axs[i].set_xticks(np.arange(j+1), K)
-        axs[i].tick_params(axis='x', which='major', labelsize=13)
-        axs[i].tick_params(axis='y', which='major', labelsize=11)
-        if i==1:
-            axs[i].set_xlabel("K (Similarity Rank)", fontsize=15)
-        axs[i].set_ylabel("mAP@k (↑)", fontsize=15)
-        axs[i].set_ylim([0,1])
-        if i==n_variations-1:
-            title="Original Size"
-        else:
-            title = " ".join(models[1][1][i].split("PCA_")[1].split("-")[0].split("_") + ["PCA Components"])
-        axs[i].set_title(title, fontsize=17)
-        axs[i].grid()
-        axs[i].legend(fontsize=10, title="Models", title_fontsize=11, fancybox=True)
-
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        names = "-".join([model[0] for model in models])
-        fig_path =os.path.join(save_dir, f"{names}-mAP_comparison.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
-    plt.show()
-
-def plot_av_label_based_map_comparisons(models, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
+    default_fig_name = f"Embedding Performances using mAP@15 (Micro-Averaged) values on {dataset_name}"
 
     # Determine Some Parameters
     positions = np.linspace(-0.4, 0.4, len(models))
@@ -226,14 +153,14 @@ def plot_av_label_based_map_comparisons(models, eval_dir, dataset_name, fig_name
     maps = []
     for model in models:
         model_dir = os.path.join(eval_dir, dataset_name, model[0])
-        results_dir = os.path.join(model_dir, dataset_name, model[1])
-        map_path = os.path.join(results_dir, "av_label_based_mAP_at_15.txt")
-        with open(map_path, "r") as f:
-            map = float(f.read())
+        results_dir = os.path.join(model_dir, model[1])
+        map_path = os.path.join(results_dir, "micro_mAP.csv")
+        map = pd.read_csv(map_path)
+        map = map[map["k"]==15]["mAP"].values[0]
         maps.append((model[0], model[1], map))
 
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig_name = fig_name if fig_name else f"Embedding Performances using Average Label-Based mAP@15 values on {dataset_name}"
+    fig_name = fig_name if fig_name else default_fig_name
     fig.suptitle(fig_name, fontsize=19, weight='bold')
     ax.set_title("Page 1 Results", fontsize=15)
     for j,(model_name,search,map) in enumerate(maps):
@@ -267,11 +194,73 @@ def plot_av_label_based_map_comparisons(models, eval_dir, dataset_name, fig_name
             print("Please provide a save directory if you want to save the figure.")
             sys.exit(1)
         os.makedirs(save_dir, exist_ok=True)
-        if fig_name == "":
-            names = "-".join([model[0] for model in models])
-            fig_path = os.path.join(save_dir, f"{names}-av_label_based_mAP_comparison_k15.png")
-        else:
-            fig_path = os.path.join(save_dir, fig_name+".png")
+        fig_path = os.path.join(save_dir, f"best_embeddings-micro_mAP@15-comparison.png")
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
+        txt_path = os.path.splitext(fig_path)[0]+".txt"
+        with open(txt_path, "w") as infile:
+            for model in models:
+                infile.write(f"{model[0]}-{model[1]}\n")
+    plt.show()
+
+def plot_macro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
+    """Takes a list of [(embedding,search)] and plots all the Macro Averaged mAP@k in the same figure."""
+
+    default_fig_name = f"Embedding Performances using Label-Based mAP@15 (Macro-Averaged) values on {dataset_name}"
+
+    # Determine Some Parameters
+    positions = np.linspace(-0.4, 0.4, len(models))
+    delta = positions[1]-positions[0]
+
+    # Read the mAP for each model
+    maps = []
+    for model in models:
+        model_dir = os.path.join(eval_dir, dataset_name, model[0])
+        results_dir = os.path.join(model_dir, model[1])
+        map_path = os.path.join(results_dir, "macro_mAP@15.csv")
+        map = pd.read_csv(map_path)["macro_map@15"].values[0]
+        maps.append((model[0], model[1], map))
+
+    fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
+    fig_name = fig_name if fig_name else default_fig_name
+    fig.suptitle(fig_name, fontsize=19, weight='bold')
+    ax.set_title("Page 1 Results", fontsize=15)
+    for j,(model_name,search,map) in enumerate(maps):
+        ax.bar(0+positions[j], 
+                map, 
+                label=get_model_name(model_name) if 0==0 else "",
+                width=delta*0.80, 
+                color=COLORS[j], 
+                edgecolor='k'
+                )
+        ax.text(0+positions[j], 
+                map+0.01, 
+                f"{map:.3f}", 
+                ha='center', 
+                va='bottom', 
+                fontsize=10, 
+                weight='bold'
+                )
+
+    # Set the plot parameters
+    ax.set_yticks(np.arange(0,1.05,0.05))
+    ax.tick_params(axis='x', which='major', labelsize=0)
+    ax.tick_params(axis='y', which='major', labelsize=11)
+    ax.set_xlabel("Embedding, Search Combinations", fontsize=15)
+    ax.set_ylabel("mAP@15 (↑)", fontsize=15) # TODO: change name?
+    ax.set_ylim([0,1])
+    ax.grid()
+    ax.legend(loc="best", fontsize=10, title_fontsize=11, fancybox=True)
+    if save_fig:
+        if save_dir == "":
+            print("Please provide a save directory if you want to save the figure.")
+            sys.exit(1)
+        os.makedirs(save_dir, exist_ok=True)
+        fig_path = os.path.join(save_dir, f"best_embeddings-macro_mAP@15-comparison.png")
+        print(f"Saving figure to {fig_path}")
+        fig.savefig(fig_path)
+        txt_path = os.path.splitext(fig_path)[0]+".txt"
+        with open(txt_path, "w") as infile:
+            for model in models:
+                infile.write(f"{model[0]}-{model[1]}\n")
     plt.show()
