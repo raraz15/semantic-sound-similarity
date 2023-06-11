@@ -16,7 +16,11 @@ def find_fnames_with_label(label, df):
     """Returns the list of fnames that contain the label. Uses a regular expression to
     find the label in the labels column."""
 
-    pattern = re.compile(r",{,1}"+label+r",{,1}")
+    _label = label.replace("(", "\(").replace(")", "\)")
+    pattern = ""
+    for p in ["\A"+_label+",|", ","+_label+",|", ","+_label+"\Z", r"|\A"+_label+r"\Z"]:
+        pattern += p
+    pattern = re.compile(r"(?:"+pattern+r")") # Compile the pattern with matching group
     return df[df["labels"].str.contains(pattern)]["fname"].to_list()
 
 def evaluate_relevance(query_fname, result, df, query_label=None):
