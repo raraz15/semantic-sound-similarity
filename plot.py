@@ -29,7 +29,7 @@ if __name__=="__main__":
 
     # Plot the figures
     plot_micro_map_at_15_comparisons(args.model, EVAL_DIR, args.dataset, save_fig=True, save_dir=args.save_dir)
-    plot_label_based_map_at_15(args.model, EVAL_DIR, args.dataset, save_fig=True, save_dir=args.save_dir)
     plot_macro_map_at_15_comparisons(args.model, EVAL_DIR, args.dataset, save_fig=True, save_dir=args.save_dir)
+    plot_label_based_map_at_15(args.model, EVAL_DIR, args.dataset, save_fig=True, save_dir=args.save_dir)
     plot_mr1(args.model, EVAL_DIR, args.dataset, save_fig=True, save_dir=args.save_dir)
     print("Done!")
