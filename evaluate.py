@@ -59,7 +59,7 @@ if __name__=="__main__":
     if "micro_map" in args.metrics:
 
         # Calculate mAP@k for k=15, 30, 45, ...
-        print("\nCalculating micro mAP@k for various k values...")
+        print("\nCalculating Micro-Averaged mAP@k for various k values...")
         map_at_ks = []
         for k in range(args.increment, ((N//args.increment)+1)*args.increment, args.increment):
             start_time = time.time()
@@ -80,7 +80,7 @@ if __name__=="__main__":
         start_time = time.time()
 
         # Calculate mAP for each label
-        print("\nCalculating macro mAP@15 for each label ...")
+        print("\nCalculating mAP@15 for each label ...")
         label_maps, columns = metrics.calculate_map_at_k_for_labels(results_dict, df, k=15)
         # Convert to a dataframe
         _df = pd.DataFrame(label_maps, columns=columns)
@@ -90,7 +90,7 @@ if __name__=="__main__":
         print(f"Results are exported to{output_path}")
 
         # Calculate the macro mAP@15 and weighted macro mAP@15
-        print("\nCalculating the macro mAP@15 and weighted macro mAP@15...")
+        print("\nCalculating the Macro-Averaged mAP@15 and Weighted Macro-Averaged mAP@15...")
         macro_averaged_precision = metrics.calculate_macro_map(label_maps)
         w_macro_averaged_precision = metrics.calculate_weighted_macro_map(label_maps)
         print(f"Macro mAP@15: {macro_averaged_precision:.5f} | "
