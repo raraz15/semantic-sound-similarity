@@ -1,5 +1,7 @@
 """Script to contain the metrics used for evaluation."""
 
+import re
+
 # TODO: ncdg
 
 ####################################################################################
@@ -10,8 +12,15 @@ def get_labels(fname, df):
 
     return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
 
+def find_fnames_with_label(label, df):
+    """Returns the list of fnames that contain the label. Uses a regular expression to
+    find the label in the labels column."""
+
+    pattern = re.compile(r",{,1}"+label+r",{,1}")
+    return df[df["labels"].str.contains(pattern)]["fname"].to_list()
+
 def evaluate_relevance(query_fname, result, df, query_label=None):
-    """ Evaluates the relevance of a result for a query. By default, A result is considered
+    """Evaluates the relevance of a result for a query. By default, A result is considered
     relevant if it has at least one label in common with the query. If a query label is 
     provided, a result is considered relevant if it contains the label. Relevance: list of 
     relevance values (1: relevant, 0: not relevant)."""
@@ -113,7 +122,7 @@ def calculate_map_at_k_for_labels(results_dict, df, k=15):
     label_maps = []
     for query_label in labels:
         # Get the fnames containing this label
-        fnames_with_label = df[df["labels"].apply(lambda x: query_label in x)]["fname"].to_list()
+        fnames_with_label = find_fnames_with_label(query_label, df)
         # For each fname containing the label, calculate the total tp and fp
         label_aps = []
         for query_fname in fnames_with_label:
