@@ -10,6 +10,7 @@ Collaboration with: Frederic Font, Alastair Porter
 contact: oguza97@gmail.com
 
 ## TODO:
+- What is the sample rate of FSD50k?
 - Understand audioset taxonomy
     - How many labels
     - How many example for each label
