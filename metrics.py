@@ -12,16 +12,17 @@ def get_labels(fname, df):
 
     return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
 
-def find_fnames_with_label(label, df):
+def find_indices_containing_label(label, df):
     """Returns the list of fnames that contain the label. Uses a regular expression to
     find the label in the labels column."""
 
-    _label = label.replace("(", "\(").replace(")", "\)")
+    label = re.escape(label)
+    # Create the pattern to search the label in the labels column
     pattern = ""
-    for p in ["\A"+_label+",|", ","+_label+",|", ","+_label+"\Z", r"|\A"+_label+r"\Z"]:
+    for p in ["\A"+label+",|", ","+label+",|", ","+label+"\Z", r"|\A"+label+r"\Z"]:
         pattern += p
     pattern = re.compile(r"(?:"+pattern+r")") # Compile the pattern with matching group
-    return df[df["labels"].str.contains(pattern)]["fname"].to_list()
+    return df["labels"].str.contains(pattern)
 
 def evaluate_relevance(query_fname, result, df, query_label=None):
     """Evaluates the relevance of a result for a query. By default, A result is considered
@@ -126,7 +127,7 @@ def calculate_map_at_k_for_labels(results_dict, df, k=15):
     label_maps = []
     for query_label in labels:
         # Get the fnames containing this label
-        fnames_with_label = find_fnames_with_label(query_label, df)
+        fnames_with_label = df[find_indices_containing_label(query_label, df)]["fname"].to_list()
         # For each fname containing the label, calculate the total tp and fp
         label_aps = []
         for query_fname in fnames_with_label:
