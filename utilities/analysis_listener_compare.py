@@ -13,7 +13,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import streamlit as st
 import pandas as pd
 
-from evaluate import calculate_average_precision
+from metrics import evaluate_relevance,average_precision, find_indices_containing_label
 from directories import *
 
 FREESOUND_STRING = '<iframe frameborder="0" scrolling="no" \
@@ -33,7 +33,9 @@ def load_gt():
 
 @st.cache_data(ttl=1800, show_spinner=False)
 def load_results(paths):
-    # For each analysis file, load the results
+    """For each embedding analysis, load the results and store them in a dictionary. 
+    Return a list of dictionaries, one for each embedding analysis."""
+
     model_results_dcts = []
     for path in paths:
         # Load the analysis file
@@ -56,7 +58,6 @@ def load_results(paths):
                                 "embeddings_name": embeddings_name, 
                                 "search": search, 
                                 "results": similarity_dict, 
-                                "fnames": list(similarity_dict.keys()), 
                                 })
     return model_results_dcts
 
@@ -75,8 +76,8 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
         st.components.v1.html(FREESOUND_STRING.format(query_fname))
     st.divider()
 
-    # Split the labels into a list
-    query_labels = query_labels.split(",")
+    # Split the labels into a set for easier comparison
+    query_labels = set(query_labels.split(","))
 
     # Display the top N similar sounds for each embedding-search combination
     st.subheader(f"Top {N} Similar Sounds for each Embedding-Search Combination")
@@ -88,37 +89,40 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
         # Fill columns for each embedding-search combination
         for i, model_result_dct in enumerate(model_result_dcts):
 
-            # Calculate the average precision for the query sound with this embedding
-            ap = calculate_average_precision(query_fname, model_result_dct['results'][query_fname], df)
-
-            # Get the model name and variant
-            if "Agg" not in model_result_dct['embeddings_name']:
-                model_name, variant = model_result_dct['embeddings_name'].split("-PCA")
-                variant = "PCA"+"".join(variant)
-            else:
-                model_name, variant = model_result_dct['embeddings_name'].split("-Agg")
-                variant = "Agg"+"".join(variant)
             # Display the results for this embedding-search combination
             with columns[i]:
-                # Display the model name, variant and search
+
+                # Get the model name and variant and dislay it
+                if "Agg" not in model_result_dct['embeddings_name']:
+                    model_name, variant = model_result_dct['embeddings_name'].split("-PCA")
+                    variant = "PCA"+"".join(variant)
+                else:
+                    model_name, variant = model_result_dct['embeddings_name'].split("-Agg")
+                    variant = "Agg"+"".join(variant)
                 st.subheader(model_name)
                 for v in variant.split("-"):
                     st.subheader(v)
                 st.subheader(f"{model_result_dct['search']} Search")
-                # Display the average precision
-                st.write(f"Average Precision@15 for this result is: {ap:.3f}")
+
+                # Calculate and display the average precision for the query sound with this embedding
+                relevance = evaluate_relevance(query_fname, 
+                                            model_result_dct['results'][query_fname][:N], 
+                                            df)
+                ap_at_15 = average_precision(relevance)
+                st.write(f"Average Precision@{N} for this result is: {ap_at_15:.3f}")
                 st.divider()
-                # Display the results
+
+                # Display the similarity results
                 for j,result in  enumerate(model_result_dct["results"][query_fname][:N]):
                     if model_result_dct["search"]=="Nearest Neighbor":
                         st.write(f"Ranking: {j+1} - Distance: {result['score']:.3f}")
                     elif model_result_dct["search"]=="Dot Product":
                         st.write(f"Ranking: {j+1} - Score: {result['score']:.3f}")
                     ref_fname = result["result_fname"]
-                    ref_labels = df[df.fname==int(ref_fname)].labels.values[0]
                     st.caption(f"Sound ID: {ref_fname}")
                     # Highlight the common labels between the query and the reference sound
-                    common_labels = list(set(query_labels).intersection(ref_labels.split(",")))
+                    ref_labels = df[df.fname==int(ref_fname)].labels.values[0]
+                    common_labels = list(query_labels.intersection(ref_labels.split(",")))
                     if len(common_labels)>0:
                         ref_labels += ","
                         for common_label in common_labels:
@@ -128,20 +132,22 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
                     st.components.v1.html(FREESOUND_STRING.format(ref_fname))
 
 def get_subsets(sound_classes, df, model_results_dcts, N=15):
+    """Get the subset of sounds containing all the selected labels.
+    If no sound contains all the labels, return an error."""
 
     # Get the subset of sounds containing all the selected labels
-    indices = df.labels.str.contains(sound_classes[0])
+    indices = find_indices_containing_label(sound_classes[0], df)
     if len(sound_classes)>1:
         for sound_class in sound_classes[1:]:
-            indices = indices & df.labels.str.contains(sound_class)
-    fnames_of_class = df[indices].fname.to_list()
+            indices = indices & find_indices_containing_label(sound_class, df)
+    fnames_of_intersection = df[indices]["fname"].to_list()
     # If no sound contains all the labels, return an error
-    if fnames_of_class==[]:
+    if fnames_of_intersection==[]:
         st.error("No sound found containing all the selected labels. Choose Again.")
         return
     else:
         # Get a random sound from the subset
-        fname = str(random.choice(fnames_of_class))
+        fname = str(random.choice(fnames_of_intersection))
         # Header to display above the results
         header = f"Random Sound Containing '{', '.join(sound_classes)}' Label(s)"
         # Display the results
