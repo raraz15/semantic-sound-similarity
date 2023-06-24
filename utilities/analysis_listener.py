@@ -17,8 +17,8 @@ from metrics import evaluate_relevance,average_precision, find_indices_containin
 from directories import *
 
 FREESOUND_STRING = '<iframe frameborder="0" scrolling="no" \
-                    src="https://freesound.org/embed/sound/iframe/{}/simple/small/" \
-                    width="375" height="30"></iframe>'
+                    src="https://freesound.org/embed/sound/iframe/{}/simple/medium/" \
+                    width="481" height="86"></iframe>'
 
 # Set the page title and icon
 st.set_page_config(page_title="Sound Similarity", page_icon=":loud_sound:", layout="wide")
@@ -61,7 +61,7 @@ def load_results(paths):
                                 })
     return model_results_dcts
 
-def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, header=None, query_label=None):
+def display_query_and_similar_sounds(query_fname, df, model_result_dcts, N=15, header=None, query_label=None):
 
     # Display the header if provided
     if header is not None:
@@ -78,6 +78,7 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
         # Display the query sound
         st.components.v1.html(FREESOUND_STRING.format(query_fname))
     st.divider()
+
     # Convert the query labels to a set for faster lookup
     query_labels = set(query_labels)
 
@@ -121,8 +122,8 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
                                                 model_result_dct['results'][query_fname][:N], 
                                                 df)
                 ap_at_15 = average_precision(relevance)
-                st.write(f"Average Precision@{N} for this result is: **{ap_at_15:.3f}**.")
                 st.write(f"**{sum(relevance)}** relevant sounds returned.")
+                st.write(f"Average Precision@{N} for this result is: **{ap_at_15:.3f}**.")
                 st.divider()
 
                 # Display the top N similarity results
@@ -160,9 +161,9 @@ def get_subsets(sound_classes, df, model_results_dcts, N=15):
             # Get a random sound from the subset
             fname = str(random.choice(fnames_of_intersection))
             # Header to display above the results
-            header = f"There are {len(fnames_of_intersection)} Sounds Containing *{', '.join(sound_classes)}* Labels."
+            header = f"There are {len(fnames_of_intersection)} sounds containing *{', '.join(sound_classes)}* labels."
             # Display the results
-            display_query_and_similar_sound(fname, 
+            display_query_and_similar_sounds(fname, 
                                             df, 
                                             model_results_dcts, 
                                             N=N, 
@@ -172,9 +173,9 @@ def get_subsets(sound_classes, df, model_results_dcts, N=15):
         # Get a random sound from the subset
         fname = str(random.choice(fnames_of_intersection))
         # Header to display above the results
-        header = f"There are {len(fnames_of_intersection)} Sounds Containing the :blue[{', '.join(sound_classes)}] Label"
+        header = f"There are {len(fnames_of_intersection)} sounds containing the :blue[{', '.join(sound_classes)}] label."
         # Display the results
-        display_query_and_similar_sound(fname, 
+        display_query_and_similar_sounds(fname, 
                                         df, 
                                         model_results_dcts, 
                                         N=N, 
