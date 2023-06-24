@@ -81,6 +81,9 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
 
     # Display the top N similar sounds for each embedding-search combination
     st.subheader(f"Top {N} Similar Sounds for each Embedding-Search Combination")
+    st.write("Labels that are common to the query and the reference sound are highlighted in :green[green].")
+    if query_label is not None:
+        st.write(f"The :blue[query label] is marked with blue.")
     with st.container():
 
         # Create a column for each embedding-search combination
@@ -114,7 +117,6 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
                     relevance = evaluate_relevance(query_fname, 
                                                 model_result_dct['results'][query_fname][:N], 
                                                 df)
-                print(relevance)
                 ap_at_15 = average_precision(relevance)
                 st.write(f"Average Precision@{N} for this result is: {ap_at_15:.3f}")
                 st.divider()
@@ -128,14 +130,14 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
                     ref_fname = result["result_fname"]
                     st.caption(f"Sound ID: {ref_fname}")
                     # Highlight the common labels between the query and the reference sound
-                    ref_labels = df[df.fname==int(ref_fname)].labels.values[0]
-                    common_labels = list(query_labels.intersection(ref_labels.split(",")))
-                    if len(common_labels)>0:
-                        ref_labels += ","
-                        for common_label in common_labels:
-                            ref_labels = re.sub(common_label+",", f"**{common_label}**,", ref_labels)
-                        ref_labels = ref_labels[:-1]
-                    st.write(f"Labels: {ref_labels.replace(',', ', ')}")
+                    ref_labels = df[df.fname==int(ref_fname)].labels.values[0].split(",")
+                    for common_label in query_labels.intersection(set(ref_labels)):
+                        if common_label==query_label:
+                            ref_labels = [f":blue[{common_label}]" if label==common_label else label for label in ref_labels]
+                        else:
+                            ref_labels = [f":green[{common_label}]" if label==common_label else label for label in ref_labels]
+                    st.write(f"Labels: {', '.join(ref_labels)}")
+                    # Display the result sound
                     st.components.v1.html(FREESOUND_STRING.format(ref_fname))
 
 def get_subsets(sound_classes, df, model_results_dcts, N=15):
@@ -168,7 +170,7 @@ def get_subsets(sound_classes, df, model_results_dcts, N=15):
         # Get a random sound from the subset
         fname = str(random.choice(fnames_of_intersection))
         # Header to display above the results
-        header = f"There are {len(fnames_of_intersection)} Sounds Containing the *{', '.join(sound_classes)}* Label"
+        header = f"There are {len(fnames_of_intersection)} Sounds Containing the :blue[{', '.join(sound_classes)}] Label"
         # Display the results
         display_query_and_similar_sound(fname, 
                                         df, 
