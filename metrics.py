@@ -55,19 +55,20 @@ def evaluate_relevance(query_fname, result, df, query_label=None):
 # mAP Related Metrics
 
 def precision_at_k(relevance, k):
-    """ Calculate precision@k where k is and index in range(0,len(relevance)). Since relevance
-    is a list of 0s (fp) and 1s (tp), the precision is the sum of the relevance values up to k, 
-    which is equal to sum of tps up to k, divided by the length (tp+fp)."""
+    """ Calculate precision@k where k is and index in range(0,len(relevance)). Since 
+    relevance is a list of 0s (fp) and 1s (tp), the precision is the sum of the 
+    relevance values up to k, which is equal to sum of tps up to k, divided by the 
+    length (tp+fp)."""
+
+    assert set(relevance).issubset({0,1}), "Relevance values must be 0 or 1"
 
     return sum(relevance[:k+1])/(k+1)
 
 def average_precision(relevance):
-    """ Calculate the average prediction for a list of relevance values. The average 
-    precision is defined as the average of the precision@k values of the relevant 
-    documents. If there are no relevant documents, the average precision is defined 
-    to be 0. """
-
-    assert set(relevance).issubset({0,1}), "Relevance values must be 0 or 1"
+    """ Calculate the average presicion for a list of relevance values. The average 
+    precision is defined as the 'average of the precision@k values of the relevant 
+    documents in the top k resulst'. If there are no relevant documents, the average 
+    precision is defined to be 0."""
 
     # Number of relevant documents
     tp = sum(relevance)
