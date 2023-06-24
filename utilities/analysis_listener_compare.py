@@ -61,7 +61,7 @@ def load_results(paths):
                                 })
     return model_results_dcts
 
-def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, header=None):
+def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, header=None, query_label=None):
 
     # Display the header if provided
     if header is not None:
@@ -70,7 +70,7 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
     # Display the query sound
     query_labels = df[df.fname==int(query_fname)].labels.values[0] # Get the labels for the query sound
     with st.container():
-        st.subheader("Query Sound")
+        st.subheader("Random Query Sound")
         st.caption(f"Sound ID: {query_fname}")
         st.write(f"Labels: {query_labels.replace(',', ', ')}")
         st.components.v1.html(FREESOUND_STRING.format(query_fname))
@@ -105,9 +105,16 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
                 st.subheader(f"{model_result_dct['search']} Search")
 
                 # Calculate and display the average precision for the query sound with this embedding
-                relevance = evaluate_relevance(query_fname, 
-                                            model_result_dct['results'][query_fname][:N], 
-                                            df)
+                if query_label is not None:
+                    relevance = evaluate_relevance(query_fname, 
+                                                model_result_dct['results'][query_fname][:N], 
+                                                df,
+                                                query_label=query_label)
+                else:
+                    relevance = evaluate_relevance(query_fname, 
+                                                model_result_dct['results'][query_fname][:N], 
+                                                df)
+                print(relevance)
                 ap_at_15 = average_precision(relevance)
                 st.write(f"Average Precision@{N} for this result is: {ap_at_15:.3f}")
                 st.divider()
@@ -140,22 +147,35 @@ def get_subsets(sound_classes, df, model_results_dcts, N=15):
     if len(sound_classes)>1:
         for sound_class in sound_classes[1:]:
             indices = indices & find_indices_containing_label(sound_class, df)
-    fnames_of_intersection = df[indices]["fname"].to_list()
-    # If no sound contains all the labels, return an error
-    if fnames_of_intersection==[]:
-        st.error("No sound found containing all the selected labels. Choose Again.")
-        return
+        fnames_of_intersection = df[indices]["fname"].to_list()
+        # If no sound contains all the labels, return an error
+        if fnames_of_intersection==[]:
+            st.error("No sound found containing all the selected labels. Choose Again.")
+            return
+        else:
+            # Get a random sound from the subset
+            fname = str(random.choice(fnames_of_intersection))
+            # Header to display above the results
+            header = f"There are {len(fnames_of_intersection)} Sounds Containing *{', '.join(sound_classes)}* Labels."
+            # Display the results
+            display_query_and_similar_sound(fname, 
+                                            df, 
+                                            model_results_dcts, 
+                                            N=N, 
+                                            header=header)
     else:
+        fnames_of_intersection = df[indices]["fname"].to_list()
         # Get a random sound from the subset
         fname = str(random.choice(fnames_of_intersection))
         # Header to display above the results
-        header = f"Random Sound Containing '{', '.join(sound_classes)}' Label(s)"
+        header = f"There are {len(fnames_of_intersection)} Sounds Containing the *{', '.join(sound_classes)}* Label"
         # Display the results
         display_query_and_similar_sound(fname, 
                                         df, 
                                         model_results_dcts, 
                                         N=N, 
-                                        header=header)
+                                        header=header,
+                                        query_label=sound_classes[0])
 
 if __name__=="__main__":
 
