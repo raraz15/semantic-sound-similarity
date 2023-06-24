@@ -13,7 +13,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import streamlit as st
 import pandas as pd
 
-from metrics import evaluate_relevance,average_precision, find_indices_containing_label
+from metrics import evaluate_relevance,average_precision, find_indices_containing_label, get_labels
 from directories import *
 
 FREESOUND_STRING = '<iframe frameborder="0" scrolling="no" \
@@ -68,16 +68,18 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
         st.header(header)
 
     # Display the query sound
-    query_labels = df[df.fname==int(query_fname)].labels.values[0] # Get the labels for the query sound
     with st.container():
         st.subheader("Random Query Sound")
         st.caption(f"Sound ID: {query_fname}")
-        st.write(f"Labels: {query_labels.replace(',', ', ')}")
+        # Get the query labels and highlight the query label if provided
+        query_labels = get_labels(query_fname, df)
+        query_labels = [f":blue[{query_label}]" if label==query_label else label for label in query_labels]
+        st.write(f"Labels: {', '.join(query_labels)}")
+        # Display the query sound
         st.components.v1.html(FREESOUND_STRING.format(query_fname))
     st.divider()
-
-    # Split the labels into a set for easier comparison
-    query_labels = set(query_labels.split(","))
+    # Convert the query labels to a set for faster lookup
+    query_labels = set(query_labels)
 
     # Display the top N similar sounds for each embedding-search combination
     st.subheader(f"Top {N} Similar Sounds for Embedding-Search Combination(s)")
@@ -132,12 +134,10 @@ def display_query_and_similar_sound(query_fname, df, model_result_dcts, N=15, he
                     ref_fname = result["result_fname"]
                     st.caption(f"Sound ID: {ref_fname}")
                     # Highlight the common labels between the query and the reference sound
-                    ref_labels = df[df.fname==int(ref_fname)].labels.values[0].split(",")
+                    ref_labels = get_labels(ref_fname,df)
                     for common_label in query_labels.intersection(set(ref_labels)):
-                        if common_label==query_label:
-                            ref_labels = [f":blue[{common_label}]" if label==common_label else label for label in ref_labels]
-                        else:
-                            ref_labels = [f":green[{common_label}]" if label==common_label else label for label in ref_labels]
+                        ref_labels = [f":green[{label}]" if label==common_label else label for label in ref_labels]
+                    ref_labels = [f":blue[{label}]" if label==query_label else label for label in ref_labels]
                     st.write(f"Labels: {', '.join(ref_labels)}")
                     # Display the result sound
                     st.components.v1.html(FREESOUND_STRING.format(ref_fname))
