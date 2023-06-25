@@ -111,19 +111,32 @@ def display_query_and_similar_sounds(query_fname, df, model_result_dcts, N=15, h
                     st.subheader(v)
                 st.subheader(f"{model_result_dct['search']} Search")
 
-                # Calculate and display the average precision for the query sound with this embedding
-                if query_label is not None:
-                    relevance = evaluate_relevance(query_fname, 
+                # Calculate and display the relevance and theaverage precision for the query sound with this embedding-search combination
+                if query_label is None: # If a query label is provided, check for inclusion
+                    relevance_intersection = evaluate_relevance(query_fname, 
+                            model_result_dct['results'][query_fname][:N], 
+                            df)
+                    ap_at_15_intersection = average_precision(relevance_intersection)
+                    st.write(f":green[{sum(relevance_intersection)}] sound(s) share a label with the query sound. "
+                            f"[AP@{N}: **{ap_at_15_intersection:.3f}**]")
+                else: # If a query label is provided, check for inclusion and intersection
+                    # Inclusion
+                    relevance_inclusion = evaluate_relevance(query_fname, 
                                                 model_result_dct['results'][query_fname][:N], 
                                                 df,
                                                 query_label=query_label)
-                else:
-                    relevance = evaluate_relevance(query_fname, 
+                    ap_at_15_inclusion = average_precision(relevance_inclusion)
+                    st.write(f":blue[{sum(relevance_inclusion)}] sound(s) contain the query label. "
+                             f"[AP@{N}: **{ap_at_15_inclusion:.3f}**]")
+                    # Intersection
+                    relevance_intersection = evaluate_relevance(query_fname, 
                                                 model_result_dct['results'][query_fname][:N], 
                                                 df)
-                ap_at_15 = average_precision(relevance)
-                st.write(f"**{sum(relevance)}** relevant sounds returned.")
-                st.write(f"Average Precision@{N} for this result is: **{ap_at_15:.3f}**.")
+                    ap_at_15_intersection = average_precision(relevance_intersection)
+                    # See how many items can be potentially relevant
+                    diff = [1 if (x==0 and y==1) else 0 for x,y in zip(relevance_inclusion, relevance_intersection)]
+                    st.write(f":green[{sum(diff)}] sound(s) share a label with the query sound other than the query label. "
+                             f"[AP@{N}: **{ap_at_15_intersection:.3f}** (including all intersecting labels)]")
                 st.divider()
 
                 # Display the top N similarity results
