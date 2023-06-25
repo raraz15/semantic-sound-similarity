@@ -164,18 +164,37 @@ def display_query_and_similar_sounds(query_fname, df, model_result_dcts, N=15, h
                     st.components.v1.html(FREESOUND_STRING.format(ref_fname))
 
 # TODO: display the AP@N for the selected label for each embedding-search combination
-def get_subsets(sound_classes, df, model_results_dcts, N=15):
+def get_subsets(sound_classes, exclusion_classes, df, model_results_dcts, N=15):
     """Get the subset of sounds containing all the selected labels.
     If no sound contains all the labels, return an error."""
 
     # If only one label is selected, display the results for that label
     if len(sound_classes)==1:
+        # Find which indices contain the selected label
         indices = find_indices_containing_label(sound_classes[0], df)
+        # If there are exclusion classes, remove them from the indices
+        if len(exclusion_classes)>0:
+            # Find which indices contain the excluded labels
+            exclusion_indices = pd.Series(dtype=bool)
+            for sound_class in exclusion_classes:
+                exclusion_indices = exclusion_indices | find_indices_containing_label(sound_class, df)
+            # Get the subset of sounds containing the selected label but not the excluded labels
+            indices = indices & ~exclusion_indices
+            # If there are no sounds containing the selected label, return an error
+            if sum(indices)==0:
+                st.error(f"No sound contains the :blue[{sound_classes[0]}] label "
+                        f"but not the :red[{', '.join(exclusion_classes)}] label(s). Choose Again.")
+                return
+        # Get the filenames of the subset
         fnames_of_intersection = df[indices]["fname"].to_list()
         # Get a random sound from the subset
         fname = str(random.choice(fnames_of_intersection))
         # Header to display above the results
-        header = f"There are {len(fnames_of_intersection)} sounds containing the :blue[{', '.join(sound_classes)}] label."
+        header = f"There are {len(fnames_of_intersection)} sounds containing the :blue[{', '.join(sound_classes)}] label"
+        if len(exclusion_classes)>0:
+            header += f" but not the :red[{', '.join(exclusion_classes)}] label(s)."
+        else:
+            header += "."
         # Display the results
         display_query_and_similar_sounds(fname, 
                                         df, 
@@ -183,10 +202,24 @@ def get_subsets(sound_classes, df, model_results_dcts, N=15):
                                         N=N, 
                                         header=header,
                                         query_label=sound_classes[0])
-    else: # Get the subset of sounds containing all the selected labels
-        indices = find_indices_containing_label(sound_classes[0], df)
-        for sound_class in sound_classes[1:]:
+    else:
+        # Get the subset of sounds containing all the selected labels
+        indices = pd.Series(dtype=bool)
+        for sound_class in sound_classes:
             indices = indices & find_indices_containing_label(sound_class, df)
+        # If there are exclusion classes, remove them from the indices
+        if len(exclusion_classes)>0:
+            # Find which indices contain the excluded labels
+            exclusion_indices = pd.Series(dtype=bool)
+            for sound_class in exclusion_classes:
+                exclusion_indices = exclusion_indices | find_indices_containing_label(sound_class, df)
+            # Get the subset of sounds containing the selected label but not the excluded labels
+            indices = indices & ~exclusion_indices
+            # If there are no sounds containing the selected label, return an error
+            if sum(indices)==0:
+                st.error(f"No sound contains the :blue[{sound_classes[0]}] label "
+                        f"but not the :red[{', '.join(exclusion_classes)}] label(s). Choose Again.")
+                return
         fnames_of_intersection = df[indices]["fname"].to_list()
         # If no sound contains all the labels, return an error
         if fnames_of_intersection==[]:
@@ -204,7 +237,6 @@ def get_subsets(sound_classes, df, model_results_dcts, N=15):
                                             N=N, 
                                             header=header,
                                             query_label=None)
-
 
 if __name__=="__main__":
 
@@ -239,10 +271,18 @@ if __name__=="__main__":
 
     # Select sound categories
     sound_classes = st.multiselect("FSD50K Sound Classes", 
-                                   options=all_labels)
+                                   options=all_labels,
+                                   default=[],
+                                   help="Select the sound categories you want to search for.")
+    exclusion_classes = st.multiselect("Any Classes you want to Exclude?",
+                                        options=all_labels,
+                                        default=[],
+                                        help="If you select a class here, "
+                                              "no sound containing that class will be returned.",
+                                              )
     # Display the results with the selected categories
     st.button(label=":speaker:", 
             on_click=get_subsets, 
-            args=(sound_classes, df, model_results_dcts), 
+            args=(sound_classes, exclusion_classes, df, model_results_dcts), 
             kwargs={"N":args.N}
             )
