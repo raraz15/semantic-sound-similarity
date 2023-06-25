@@ -107,8 +107,12 @@ def display_query_and_similar_sounds(query_fname, df, model_result_dcts, N=15, h
                     model_name, variant = model_result_dct['embeddings_name'].split("-Agg")
                     variant = "Agg"+"".join(variant)
                 st.subheader(model_name)
+                if model_name=="fs-essentia-extractor_legacy":
+                    st.subheader("-")
                 for v in variant.split("-"):
                     st.subheader(v)
+                if model_name=="fs-essentia-extractor_legacy":
+                    st.subheader("-")
                 st.subheader(f"{model_result_dct['search']} Search")
 
                 # Calculate and display the relevance and theaverage precision for the query sound with this embedding-search combination
