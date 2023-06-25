@@ -16,6 +16,7 @@ from directories import GT_PATH, EVAL_DIR
 METRICS = ["micro_map", "macro_map", "mr1"]
 
 # TODO: ncdg
+# TODO: change labels_mAP@15 to labels_AP@15
 if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
