@@ -136,11 +136,12 @@ def display_query_and_similar_sounds(query_fname, df, model_result_dcts, N=15, h
                     # See how many items can be potentially relevant
                     diff = [1 if (x==0 and y==1) else 0 for x,y in zip(relevance_inclusion, relevance_intersection)]
                     st.write(f":green[{sum(diff)}] sound(s) share a label with the query sound other than the query label. "
-                             f"[AP@{N}: **{ap_at_15_intersection:.3f}** (including all intersecting labels)]")
+                             f"[AP@{N}: **{ap_at_15_intersection:.3f}**]")
                 st.divider()
 
                 # Display the top N similarity results
                 for j,result in  enumerate(model_result_dct["results"][query_fname][:N]):
+                    # Determine the score type and display it
                     if model_result_dct["search"]=="Nearest Neighbor":
                         st.write(f"Ranking: {j+1} - Distance: {result['score']:.3f}")
                     elif model_result_dct["search"]=="Dot Product":
@@ -151,18 +152,35 @@ def display_query_and_similar_sounds(query_fname, df, model_result_dcts, N=15, h
                     ref_labels = get_labels(ref_fname,df)
                     for common_label in query_labels.intersection(set(ref_labels)):
                         ref_labels = [f":green[{label}]" if label==common_label else label for label in ref_labels]
+                    # Highlight the query label if provided
                     ref_labels = [f":blue[{label}]" if label==query_label else label for label in ref_labels]
+                    # Display the highlighted labels
                     st.write(f"Labels: {', '.join(ref_labels)}")
                     # Display the result sound
                     st.components.v1.html(FREESOUND_STRING.format(ref_fname))
 
+# TODO: display the AP@N for the selected label for each embedding-search combination
 def get_subsets(sound_classes, df, model_results_dcts, N=15):
     """Get the subset of sounds containing all the selected labels.
     If no sound contains all the labels, return an error."""
 
-    # Get the subset of sounds containing all the selected labels
-    indices = find_indices_containing_label(sound_classes[0], df)
-    if len(sound_classes)>1:
+    # If only one label is selected, display the results for that label
+    if len(sound_classes)==1:
+        indices = find_indices_containing_label(sound_classes[0], df)
+        fnames_of_intersection = df[indices]["fname"].to_list()
+        # Get a random sound from the subset
+        fname = str(random.choice(fnames_of_intersection))
+        # Header to display above the results
+        header = f"There are {len(fnames_of_intersection)} sounds containing the :blue[{', '.join(sound_classes)}] label."
+        # Display the results
+        display_query_and_similar_sounds(fname, 
+                                        df, 
+                                        model_results_dcts, 
+                                        N=N, 
+                                        header=header,
+                                        query_label=sound_classes[0])
+    else: # Get the subset of sounds containing all the selected labels
+        indices = find_indices_containing_label(sound_classes[0], df)
         for sound_class in sound_classes[1:]:
             indices = indices & find_indices_containing_label(sound_class, df)
         fnames_of_intersection = df[indices]["fname"].to_list()
@@ -180,20 +198,9 @@ def get_subsets(sound_classes, df, model_results_dcts, N=15):
                                             df, 
                                             model_results_dcts, 
                                             N=N, 
-                                            header=header)
-    else:
-        fnames_of_intersection = df[indices]["fname"].to_list()
-        # Get a random sound from the subset
-        fname = str(random.choice(fnames_of_intersection))
-        # Header to display above the results
-        header = f"There are {len(fnames_of_intersection)} sounds containing the :blue[{', '.join(sound_classes)}] label."
-        # Display the results
-        display_query_and_similar_sounds(fname, 
-                                        df, 
-                                        model_results_dcts, 
-                                        N=N, 
-                                        header=header,
-                                        query_label=sound_classes[0])
+                                            header=header,
+                                            query_label=None)
+
 
 if __name__=="__main__":
 
