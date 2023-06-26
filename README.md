@@ -8,3 +8,7 @@ Advisors: Dmitry Bogdanov, Pablo Alonso
 Collaboration with: Frederic Font, Alastair Porter
 
 contact: oguza97@gmail.com
+
+# TODO
+- write the insturcitons of installation and how to use
+    - fs-essentia hwo to install...
