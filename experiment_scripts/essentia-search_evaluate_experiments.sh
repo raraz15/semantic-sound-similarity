@@ -23,6 +23,6 @@ for file in "$EMBED_DIR/"*; do # for each embedding dir
 done
 
 # Compare the results of the experiments
-python plot_evaluation_results.py --model=$MODEL_NAME
+python plot_evaluation_results.py =$MODEL_NAME
 
 #############################################################################

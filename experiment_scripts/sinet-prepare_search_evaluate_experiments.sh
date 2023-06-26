@@ -37,6 +37,6 @@ for v1 in ${variable1[@]}; do
 done
 
 # Compare the results of the experiments
-python plot_evaluation_results.py --model=$1
+python plot_evaluation_results.py =$1
 
 #############################################################################
