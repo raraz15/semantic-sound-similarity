@@ -41,7 +41,7 @@ def normalize_embedding(embeds):
 if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
-                                   formatter_class=ArgumentDefaultsHelpFormatter)
+                        formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('embed_dir', 
                         type=str, 
                         help='Directory containing embedding.json files.')
