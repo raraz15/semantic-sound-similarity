@@ -13,7 +13,10 @@ urls=(
     "https://essentia.upf.edu/models/feature-extractors/openl3/openl3-env-mel128-emb512-3.json"\
     "https://essentia.upf.edu/models/feature-extractors/openl3/openl3-env-mel256-emb512-3.pb"\
     "https://essentia.upf.edu/models/feature-extractors/openl3/openl3-env-mel256-emb512-3.json"\
-
+    "https://essentia.upf.edu/models/feature-extractors/openl3/openl3-env-mel256-emb6144-3.pb"\
+    "https://essentia.upf.edu/models/feature-extractors/openl3/openl3-env-mel256-emb6144-3.json"\
+    # "https://essentia.upf.edu/models/feature-extractors/openl3/openl3-env-mel128-emb6144-3.pb"\
+    # "https://essentia.upf.edu/models/feature-extractors/openl3/openl3-env-mel128-emb6144-3.json"\
 )
 
 for url in ${urls[@]}; do
@@ -21,6 +24,7 @@ for url in ${urls[@]}; do
     wget $url -P $MODELS_DIR
 done
 
+exit 0
 ############################################################################################################
 
 echo "====================================================================================================="

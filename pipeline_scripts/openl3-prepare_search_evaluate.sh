@@ -41,6 +41,10 @@ if [[ $3 == -1 ]]; then
         N=512
     elif [[ $MODEL_NAME == "openl3-env-mel256-emb512-3" ]]; then
         N=512
+    elif [[ $MODEL_NAME == "openl3-env-mel128-emb6144-3" ]]; then
+        N=6144
+    elif [[ $MODEL_NAME == "openl3-env-mel256-emb6144-3" ]]; then
+        N=6144
     else
         echo "Wrong Open-L3 name"
         exit 1
