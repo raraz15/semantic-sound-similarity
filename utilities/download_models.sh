@@ -6,6 +6,24 @@ mkdir -p $MODELS_DIR
 ############################################################################################################
 
 echo "====================================================================================================="
+echo "Downloading OpenL3 model"
+
+urls=(
+    "https://essentia.upf.edu/models/feature-extractors/openl3/openl3-env-mel128-emb512-3.pb"\
+    "https://essentia.upf.edu/models/feature-extractors/openl3/openl3-env-mel128-emb512-3.json"\
+    "https://essentia.upf.edu/models/feature-extractors/openl3/openl3-env-mel256-emb512-3.pb"\
+    "https://essentia.upf.edu/models/feature-extractors/openl3/openl3-env-mel256-emb512-3.json"\
+
+)
+
+for url in ${urls[@]}; do
+    echo "$url"
+    wget $url -P $MODELS_DIR
+done
+
+############################################################################################################
+
+echo "====================================================================================================="
 echo "Downloading YAMNet model"
 
 urls=(
