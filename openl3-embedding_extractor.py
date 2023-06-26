@@ -180,23 +180,27 @@ def process_audio(model_embeddings, audio_path, output_dir, sample_rate):
 if __name__ == "__main__":
 
     parser=ArgumentParser(description=__doc__, 
-                                formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('config', type=str, 
+                        formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('config_path', 
+                        type=str, 
                         help="Path to config.json file of the model. "
                         "Assumes the model.pb is next to it.")
-    parser.add_argument('-o', '--output_dir', type=str, default="",
+    parser.add_argument('-o', 
+                        '--output_dir', 
+                        type=str, 
+                        default="",
                         help="Path to output directory.")
     args=parser.parse_args()
 
     # Read the config file
-    with open(args.config, "r") as json_file:
+    with open(args.config_path, "r") as json_file:
         config = json.load(json_file)
     print("Config:")
     print(json.dumps(config, indent=4))
 
     # Configure the embedding model
-    model_name = os.path.splitext(os.path.basename(args.config))[0]
-    model_path = os.path.join(os.path.dirname(args.config), f"{model_name}.pb")
+    model_name = os.path.splitext(os.path.basename(args.config_path))[0]
+    model_path = os.path.join(os.path.dirname(args.config_path), f"{model_name}.pb")
     model_embeddings = EmbeddingsOpenL3(model_path,
                                         input_shape=config['schema']['inputs'][0]['shape'])
 

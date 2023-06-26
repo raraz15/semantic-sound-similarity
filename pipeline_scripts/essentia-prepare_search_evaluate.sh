@@ -49,7 +49,7 @@ echo $EVAL_DIR
 # Prepare the embeddings
 echo "======================================================================="
 echo "Preparation"
-python fs-essentia-extractor_legacy-embedding_prepare.py -p=$EMBED_DIR -N=$1
+python fs-essentia-extractor_legacy-embedding_prepare.py $EMBED_DIR -N=$1
 echo $PREP_EMBED_DIR
 echo
 
@@ -58,7 +58,7 @@ echo
 # Perform similarity search
 echo "======================================================================="
 echo "Similarity Search"
-python similarity_search.py -p=$PREP_EMBED_DIR -s=nn
+python similarity_search.py $PREP_EMBED_DIR -s=nn
 SIMILARITY_PATH="$SIMILARITY_DIR-PCA_$N/nn/similarity_results.json"
 echo
 
@@ -67,7 +67,7 @@ echo
 # Evaluate
 echo "======================================================================="
 echo "Evaluation"
-python evaluate.py -p=$SIMILARITY_PATH
+python evaluate.py $SIMILARITY_PATH
 echo
 echo "======================================================================="
 

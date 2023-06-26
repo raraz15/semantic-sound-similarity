@@ -43,7 +43,7 @@ echo
 # Perform similarity search
 echo "======================================================================="
 echo "Similarity Search"
-python similarity_search.py -p=$PREP_EMBED_DIR -s=nn
+python similarity_search.py $PREP_EMBED_DIR -s=nn
 SIMILARITY_PATH="$SIMILARITY_DIR/similarity_results.json"
 echo
 
@@ -52,7 +52,7 @@ echo
 # Evaluate
 echo "======================================================================="
 echo "Evaluation"
-python evaluate.py -p=$SIMILARITY_PATH
+python evaluate.py $SIMILARITY_PATH
 echo
 echo "======================================================================="
 

@@ -20,12 +20,17 @@ METRICS = ["micro_map", "macro_map", "mr1"]
 if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
-                                   formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p', '--path', type=str, required=True, 
+                        formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('results_path',
+                        type=str,
                         help='Path to results.json file.')
-    parser.add_argument('--increment', type=int, default=15, 
+    parser.add_argument('--increment', 
+                        type=int, 
+                        default=15, 
                         help="MAP@k calculation increments.")
-    parser.add_argument('--metrics', type=str, nargs='+', 
+    parser.add_argument('--metrics',
+                        type=str,
+                        nargs='+',
                         default=METRICS, 
                         help='Metrics to calculate.')
     args=parser.parse_args()
@@ -43,16 +48,16 @@ if __name__=="__main__":
 
     # Read the results
     results_dict = {}
-    with open(args.path, "r") as infile:
+    with open(args.results_path, "r") as infile:
         for jline in infile:
             result_dict = json.loads(jline)
             results_dict[result_dict["query_fname"]] = result_dict["results"]
     N = len(result_dict["results"]) # Number of returned results for each query
 
     # Create the output directory
-    search_name = os.path.basename(os.path.dirname(args.path))
-    model_name = os.path.basename(os.path.dirname(os.path.dirname(args.path)))
-    dataset_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(args.path))))
+    search_name = os.path.basename(os.path.dirname(args.results_path))
+    model_name = os.path.basename(os.path.dirname(os.path.dirname(args.results_path)))
+    dataset_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(args.results_path))))
     output_dir = os.path.join(EVAL_DIR, dataset_name, model_name, search_name)
     os.makedirs(output_dir, exist_ok=True)
 

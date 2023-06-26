@@ -9,9 +9,8 @@ if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
                         formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-m', '--model', 
+    parser.add_argument('model', 
                         type=str, 
-                        required=True, 
                         help='Name of the model.')
     parser.add_argument("--save-dir",
                         type=str,

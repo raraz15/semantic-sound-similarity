@@ -72,16 +72,20 @@ if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
                                    formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p', '--path', type=str, required=True, 
+    parser.add_argument('embed_dir',
+                        type=str,
                         help='Directory containing fs-essentia-extractor_legacy embeddings.')
-    parser.add_argument("-N", type=int, default=100, 
+    parser.add_argument("-N",
+                        type=int,
+                        default=100, 
                         help="Number of PCA components to keep.")
-    parser.add_argument('--plot-scree', action='store_true', 
+    parser.add_argument('--plot-scree', 
+                        action='store_true', 
                         help="Plot variance contributions of PCA components.")
     args = parser.parse_args()
 
     # Read all the embeddins
-    embed_paths = glob.glob(os.path.join(args.path, "*.yaml"))
+    embed_paths = glob.glob(os.path.join(args.embed_dir, "*.yaml"))
     print(f"{len(embed_paths)} embeddings found.")
 
     # Create the initial embeddings from model outputs
@@ -135,7 +139,7 @@ if __name__=="__main__":
 
     # Create the output dir
     n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
-    output_dir = f"{args.path}-PCA_{n_components}"
+    output_dir = f"{args.embed_dir}-PCA_{n_components}"
     os.makedirs(output_dir, exist_ok=True)
     print(f"Exporting the embeddings to: {output_dir}")
 
@@ -143,8 +147,8 @@ if __name__=="__main__":
     if args.plot_scree:
         print(f"Plotting the PCA Scree plot next to the embeddings...")
         import matplotlib.pyplot as plt
-        model = os.path.basename(args.path)
-        data = os.path.basename(os.path.dirname(args.path))
+        model = os.path.basename(args.embed_dir)
+        data = os.path.basename(os.path.dirname(args.embed_dir))
         title=f'FSD50K.{data} - {model} Embeddings PCA Scree Plot'
         pca = PCA(n_components=None, copy=True)
         pca.fit(embeddings)

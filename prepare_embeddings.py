@@ -42,14 +42,17 @@ if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
                                    formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p', '--path', type=str, required=True, 
+    parser.add_argument('embed_dir', 
+                        type=str, 
                         help='Directory containing embedding.json files.')
     parser.add_argument("-a", "-aggregation", 
                         type=str, 
                         choices=["mean", "median", "max", "none"], 
                         default="mean", 
                         help="Type of embedding aggregation.")
-    parser.add_argument("-N", type=int, default=100, 
+    parser.add_argument("-N", 
+                        type=int, 
+                        default=100, 
                         help="Number of PCA components to keep. -1 to do not apply.")
     parser.add_argument("--no-normalization",
                         action="store_true", 
@@ -57,7 +60,8 @@ if __name__=="__main__":
     parser.add_argument("--normalization",
                         action="store_true", 
                         help="Normalize the final clip embedding.")
-    parser.add_argument('--plot-scree', action='store_true', 
+    parser.add_argument('--plot-scree', 
+                        action='store_true', 
                         help="Plot variance contributions of PCA components.")
     args=parser.parse_args()
 
@@ -65,7 +69,7 @@ if __name__=="__main__":
         raise ValueError("Cannot specify both --normalization and --no-normalization")
 
     # Read all the json files in the tree
-    embed_paths = glob.glob(os.path.join(args.path, "*.json"))
+    embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
     print(f"{len(embed_paths)} embeddings were found in the directory.")
 
     # Load the embeddings and process them
@@ -87,7 +91,7 @@ if __name__=="__main__":
 
     # Create the output dir
     n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
-    output_dir = f"{args.path}-Agg_{args.a}-PCA_{n_components}-Norm_{not args.no_normalization}"
+    output_dir = f"{args.embed_dir}-Agg_{args.a}-PCA_{n_components}-Norm_{not args.no_normalization}"
     os.makedirs(output_dir, exist_ok=True)
     print(f"Output directory: {output_dir}")
 
@@ -96,8 +100,8 @@ if __name__=="__main__":
     if args.plot_scree:
         print(f"Plotting the PCA Scree plot next to the embeddings...")
         import matplotlib.pyplot as plt
-        model = os.path.basename(args.path)
-        data = os.path.basename(os.path.dirname(args.path))
+        model = os.path.basename(args.embed_dir)
+        data = os.path.basename(os.path.dirname(args.embed_dir))
         title=f'FSD50K.{data} - {model} Embeddings PCA Scree Plot'
         pca = PCA(n_components=None, copy=True)
         pca.fit(embeddings)

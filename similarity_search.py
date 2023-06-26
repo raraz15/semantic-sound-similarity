@@ -65,11 +65,12 @@ if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
                         formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p', '--path', 
+    parser.add_argument('embed_dir', 
                         type=str, 
-                        required=True, 
-                        help='Directory containing embedding.json files.')
-    parser.add_argument("-s", "--search", 
+                        help='Directory containing embedding.json files. ' 
+                        'Embeddings should be prepared with prepare_embeddings.py.')
+    parser.add_argument("-s", 
+                        "--search", 
                         type=str, 
                         choices=["dot", "nn"], 
                         default="dot", 
@@ -81,7 +82,7 @@ if __name__=="__main__":
     args=parser.parse_args()
 
     # Read all the json files in the tree
-    embed_paths = glob.glob(os.path.join(args.path, "*.json"))
+    embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
     print(f"{len(embed_paths)} embedding paths were found in the directory.")
 
     # Load the embeddings, convert to numpy and store with the audio path
@@ -97,8 +98,8 @@ if __name__=="__main__":
     print(f"{len(embeddings)} embeddings were read.")
 
     # Create the export directory
-    model_name = os.path.basename(args.path)
-    dataset_name = os.path.basename(os.path.dirname(args.path))
+    model_name = os.path.basename(args.embed_dir)
+    dataset_name = os.path.basename(os.path.dirname(args.embed_dir))
     output_dir = os.path.join(ANALYSIS_DIR, dataset_name, model_name, args.search)
     output_path = os.path.join(output_dir, "similarity_results.json")
     print(f"Exporting analysis results to: {output_path}")
