@@ -77,7 +77,7 @@ if __name__=="__main__":
                         help="Type of similarity search algorithm.")
     parser.add_argument('-N', 
                         type=int, 
-                        default=90, 
+                        default=30, 
                         help="Number of queries to return.")
     args=parser.parse_args()
 
