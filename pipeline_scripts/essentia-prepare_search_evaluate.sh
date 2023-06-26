@@ -60,6 +60,7 @@ echo "======================================================================="
 echo "Similarity Search"
 python similarity_search.py $PREP_EMBED_DIR -s=nn
 SIMILARITY_PATH="$SIMILARITY_DIR-PCA_$N/nn/similarity_results.json"
+echo $SIMILARITY_PATH
 echo
 
 #############################################################################
