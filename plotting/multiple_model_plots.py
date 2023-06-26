@@ -166,7 +166,7 @@ def plot_micro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_na
     for j,(model_name,search,map) in enumerate(maps):
         ax.bar(0+positions[j], 
                 map, 
-                label=get_model_name(model_name) if 0==0 else "",
+                label=get_model_name(model_name),
                 width=delta*0.80, 
                 color=COLORS[j], 
                 edgecolor='k'
