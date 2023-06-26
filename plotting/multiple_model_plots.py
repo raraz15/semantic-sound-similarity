@@ -143,7 +143,7 @@ def plot_map_comparisons_single_variation(models, eval_dir, dataset_name, fig_na
 def plot_micro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
     """Takes a list of [(embedding,search)] and plots all the Micro Averaged mAP@k in the same figure."""
 
-    default_fig_name = f"Embedding Performances using mAP@15 (Micro-Averaged) values on {dataset_name}"
+    default_fig_name = f"Embedding Performances using Instance-Based mAP@15 (Micro-Averaged) values on {dataset_name}"
 
     # Determine Some Parameters
     positions = np.linspace(-0.4, 0.4, len(models))
