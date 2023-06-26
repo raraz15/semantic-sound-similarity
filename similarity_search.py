@@ -95,14 +95,14 @@ if __name__=="__main__":
         # For pretty print
         if len(clip_embedding["audio_path"]) > str_len:
             str_len = len(clip_embedding["audio_path"])
-    print(f"{len(embeddings)} embeddings were read.")
+    print(f"{len(embeddings)} embeddings are read.")
 
     # Create the export directory
     model_name = os.path.basename(args.embed_dir)
     dataset_name = os.path.basename(os.path.dirname(args.embed_dir))
     output_dir = os.path.join(ANALYSIS_DIR, dataset_name, model_name, args.search)
     output_path = os.path.join(output_dir, "similarity_results.json")
-    print(f"Exporting analysis results to: {output_path}")
+    print(f"Analysis results will be exported to: {output_path}")
     os.makedirs(output_dir, exist_ok=True)
 
     # For each element in the dataset, perform the sound search to the rest of the dataset
