@@ -11,7 +11,7 @@ import pandas as pd
 
 from essentia.standard import EasyLoader, TensorflowPredictFSDSINet, TensorflowPredictVGGish
 
-from directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR, MODELS_DIR
+from directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
 
 TRIM_DUR = 30 # seconds
 
@@ -49,11 +49,10 @@ if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
                                    formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p', '--path', type=str, default=GT_PATH, 
-                        help='Path to csv file containing audio fnames.')
-    parser.add_argument('-c', '--config', type=str, required=True,
-                        help="Path to config file of the model.")
-    parser.add_argument('-o', '--output_dir', type=str, default=EMBEDDINGS_DIR,
+    parser.add_argument('config', type=str, 
+                        help="Path to config.json file of the model. "
+                        "Assumes the model.pb is next to it.")
+    parser.add_argument('-o', '--output_dir', type=str, default="",
                         help="Path to output directory.")
     args=parser.parse_args()
 
@@ -64,27 +63,33 @@ if __name__=="__main__":
     print(json.dumps(config, indent=4))
 
     # Configure the embedding model
-    model_path = os.path.join(MODELS_DIR, f"{config['model_name']}.pb")
-    if "audioset-yamnet" in config['model_name']:
+    model_name = os.path.splitext(os.path.basename(args.config))[0]
+    model_path = os.path.join(os.path.dirname(args.config), f"{model_name}.pb")
+    if "audioset-yamnet" in 'model_name':
         model_embeddings = TensorflowPredictVGGish(graphFilename=model_path, 
                                                 input="melspectrogram", 
                                                 output="embeddings")
-    elif "audioset-vggish" in config['model_name']:
+    elif "audioset-vggish" in model_name:
         model_embeddings = TensorflowPredictVGGish(graphFilename=model_path, 
                                                 output="model/vggish/embeddings")
-    elif "fsd-sinet" in config['model_name']:
+    elif "fsd-sinet" in model_name:
         model_embeddings = TensorflowPredictFSDSINet(graphFilename=model_path,
                                                     output="model/global_max_pooling1d/Max")
     else:
-        raise ValueError(f"Unknown model name: {config['model_name']}")
+        raise ValueError(f"Unknown model name: {model_name}")
 
     # Read the file names
-    fnames = pd.read_csv(args.path)["fname"].to_list()
+    fnames = pd.read_csv(GT_PATH)["fname"].to_list()
     audio_paths = [os.path.join(AUDIO_DIR, f"{fname}.wav") for fname in fnames]
     print(f"There are {len(audio_paths)} audio files to process.")
 
+    # Determine the output directory
+    if args.output_dir=="":
+        # If the default output directory is used add the AUDIO_DIR to the path
+        output_dir = os.path.join(EMBEDDINGS_DIR, os.path.basename(AUDIO_DIR), model_name)
+    else:
+        output_dir = os.path.join(args.output_dir, model_name)
     # Create the output directory
-    output_dir = os.path.join(args.output_dir, config['model_name'])
     os.makedirs(output_dir, exist_ok=True)
     print(f"Exporting the embeddings to: {output_dir}")
 
