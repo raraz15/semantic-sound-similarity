@@ -34,6 +34,16 @@ if __name__=="__main__":
                         nargs='+',
                         default=METRICS, 
                         help='Metrics to calculate.')
+    parser.add_argument("--ground-truth",
+                        type=str,
+                        default=GT_PATH,
+                        help="Path to the ground truth CSV file. "
+                        "You can provide a subset of the ground truth by "
+                        "filtering the CSV file before passing it to this script.")
+    parser.add_argument("--output-dir",
+                        type=str,
+                        default=EVAL_DIR,
+                        help="Path to the output directory.")
     args=parser.parse_args()
 
     # Check the metrics
@@ -45,21 +55,25 @@ if __name__=="__main__":
     metrics.test_average_precision()
 
     # Read the ground truth annotations
-    df = pd.read_csv(GT_PATH)
+    df = pd.read_csv(args.ground_truth)
+    fnames = set(df["fname"].to_list())
 
     # Read the results
     results_dict = {}
     with open(args.results_path, "r") as infile:
         for jline in infile:
             result_dict = json.loads(jline)
-            results_dict[result_dict["query_fname"]] = result_dict["results"]
+            # Only calculate metrics for queries that are in the ground truth
+            if int(result_dict["query_fname"]) in fnames:
+                results_dict[result_dict["query_fname"]] = result_dict["results"]
     N = len(result_dict["results"]) # Number of returned results for each query
 
-    # Create the output directory
+    # Determine the output directory
     search_name = os.path.basename(os.path.dirname(args.results_path))
     model_name = os.path.basename(os.path.dirname(os.path.dirname(args.results_path)))
     dataset_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(args.results_path))))
-    output_dir = os.path.join(EVAL_DIR, dataset_name, model_name, search_name)
+    output_dir = os.path.join(args.output_dir, dataset_name, model_name, search_name)
+    # Create the output directory if it does not exist
     os.makedirs(output_dir, exist_ok=True)
 
     # Calculate micro_mAP@k if required

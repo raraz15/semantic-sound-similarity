@@ -8,8 +8,9 @@ import glob
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import numpy as np
+import pandas as pd
 
-from directories import ANALYSIS_DIR
+from directories import ANALYSIS_DIR, GT_PATH, EVAL_DIR
 
 def get_fname(audio_path):
     """Returns the file name without the extension."""
@@ -79,11 +80,28 @@ if __name__=="__main__":
                         type=int, 
                         default=30, 
                         help="Number of queries to return.")
+    parser.add_argument("--ground-truth",
+                        type=str,
+                        default=GT_PATH,
+                        help="Path to the ground truth CSV file. "
+                        "You can provide a subset of the ground truth by "
+                        "filtering the CSV file before passing it to this script.")
+    parser.add_argument("--output-dir",
+                        type=str,
+                        default=ANALYSIS_DIR,
+                        help="Path to the output directory.")
     args=parser.parse_args()
+
+    # Read the ground truth annotations
+    df = pd.read_csv(args.ground_truth)
+    fnames = set(df["fname"].to_list())
 
     # Read all the json files in the tree
     embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
     print(f"{len(embed_paths)} embedding paths were found in the directory.")
+    # Filter the embeddings to only include the ones in the ground truth
+    embed_paths = [embed_path for embed_path in embed_paths if int(get_fname(embed_path)) in fnames]
+    print(f"{len(embed_paths)} embeddings are in the ground truth.")
 
     # Load the embeddings, convert to numpy and store with the audio path
     print("Loading the embeddings...")
@@ -100,7 +118,7 @@ if __name__=="__main__":
     # Create the export directory
     model_name = os.path.basename(args.embed_dir)
     dataset_name = os.path.basename(os.path.dirname(args.embed_dir))
-    output_dir = os.path.join(ANALYSIS_DIR, dataset_name, model_name, args.search)
+    output_dir = os.path.join(args.output_dir, dataset_name, model_name, args.search)
     output_path = os.path.join(output_dir, "similarity_results.json")
     print(f"Analysis results will be exported to: {output_path}")
     os.makedirs(output_dir, exist_ok=True)
