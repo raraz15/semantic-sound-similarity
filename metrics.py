@@ -142,26 +142,19 @@ def calculate_map_at_k_for_labels(results_dict, df, k=15):
             label_aps.append(ap)
         # Calculate the mean average precision for this label
         label_map_at_k = sum(label_aps)/len(label_aps)
-        # Calculate the weight of the label and weigh the label map@k
-        label_weight = len(fnames_with_label)/len(df)
-        weighted_label_map_at_k = label_map_at_k * label_weight
+        # Find how many elements contain this label
+        label_occurance = len(fnames_with_label)
         # Append the results
-        label_maps.append([query_label, label_map_at_k, weighted_label_map_at_k, label_weight])
+        label_maps.append([query_label, label_map_at_k, label_occurance])
     # Sort the label maps by the map@k value
     label_maps.sort(key=lambda x: x[1], reverse=True)
-    return label_maps, ["label", "map@15", "weighted_map@k", "weight"]
+    return label_maps, ["label", "map@15", "occurance"]
 
 def calculate_macro_map(label_maps):
     """ Calculates the macro mean average precision (map) for the whole dataset. 
     That is, the map@k values for each label is averaged."""
 
     return sum([label_map[1] for label_map in label_maps])/len(label_maps)
-
-def calculate_weighted_macro_map(label_maps):
-    """ Calculates the weighted macro mean average precision (map) for the whole
-    dataset. That is, the weighted map@k values for each label is averaged."""
-
-    return sum([label_map[2] for label_map in label_maps])/len(label_maps)
 
 ####################################################################################
 # Ranking Related Metrics
