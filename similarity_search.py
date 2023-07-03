@@ -69,7 +69,7 @@ if __name__=="__main__":
     parser.add_argument('embed_dir', 
                         type=str, 
                         help='Directory containing embedding.json files. ' 
-                        'Embeddings should be prepared with prepare_embeddings.py.')
+                        'Embeddings should be prepared with create_clip_level_embedding.py.')
     parser.add_argument("-s", 
                         "--search", 
                         type=str, 
