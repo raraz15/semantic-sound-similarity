@@ -16,8 +16,6 @@ from directories import GT_PATH, EVAL_DIR
 METRICS = ["micro_map", "macro_map", "mr1"]
 
 # TODO: ncdg
-# TODO: change labels_mAP@15 to labels_AP@15
-# TODO: remove weighted macro mAP@15
 # TODO: GAP@k
 if __name__=="__main__":
 
@@ -77,33 +75,32 @@ if __name__=="__main__":
     # Create the output directory if it does not exist
     os.makedirs(output_dir, exist_ok=True)
 
-    # Calculate micro_mAP@k if required
+    # Calculate Micro-Averaged mAP@15 if required
     if "micro_map" in args.metrics:
 
-        # Calculate mAP@k for k=15, 30, 45, ...
-        print("\nCalculating Micro-Averaged mAP@k for various k values...")
-        map_at_ks = []
-        for k in range(args.increment, ((N//args.increment)+1)*args.increment, args.increment):
-            start_time = time.time()
-            micro_map_at_k = metrics.instance_based_map_at_n(results_dict, df, k)
-            map_at_ks.append({"k": k, "mAP": micro_map_at_k})
-            time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
-            print(f"k: {k:>{len(str(N))}} | mAP@k: {micro_map_at_k:.5f} | Time: {time_str}")
+        start_time = time.time()
 
-        # Export the mAPs to CSV
-        map_at_ks = pd.DataFrame(map_at_ks)
-        output_path = os.path.join(output_dir, "micro_mAP.csv")
-        map_at_ks.to_csv(output_path, index=False)
+        # Calculate mAP@k for k=15
+        print("\nCalculating Micro-Averaged mAP@15...")
+        micro_map_at_15 = metrics.instance_based_map_at_n(results_dict, df, n=15)
+
+        # Export the micro mAP@15 to txt
+        output_path = os.path.join(output_dir, "micro_mAP@15.txt")
+        with open(output_path, "w") as outfile:
+            outfile.write(str(micro_map_at_15))
         print(f"Results are exported to {output_path}")
 
-    # Calculate Macro and Weighted Macro Averaged Precision@15 if required
+        time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
+        print(f"Micro-Averaged mAP@15: {micro_map_at_15:.5f} | Time: {time_str}")
+
+    # Calculate Macro Averaged Precision@15 if required
     if "macro_map" in args.metrics:
 
         start_time = time.time()
 
         # Calculate mAP for each label
         print("\nCalculating mAP@15 for each label ...")
-        label_maps, columns = metrics.calculate_map_at_n_for_labels(results_dict, df, k=15)
+        label_maps, columns = metrics.calculate_map_at_n_for_labels(results_dict, df, n=15)
         # Convert to a dataframe
         _df = pd.DataFrame(label_maps, columns=columns)
         # Export the labels' maps to CSV
@@ -111,18 +108,19 @@ if __name__=="__main__":
         _df.to_csv(output_path, index=False)
         print(f"Results are exported to{output_path}")
 
-        # Calculate the macro mAP@15 and weighted macro mAP@15
-        print("\nCalculating the Macro-Averaged mAP@15 and Weighted Macro-Averaged mAP@15...")
-        macro_averaged_precision = metrics.label_based_map_at_n(label_maps)
-        print(f"Macro mAP@15: {macro_averaged_precision:.5f}")
-        # Convert to a dataframe
-        _df = pd.DataFrame([{"macro_map@15": macro_averaged_precision}])
-        # Export the results
-        output_path = os.path.join(output_dir, "macro_mAP@15.csv")
-        _df.to_csv(output_path, index=False)
+        # Calculate the Balanced mAP@15, "AP computed on per-class basis, then averaged 
+        # with equal weight across all classes to yield the overall performance"
+        print("\nCalculating the Balanced mAP@15...")
+        balanced_map_at_15 = metrics.label_based_map_at_n(label_maps)
+
+        # Export the micro mAP@15 to txt
+        output_path = os.path.join(output_dir, "balanced_mAP@15.txt")
+        with open(output_path, "w") as outfile:
+            outfile.write(str(micro_map_at_15))
         print(f"Results are exported to {output_path}")
 
-        print(f"Time: {time.strftime('%M:%S', time.gmtime(time.time()-start_time))}")
+        time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
+        print(f"Balanced mAP@15: {balanced_map_at_15:.5f} | Time: {time_str}")
 
     # Calculate MR1 if requested
     if "mr1" in args.metrics:
