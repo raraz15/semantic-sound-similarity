@@ -148,7 +148,7 @@ class EmbeddingsOpenL3:
         return batch
 
 # TODO: only discard non-floatable frames?
-def create_embeddings(model, audio):
+def create_frame_level_embeddings(model, audio):
     """ Takes an embedding model and an audio array and returns the clip level embedding."""
 
     try:
@@ -170,7 +170,7 @@ def process_audio(model_embeddings, audio_path, output_dir, sample_rate):
     if audio.shape[0] < sample_rate:
         audio = np.concatenate((audio, np.zeros((sample_rate-audio.shape[0]))))
     # Process
-    embeddings = create_embeddings(model_embeddings, audio)
+    embeddings = create_frame_level_embeddings(model_embeddings, audio)
     # Save results
     fname = os.path.splitext(os.path.basename(audio_path))[0]
     output_path = os.path.join(output_dir, f"{fname}.json")

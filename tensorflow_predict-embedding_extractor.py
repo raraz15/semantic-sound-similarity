@@ -15,7 +15,7 @@ from directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
 
 TRIM_DUR = 30 # seconds
 
-def create_embeddings(model, audio):
+def create_frame_level_embeddings(model, audio):
     """ Takes an embedding model and an audio array and returns the frame level embeddings.
     If the model produces a non-floatable embedding, returns None. This does not happen
     with models such as FSD-Sinet or VGGish, YamNet, OpenL3 on FSD50K eval."""
@@ -43,7 +43,7 @@ def process_audio(model_embeddings, audio_path, output_dir, sample_rate):
     if audio.shape[0] < sample_rate:
         audio = np.concatenate((audio, np.zeros((sample_rate-audio.shape[0]))))
     # Process
-    embeddings = create_embeddings(model_embeddings, audio)
+    embeddings = create_frame_level_embeddings(model_embeddings, audio)
     # Save results
     fname = os.path.splitext(os.path.basename(audio_path))[0]
     output_path = os.path.join(output_dir, f"{fname}.json")
