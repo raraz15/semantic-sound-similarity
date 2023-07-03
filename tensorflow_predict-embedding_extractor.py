@@ -15,10 +15,8 @@ from directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
 
 TRIM_DUR = 30 # seconds
 
-# TODO: only discard non-floatable frames?
 def create_embeddings(model, audio):
-    """ Takes an embedding model and an audio array and returns the clip level embedding.
-    """
+    """ Takes an embedding model and an audio array and returns the clip level embedding."""
     try:
         embeddings = model(audio) # Embedding vectors of each frame
         embeddings = [[float(value) for value in embedding] for embedding in embeddings]
@@ -27,14 +25,18 @@ def create_embeddings(model, audio):
         return None
 
 # TODO: effect of zero padding short clips?
-# TODO: energy based frame filtering (at audio input)
+# TODO: effect of normalization?
 def process_audio(model_embeddings, audio_path, output_dir, sample_rate):
     """ Reads the audio of given path, creates the embeddings and exports."""
     # Load the audio file
     loader = EasyLoader()
-    loader.configure(filename=audio_path, sampleRate=sample_rate, endTime=TRIM_DUR, replayGain=0)
+    loader.configure(filename=audio_path, 
+                     sampleRate=sample_rate, 
+                     endTime=TRIM_DUR, # FSD50K are already below 30 seconds
+                     replayGain=0 # Do not normalize the audio
+                     )
     audio = loader()
-    # Zero pad short clips
+    # Zero pad short clips (IN FSD50K 7% of the clips are shorter than 1 second)
     if audio.shape[0] < sample_rate:
         audio = np.concatenate((audio, np.zeros((sample_rate-audio.shape[0]))))
     # Process
