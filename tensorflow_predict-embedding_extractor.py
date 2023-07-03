@@ -16,12 +16,15 @@ from directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
 TRIM_DUR = 30 # seconds
 
 def create_embeddings(model, audio):
-    """ Takes an embedding model and an audio array and returns the clip level embedding."""
+    """ Takes an embedding model and an audio array and returns the frame level embeddings.
+    If the model produces a non-floatable embedding, returns None. This does not happen
+    with models such as FSD-Sinet or VGGish, YamNet, OpenL3 on FSD50K eval."""
     try:
         embeddings = model(audio) # Embedding vectors of each frame
         embeddings = [[float(value) for value in embedding] for embedding in embeddings]
         return embeddings
     except AttributeError:
+        print("Model produced a non-floatable embedding.")
         return None
 
 # TODO: effect of zero padding short clips?
