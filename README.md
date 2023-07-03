@@ -16,5 +16,6 @@ contact: <oguza97@gmail.com>
 
 ## TODO
 
-- write the insturcitons of installation and how to use
+- When the yamnet config is fixed read those configs and delete configs directory
+- write the instrucitons of installation and how to use
   - fs-essentia hwo to install...
