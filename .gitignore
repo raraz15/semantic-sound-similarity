@@ -1,7 +1,6 @@
 ps/*
 
 models/*
-notebooks/*
 
 __pycache__/*
 .ipynb_checkpoints
@@ -10,7 +9,6 @@ __pycache__/*
 *.csv
 *.png
 *.jpeg
-*.ipynb
 freesound_api.json
 queries.json
 TODO.md
