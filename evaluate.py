@@ -53,7 +53,7 @@ if __name__=="__main__":
         f"Invalid metrics. Valid metrics are: {METRICS}"
 
     # Test the average precision function
-    metrics.test_average_precision()
+    metrics.test_average_precision_at_n()
 
     # Read the ground truth annotations
     df = pd.read_csv(args.ground_truth)
@@ -85,7 +85,7 @@ if __name__=="__main__":
         map_at_ks = []
         for k in range(args.increment, ((N//args.increment)+1)*args.increment, args.increment):
             start_time = time.time()
-            micro_map_at_k = metrics.calculate_micro_map_at_k(results_dict, df, k)
+            micro_map_at_k = metrics.instance_based_map_at_n(results_dict, df, k)
             map_at_ks.append({"k": k, "mAP": micro_map_at_k})
             time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
             print(f"k: {k:>{len(str(N))}} | mAP@k: {micro_map_at_k:.5f} | Time: {time_str}")
@@ -103,7 +103,7 @@ if __name__=="__main__":
 
         # Calculate mAP for each label
         print("\nCalculating mAP@15 for each label ...")
-        label_maps, columns = metrics.calculate_map_at_k_for_labels(results_dict, df, k=15)
+        label_maps, columns = metrics.calculate_map_at_n_for_labels(results_dict, df, k=15)
         # Convert to a dataframe
         _df = pd.DataFrame(label_maps, columns=columns)
         # Export the labels' maps to CSV
@@ -113,7 +113,7 @@ if __name__=="__main__":
 
         # Calculate the macro mAP@15 and weighted macro mAP@15
         print("\nCalculating the Macro-Averaged mAP@15 and Weighted Macro-Averaged mAP@15...")
-        macro_averaged_precision = metrics.calculate_macro_map(label_maps)
+        macro_averaged_precision = metrics.label_based_map_at_n(label_maps)
         print(f"Macro mAP@15: {macro_averaged_precision:.5f}")
         # Convert to a dataframe
         _df = pd.DataFrame([{"macro_map@15": macro_averaged_precision}])
