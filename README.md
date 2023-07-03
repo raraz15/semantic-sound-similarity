@@ -9,8 +9,6 @@ Collaboration with: Frederic Font, Alastair Porter
 
 contact: oguza97@gmail.com
 
-TODO:
-- ncdg metric
-- YAMNET median, max
-- VGGish
-- Fonseca, L3, ...
+# TODO
+- write the insturcitons of installation and how to use
+    - fs-essentia hwo to install...

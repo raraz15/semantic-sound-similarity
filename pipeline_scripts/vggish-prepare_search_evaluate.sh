@@ -17,7 +17,7 @@ fi
 
 #############################################################################
 
-MODEL_NAME="audioset-yamnet-1"
+MODEL_NAME="audioset-vggish-3"
 DATASET_NAME="FSD50K.eval_audio"
 
 #############################################################################
@@ -36,7 +36,7 @@ echo
 
 # Deal with No PCA case
 if [[ $2 == -1 ]]; then
-    N=1024
+    N=128
 else
     N=$2
 fi

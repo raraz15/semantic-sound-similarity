@@ -5,52 +5,37 @@ source ps/bin/activate
 #############################################################################
 
 if [ $# == 0 ]; then
-    echo "Description: Takes extracted essentia embeddings and prepares them, 
-    searches for similarity, and performs the evaluation pipeline."
-    echo "Usage: $0 param1"
-    echo "param1: N_PCA"
+    echo "Description: Takes prepared embeddings, searches for similarity, 
+    and performs the evaluation pipeline."
+    echo "Usage: $0 param1 param2 param3"
+    echo "param1: openl3 name"
+    echo "param2: suffix of prepared embedding"
+    echo "param3: search_type"
     exit 0
 fi
 
 #############################################################################
 
-MODEL_NAME="fs-essentia-extractor_legacy"
+MODEL_NAME=$1
 DATASET_NAME="FSD50K.eval_audio"
+EMBED_NAME="$MODEL_NAME-$2"
 
 #############################################################################
 
 DATA_DIR="$(pwd)/data"
-EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME/$MODEL_NAME"
-SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$MODEL_NAME"
-EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$MODEL_NAME"
+EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME"
+PREP_EMBED_DIR="$EMBED_DIR/$EMBED_NAME"
+
+SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$EMBED_NAME/$3"
+EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$EMBED_NAME/$3"
 
 echo "======================================================================="
 echo "Input Directory:"
-echo $EMBED_DIR
-echo
-
-#############################################################################
-
-# Deal with No PCA case
-if [[ $1 == -1 ]]; then
-    N=846
-else
-    N=$1
-fi
-PREP_EMBED_DIR="$EMBED_DIR-PCA_$N"
-
-echo "Output Directories:"
 echo $PREP_EMBED_DIR
+echo
+echo "Output Directories:"
 echo $SIMILARITY_DIR
 echo $EVAL_DIR
-
-#############################################################################
-
-# Prepare the embeddings
-echo "======================================================================="
-echo "Preparation"
-python fs-essentia-extractor_legacy-embedding_prepare.py $EMBED_DIR -N=$1
-echo $PREP_EMBED_DIR
 echo
 
 #############################################################################
@@ -58,9 +43,8 @@ echo
 # Perform similarity search
 echo "======================================================================="
 echo "Similarity Search"
-python similarity_search.py $PREP_EMBED_DIR -s=nn
-SIMILARITY_PATH="$SIMILARITY_DIR-PCA_$N/nn/similarity_results.json"
-echo $SIMILARITY_PATH
+python similarity_search.py $PREP_EMBED_DIR -s=$3
+SIMILARITY_PATH="$SIMILARITY_DIR/similarity_results.json"
 echo
 
 #############################################################################

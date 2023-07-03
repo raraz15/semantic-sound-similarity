@@ -1,120 +1,148 @@
-"""Compute evaluation metrics for the similarity search result of an embedding model over a dataset."""
+""" Compute evaluation metrics for the similarity search result of an embedding 
+over FSD50K.eval_audio."""
 
 import os
 import time
-import argparse
 import json
 import warnings
 warnings.filterwarnings("ignore") # Ignore 0 precision warnings
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import pandas as pd
 
-from sklearn.metrics import average_precision_score
+import metrics
+from directories import GT_PATH, EVAL_DIR
 
-GT_PATH = "/data/FSD50K/FSD50K.ground_truth/eval.csv"
-EVAL_DIR = "data/evaluation_results"
+METRICS = ["micro_map", "macro_map", "mr1"]
 
-def get_labels(fname, df):
-    """Returns the set of labels of the fname from the dataframe."""
-    return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
-
-# TODO: remove counts
-def calculate_average_precision(query_labels, result, df):
-    """We define a retrieved document relevant when there is
-    at least a match."""
-    y_true, y_score, counts = [], [], []
-    for ref_result in result:
-        ref_fname = list(ref_result.keys())[0]
-        ref_score = list(ref_result.values())[0]
-        y_score.append(ref_score)
-        ref_labels = get_labels(ref_fname, df)
-        # Find how many labels are shared
-        counter = len(query_labels.intersection(ref_labels))
-        counts.append(counter)
-        if counter > 0:
-            y_true.append(1)
-        else:
-            y_true.append(0)
-    # Calculate the average prediction
-    ap = average_precision_score(y_true, y_score)
-    return ap, counts
-
-def R1(query_labels, result, df):
-    for i,ref_result in enumerate(result):
-        ref_fname = list(ref_result.keys())[0]
-        ref_labels = get_labels(ref_fname, df)
-        # Find where the first match is
-        counter = len(query_labels.intersection(ref_labels))
-        if counter > 0:
-            return i
-
-# TODO: MR1@K
-# TODO: MR1 NaNs
 # TODO: ncdg
+# TODO: change labels_mAP@15 to labels_AP@15
+# TODO: remove weighted macro mAP@15
 if __name__=="__main__":
 
-    parser=argparse.ArgumentParser(description=__doc__, 
-                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p', '--path', type=str, required=True, 
+    parser=ArgumentParser(description=__doc__, 
+                        formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('results_path',
+                        type=str,
                         help='Path to results.json file.')
-    parser.add_argument('-M', type=int, default=15, 
+    parser.add_argument('--increment', 
+                        type=int, 
+                        default=15, 
                         help="MAP@k calculation increments.")
+    parser.add_argument('--metrics',
+                        type=str,
+                        nargs='+',
+                        default=METRICS, 
+                        help='Metrics to calculate.')
+    parser.add_argument("--ground-truth",
+                        type=str,
+                        default=GT_PATH,
+                        help="Path to the ground truth CSV file. "
+                        "You can provide a subset of the ground truth by "
+                        "filtering the CSV file before passing it to this script.")
+    parser.add_argument("--output-dir",
+                        type=str,
+                        default=EVAL_DIR,
+                        help="Path to the output directory.")
     args=parser.parse_args()
 
+    # Check the metrics
+    args.metrics = [metric.lower() for metric in args.metrics]
+    assert set(args.metrics).issubset(set(METRICS)), \
+        f"Invalid metrics. Valid metrics are: {METRICS}"
+
+    # Test the average precision function
+    metrics.test_average_precision()
+
     # Read the ground truth annotations
-    df = pd.read_csv(GT_PATH)
+    df = pd.read_csv(args.ground_truth)
+    fnames = set(df["fname"].to_list())
 
-    # Read the similarity search results
-    with open(args.path, "r") as infile:
-        results_dict = json.load(infile)
-    fnames = list(results_dict.keys())
-    N = len(results_dict[fnames[0]]) # Number of returned results for each query
+    # Read the results
+    results_dict = {}
+    with open(args.results_path, "r") as infile:
+        for jline in infile:
+            result_dict = json.loads(jline)
+            # Only calculate metrics for queries that are in the ground truth
+            if int(result_dict["query_fname"]) in fnames:
+                results_dict[result_dict["query_fname"]] = result_dict["results"]
+    N = len(result_dict["results"]) # Number of returned results for each query
 
-    # Create the output directory
-    search_name = os.path.basename(os.path.dirname(args.path))
-    model_name = os.path.basename(os.path.dirname(os.path.dirname(args.path)))
-    dataset_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(args.path))))
-    output_dir = os.path.join(EVAL_DIR, dataset_name, model_name, search_name)
+    # Determine the output directory
+    search_name = os.path.basename(os.path.dirname(args.results_path))
+    model_name = os.path.basename(os.path.dirname(os.path.dirname(args.results_path)))
+    dataset_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(args.results_path))))
+    output_dir = os.path.join(args.output_dir, dataset_name, model_name, search_name)
+    # Create the output directory if it does not exist
     os.makedirs(output_dir, exist_ok=True)
 
-    # Calculate mAP@k for various values
-    print("Calculating mAP@K for various K values...")
-    maps = []
-    for k in range(args.M,((N//args.M)+1)*args.M,args.M):
-        start_time = time.time()
-        aps = []
-        for query_fname in fnames:
-            query_labels = get_labels(query_fname, df)
-            result = results_dict[query_fname][:k] # Cutoff at k
-            ap, _ = calculate_average_precision(query_labels, result, df)
-            aps.append(ap)
-        map = sum(aps)/len(aps) # mean average precision
-        maps.append({"k": k, "mAP": map})
-        time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
-        print(f"K: {k:>{len(str(N))}} | mAP: {map:.5f} | Time: {time_str}")
-    # Export
-    maps = pd.DataFrame(maps)
-    output_path = os.path.join(output_dir, "mAP.csv")
-    maps.to_csv(output_path, index=False)
-    print(f"mAP results are exported to {output_path}")
+    # Calculate micro_mAP@k if required
+    if "micro_map" in args.metrics:
 
-    # Calculate MR1
-    print("\nCalculating MR1...")
-    start_time = time.time()
-    mr1 = []
-    for query_fname in fnames:
-        query_labels = get_labels(query_fname, df)
-        result = results_dict[query_fname]
-        mr1.append(R1(query_labels, result, df))
-    mr1 = [x for x in mr1 if x] # Remove entries with no matches
-    mr1 = sum(mr1)/len(mr1)
-    time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
-    print(f"MR1: {mr1:.1f} | Time: {time_str}")
-    # Export
-    output_path = os.path.join(output_dir, "MR1.txt")
-    with open(output_path, "w") as outfile:
-        outfile.write(str(mr1))
-    print(f"MR1 results are exported to {output_path}")
+        # Calculate mAP@k for k=15, 30, 45, ...
+        print("\nCalculating Micro-Averaged mAP@k for various k values...")
+        map_at_ks = []
+        for k in range(args.increment, ((N//args.increment)+1)*args.increment, args.increment):
+            start_time = time.time()
+            micro_map_at_k = metrics.calculate_micro_map_at_k(results_dict, df, k)
+            map_at_ks.append({"k": k, "mAP": micro_map_at_k})
+            time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
+            print(f"k: {k:>{len(str(N))}} | mAP@k: {micro_map_at_k:.5f} | Time: {time_str}")
+
+        # Export the mAPs to CSV
+        map_at_ks = pd.DataFrame(map_at_ks)
+        output_path = os.path.join(output_dir, "micro_mAP.csv")
+        map_at_ks.to_csv(output_path, index=False)
+        print(f"Results are exported to {output_path}")
+
+    # Calculate Macro and Weighted Macro Averaged Precision@15 if required
+    if "macro_map" in args.metrics:
+
+        start_time = time.time()
+
+        # Calculate mAP for each label
+        print("\nCalculating mAP@15 for each label ...")
+        label_maps, columns = metrics.calculate_map_at_k_for_labels(results_dict, df, k=15)
+        # Convert to a dataframe
+        _df = pd.DataFrame(label_maps, columns=columns)
+        # Export the labels' maps to CSV
+        output_path = os.path.join(output_dir, "labels_mAP@15.csv")
+        _df.to_csv(output_path, index=False)
+        print(f"Results are exported to{output_path}")
+
+        # Calculate the macro mAP@15 and weighted macro mAP@15
+        print("\nCalculating the Macro-Averaged mAP@15 and Weighted Macro-Averaged mAP@15...")
+        macro_averaged_precision = metrics.calculate_macro_map(label_maps)
+        w_macro_averaged_precision = metrics.calculate_weighted_macro_map(label_maps)
+        print(f"Macro mAP@15: {macro_averaged_precision:.5f} | "
+              f"Weighted Macro mAP@15: {w_macro_averaged_precision:.5f}")
+        # Convert to a dataframe
+        _df = pd.DataFrame([{"macro_map@15": macro_averaged_precision,
+                            "weighted_macro_map@15": w_macro_averaged_precision}])
+        # Export the results
+        output_path = os.path.join(output_dir, "macro_mAP@15.csv")
+        _df.to_csv(output_path, index=False)
+        print(f"Results are exported to {output_path}")
+
+        print(f"Time: {time.strftime('%M:%S', time.gmtime(time.time()-start_time))}")
+
+    # Calculate MR1 if requested
+    if "mr1" in args.metrics:
+
+        start_time = time.time()
+
+        # Calculate MR1 for each query
+        print("\nCalculating MR1...")
+        mr1 = metrics.calculate_MR1(results_dict, df)
+
+        # Export the MR1s to txt
+        output_path = os.path.join(output_dir, "MR1.txt")
+        with open(output_path, "w") as outfile:
+            outfile.write(str(mr1))
+        print(f"Results are exported to {output_path}")
+
+        time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
+        print(f"MR1: {mr1:.1f} | Time: {time_str}")
 
     #############
     print("Done!")

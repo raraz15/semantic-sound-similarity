@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR="/home/roguz/freesound/freesound-perceptual_similarity/pipeline_scripts/"
+SCRIPT_DIR="$(pwd)/pipeline_scripts/"
 export PATH="$SCRIPT_DIR:$PATH"
 
 #############################################################################
@@ -13,5 +13,8 @@ variable=(100 200 -1)
 for v in ${variable[@]}; do
   essentia-prepare_search_evaluate.sh $v
 done
+
+# Compare the results of the experiments
+python plot_evaluation_results.py $MODEL_NAME
 
 #############################################################################

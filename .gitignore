@@ -1,6 +1,5 @@
 ps/*
 
-#data/*
 models/*
 notebooks/*
 
@@ -14,3 +13,6 @@ __pycache__/*
 *.ipynb
 freesound_api.json
 queries.json
+TODO.md
+
+*.pyc
