@@ -67,8 +67,13 @@ def precision_at_k(relevance, k):
 def average_precision(relevance):
     """ Calculate the average presicion for a list of relevance values. The average 
     precision is defined as the 'average of the precision@k values of the relevant 
-    documents in the top k resulst'. If there are no relevant documents, the average 
-    precision is defined to be 0."""
+    documents in the top k results'. If there are no relevant documents, 
+    the average precision is defined to be 0. This calculation is based on the definition 
+    of average precision in
+    https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Average_precision
+    I believe this is a wrong wasy of computing the average precision, since it does not
+    take into account all relevant documents, but only the ones in the top k results.
+    """
 
     # Number of relevant documents
     tp = sum(relevance)
