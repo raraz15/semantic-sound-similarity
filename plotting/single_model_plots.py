@@ -18,7 +18,7 @@ def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_
     """Takes a model name and for each variation inside eval_dir,
     plots all the the micro-averaged AP@15 values in a single plot ."""
 
-    default_fig_name = "Embedding processing and Search Algorithm Performances by "+ \
+    default_fig_name = "Embedding Processing and Search Algorithm Performances by "+ \
                 f"Instance-Averaged AP@15 Values\n{model} Evaluated on {dataset_name}"
 
     # Find all the variation_paths of the model
@@ -106,7 +106,7 @@ def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_
     plots the Class-averaged mAP@15 in a single plot."""
 
     default_fig_name = "Embedding Processing and Search Algorithm Performances by "+\
-                f"Label-Based mAP@15\n{model} Evaluated on {dataset_name}"
+                f"Label-Averaged mAP@15\n{model} Evaluated on {dataset_name}"
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
@@ -189,7 +189,7 @@ def plot_label_based_map_at_15(model, eval_dir, dataset_name="FSD50K.eval_audio"
     """Takes a model name and finds all its variations in eval_dir. For each variation,
     plots the mAP@15 of the labels."""
 
-    default_fig_name = f"Label-Based mAP@15 Values for {model} Evaluated on {dataset_name}"
+    default_fig_name = f"mAP@15 Values of Labels\n{model} Evaluated on {dataset_name}"
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
