@@ -116,7 +116,7 @@ if __name__=="__main__":
         # Export the micro mAP@15 to txt
         output_path = os.path.join(output_dir, "balanced_mAP@15.txt")
         with open(output_path, "w") as outfile:
-            outfile.write(str(micro_map_at_15))
+            outfile.write(str(balanced_map_at_15))
         print(f"Results are exported to {output_path}")
 
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))

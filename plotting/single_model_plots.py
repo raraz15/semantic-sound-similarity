@@ -31,11 +31,12 @@ def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="",
     map_dict = {search: [] for search in searches}
     for search in searches:
         for model_dir in variation_paths:
-            map_path = os.path.join(model_dir, search, "micro_mAP.csv")
-            map = pd.read_csv(map_path)
+            map_path = os.path.join(model_dir, search, "micro_mAP@15.txt")
+            with open(map_path, "r") as in_f:
+                micro_map_at_15 = float(in_f.read())
             full_model_name = model_dir.split("/")[-1]
             variation = "-".join(full_model_name.split("-")[-3:])
-            map_dict[search].append((variation, map[map.k==15].mAP.to_numpy()[0]))
+            map_dict[search].append((variation, micro_map_at_15))
 
     # Determine some plot parameters
     if len(searches)>1:
@@ -205,11 +206,12 @@ def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="",
     map_dict = {search: [] for search in searches}
     for search in searches:
         for variation_path in variation_paths:
-            map_path = os.path.join(variation_path, search, "macro_mAP@15.csv")
-            map = pd.read_csv(map_path)["macro_map@15"].values[0]
+            map_path = os.path.join(variation_path, search, "balanced_mAP@15.txt")
+            with open(map_path, "r") as in_f:
+                balanced_map_at_15 = float(in_f.read())
             full_model_name = variation_path.split("/")[-1]
             variation = "-".join(full_model_name.split("-")[-3:])
-            map_dict[search].append((variation, map))
+            map_dict[search].append((variation, balanced_map_at_15))
 
     # Determine some plot parameters
     if len(searches)>1:
