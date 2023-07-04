@@ -10,7 +10,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import numpy as np
 import pandas as pd
 
-from directories import ANALYSIS_DIR, GT_PATH, EVAL_DIR
+from directories import ANALYSIS_DIR, GT_PATH
 
 def get_fname(audio_path):
     """Returns the file name without the extension."""
@@ -35,7 +35,6 @@ def dot_product_search(query, corpus, N):
             "search": "dot_product"
             }
 
-# TODO: ANN
 def nn_search(query, corpus, N):
     """Computes pairwise distances and returns the indices of bottom N. 
     Assumes that the query is aggregated and the query is removed from the corpus. 
@@ -119,9 +118,9 @@ if __name__=="__main__":
     model_name = os.path.basename(args.embed_dir)
     dataset_name = os.path.basename(os.path.dirname(args.embed_dir))
     output_dir = os.path.join(args.output_dir, dataset_name, model_name, args.search)
+    os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "similarity_results.json")
     print(f"Analysis results will be exported to: {output_path}")
-    os.makedirs(output_dir, exist_ok=True)
 
     # For each element in the dataset, perform the sound search to the rest of the dataset
     print("For each sound in the dataset, searching for similar sounds...")
