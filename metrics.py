@@ -129,9 +129,9 @@ def test_average_precision_at_n():
 # AP@n Related Metrics
 
 def instance_based_map_at_n(results_dict, df, n, n_relevant=None):
-    """ Calculates the mean average precision@n (mAP@n) over the whole dataset. 
+    """ Calculates the mean of the average precision@n (mAP@n) over the whole dataset. 
     That is, each element in the dataset is considered as a query and the average 
-    precision@n is calculated for the resulting ranking. The mean of all these values 
+    precision@n (ap@n) is calculated for the ranking. The mean of all these values 
     is returned (Micro metric)."""
 
     # Calculate the average precision for each query
@@ -140,14 +140,14 @@ def instance_based_map_at_n(results_dict, df, n, n_relevant=None):
         # Evaluate the relevance of the result
         relevance = evaluate_relevance(query_fname, result[:n], df) # Cutoff at n
         # Calculate the average precision with the relevance
-        ap_at_n = average_precision_at_n(relevance, n, n_relevant)
+        ap_at_n = average_precision_at_n(relevance, n, n_relevant=n_relevant)
         # Append the results
         aps.append(ap_at_n)
     # Mean average precision for the whole dataset
     map_at_k = sum(aps)/len(aps)
     return map_at_k
 
-def calculate_map_at_n_for_labels(results_dict, df, n=15):
+def calculate_map_at_n_for_labels(results_dict, df, n):
     """ For each label in the dataset, the elements containing that label are considered 
     as queries and the average precision@n (AP@n) is averaged for all the rankings. Here, 
     relevance is defined as: if a result contains the query label. """
@@ -159,10 +159,10 @@ def calculate_map_at_n_for_labels(results_dict, df, n=15):
     for query_label in labels:
         # Get the fnames containing this label
         fnames_with_label = df[find_indices_containing_label(query_label, df)]["fname"].to_list()
-        # Find how many elements contain this label, for the case of FSD50K, 
+        # Find how many elements contain this label, for the case of FSD50K.eval, 
         # we know that n_relevant is always bigger than 15
         n_relevant = len(fnames_with_label)
-        # For each fname containing the label, calculate the total tp and fp
+        # For each fname containing the label, aggregate the AP@n
         label_aps = []
         for query_fname in fnames_with_label:
             # Get the result for this query
@@ -177,9 +177,9 @@ def calculate_map_at_n_for_labels(results_dict, df, n=15):
         label_map_at_n = sum(label_aps)/len(label_aps)
         # Append the results
         label_maps.append([query_label, label_map_at_n, n_relevant])
-    # Sort the label maps by the map@k value
+    # Sort the label maps by the mAP@n value
     label_maps.sort(key=lambda x: x[1], reverse=True)
-    return label_maps, ["label", "map@15", "n_relevant"]
+    return label_maps, ["label", f"map@{n}", "n_relevant"]
 
 def label_based_map_at_n(label_maps):
     """ Calculates the macro mean average precision (map) for the whole dataset. 
