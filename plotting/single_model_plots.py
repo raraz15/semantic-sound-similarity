@@ -24,8 +24,6 @@ def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="",
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
-    # Read one map to get the k values
-    map_path = os.path.join(variation_paths[0], searches[0], "micro_mAP.csv")
 
     # Read all the maps
     map_dict = {search: [] for search in searches}
