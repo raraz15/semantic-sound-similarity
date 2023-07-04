@@ -14,11 +14,12 @@ COLORS = list(TABLEAU_COLORS.values())
 ###################################################################################################
 # Micro-averaged map@k
 
-def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
-    """Takes a model name and plots the micro-averaged mAP@k for all the variations of the model."""
+def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
+    """Takes a model name and for each variation inside eval_dir,
+    plots all the the micro-averaged AP@15 values in a single plot ."""
 
-    default_fig_name = "Embedding Processing and Search Algorithm "+ \
-                f"Performances by mAP Values (Micro-Averaged) \n{model} Evaluated on {dataset_name}"
+    default_fig_name = "Embedding processing and Search Algorithm Performances by "+ \
+                f"Instance-Averaged AP@15 Values\n{model} Evaluated on {dataset_name}"
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
@@ -189,8 +190,9 @@ def plot_map_at_all_k(model, eval_dir, dataset_name, fig_name="", n_cols=3, save
 ####################################################################################################
 # Macro-averaged mAP@k
 
-def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
-    """Takes a model name and for each variation, plots the Macro-averaged mAP@15."""
+def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
+    """Takes a model name and for each model variation inside eval_dir, 
+    plots the Class-averaged mAP@15 in a single plot."""
 
     default_fig_name = "Embedding Processing and Search Algorithm Performances by "+\
                 f"Label-Based mAP@15\n{model} Evaluated on {dataset_name}"
@@ -272,9 +274,9 @@ def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name, fig_name="",
         fig.savefig(fig_path)
     plt.show()
 
-def plot_label_based_map_at_15(model, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
-    """Takes an embedding name and find all the variations of the model. For each variation,
-    plots the Average Precision@15 of all labels."""
+def plot_label_based_map_at_15(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
+    """Takes a model name and finds all its variations in eval_dir. For each variation,
+    plots the mAP@15 of the labels."""
 
     default_fig_name = f"Label-Based mAP@15 Values for {model} Evaluated on {dataset_name}"
 
@@ -328,7 +330,7 @@ def plot_label_based_map_at_15(model, eval_dir, dataset_name, fig_name="", save_
 ###################################################################################################
 # MR1
 
-def plot_mr1(model, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
+def plot_mr1(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and plots the MR1 for all the variations of the model."""
 
     default_fig_name = "Embedding Processing and Search Algorithm " +\
