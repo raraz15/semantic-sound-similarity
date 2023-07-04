@@ -12,6 +12,34 @@ from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
 ###################################################################################################
+# Utility functions
+
+def sort_variation_paths(model, variation_paths):
+    # Sort based on the aggregation method, PCA, norm
+
+    if model != "fs-essentia-extractor_legacy":
+
+        all_agg = []
+        for var_path in variation_paths:
+            variation = var_path.split(model+"-")[1]
+            agg = variation.split("-")[0]
+            all_agg.append(agg)
+        all_agg = sorted(list(set(all_agg)))
+
+        new_sort = []
+        for agg in all_agg:
+            agg_sorted = []
+            for var_path in variation_paths:
+                variation = var_path.split(model+"-")[1]
+                if agg in variation:
+                    agg_sorted.append(var_path)
+            agg_sorted = sorted(agg_sorted, key=lambda x: int(x.split(model+"-")[1].split("-")[1].split("_")[1]))
+            new_sort.extend(agg_sorted)
+        return new_sort
+    else:
+        return variation_paths
+
+###################################################################################################
 # Micro-averaged map@k
 
 def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
@@ -23,6 +51,8 @@ def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
+    # Sort further
+    variation_paths = sort_variation_paths(model, variation_paths)
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
 
@@ -110,6 +140,8 @@ def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
+    # Sort further
+    variation_paths = sort_variation_paths(model, variation_paths)
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
 
@@ -249,6 +281,8 @@ def plot_mr1(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", sav
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
+    # Sort further
+    variation_paths = sort_variation_paths(model, variation_paths)
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
 
