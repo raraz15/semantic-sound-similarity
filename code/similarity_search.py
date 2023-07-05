@@ -10,7 +10,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import numpy as np
 import pandas as pd
 
-from directories import ANALYSIS_DIR, GT_PATH
+from lib.directories import ANALYSIS_DIR, GT_PATH
 
 def get_fname(audio_path):
     """Returns the file name without the extension."""

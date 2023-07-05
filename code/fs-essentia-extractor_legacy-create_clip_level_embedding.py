@@ -15,7 +15,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.decomposition import PCA
 
-from directories import AUDIO_DIR
+from lib.directories import AUDIO_DIR
 
 # Use these statistics for each feature
 PCA_DESCRIPTORS = [

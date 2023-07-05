@@ -18,7 +18,7 @@ import pandas as pd
 import essentia.standard as es
 from essentia import Pool
 
-from directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
+from lib.directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
 
 TRIM_DUR = 30 # seconds
 

@@ -2,19 +2,17 @@
 
 import os
 import re
-import sys
 import json
 import random
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 import streamlit as st
 import pandas as pd
 
-from metrics import evaluate_relevance,average_precision, find_indices_containing_label, get_labels
-from directories import *
+from lib.metrics import evaluate_relevance,average_precision, find_indices_containing_label, get_labels
+from lib.directories import *
 
 FREESOUND_STRING = '<iframe frameborder="0" scrolling="no" \
                     src="https://freesound.org/embed/sound/iframe/{}/simple/medium/" \

@@ -51,6 +51,7 @@ def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
+    print(os.path.join(eval_dir, dataset_name, f"{model}-*"))
     # Sort further
     variation_paths = sort_variation_paths(model, variation_paths)
     # Read one variation's folder to get the searches

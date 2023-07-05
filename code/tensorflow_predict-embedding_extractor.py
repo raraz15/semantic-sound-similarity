@@ -1,5 +1,5 @@
 """Takes a FSD50K csv file specifying audio file names and computes embeddings 
-using FSD-Sinet. All frame embeddings are exported without aggregation."""
+using a TensorFlowPrecict model. All frame embeddings are exported without aggregation."""
 
 import os
 import time
@@ -11,7 +11,7 @@ import pandas as pd
 
 from essentia.standard import EasyLoader, TensorflowPredictFSDSINet, TensorflowPredictVGGish
 
-from directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
+from lib.directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
 
 TRIM_DUR = 30 # seconds
 
@@ -107,7 +107,7 @@ if __name__=="__main__":
     for i,audio_path in enumerate(audio_paths):
         if i%1000==0:
             print(f"[{i:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")
-        process_audio(model_embeddings, audio_path, output_dir, config['sample_rate'])
+        process_audio(model_embeddings, audio_path, output_dir, config['inference']['sample_rate'])
     total_time = time.time()-start_time
     print(f"\nTotal time: {time.strftime('%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(audio_paths):.2f} sec.")

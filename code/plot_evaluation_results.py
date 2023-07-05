@@ -1,9 +1,10 @@
 import os
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
-from plotting import (plot_micro_map_at_15_comparisons, plot_label_based_map_at_15, 
+from lib.plotting import (plot_micro_map_at_15_comparisons, plot_label_based_map_at_15, 
                         plot_macro_map_at_15_comparisons, plot_mr1)
-from directories import FIGURES_DIR, EVAL_DIR
+
+from lib.directories import FIGURES_DIR, EVAL_DIR
 
 if __name__=="__main__":
 

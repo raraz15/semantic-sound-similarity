@@ -12,7 +12,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import numpy as np
 from sklearn.decomposition import PCA
 
-from directories import AUDIO_DIR, FIGURES_DIR
+from lib.directories import AUDIO_DIR, FIGURES_DIR
 
 def get_file_name(path):
     return os.path.splitext(os.path.basename(path))[0]

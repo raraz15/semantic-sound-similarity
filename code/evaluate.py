@@ -10,8 +10,8 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import pandas as pd
 
-import metrics
-from directories import GT_PATH, EVAL_DIR
+import lib.metrics as metrics
+from lib.directories import GT_PATH, EVAL_DIR
 
 METRICS = ["micro_map", "macro_map"] #  "mr1"
 
