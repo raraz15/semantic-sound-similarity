@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(pwd)/scripts_pipeline/"
+SCRIPT_DIR="$(pwd)/scripts/pipelines/"
 DATA_DIR="$(pwd)/data"
 export PATH="$SCRIPT_DIR:$PATH"
 
@@ -10,7 +10,7 @@ if [ $# == 0 ]; then
     echo "Description: Takes extracted yamnet embeddings and prepares them, 
     searches for similarity, and performs the evaluation pipeline."
     echo "Usage: $0 param1"
-    echo "param1: openl3 name"
+    echo "param1: fsd_sinet name"
     exit 0
 fi
 
@@ -27,7 +27,7 @@ for file in "$EMBED_DIR/"*; do # for each embedding dir
         echo "======================================================================="
         echo $f
         SUFFIX="${f/$1-/""}" # Strip model name to get the suffix
-        openl3-search_evaluate.sh $SUFFIX
+        sinet-search_evaluate.sh $SUFFIX
     fi
 done
 
