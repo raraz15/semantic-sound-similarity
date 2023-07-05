@@ -13,7 +13,7 @@ import pandas as pd
 import metrics
 from directories import GT_PATH, EVAL_DIR
 
-METRICS = ["micro_map", "macro_map", "mr1"]
+METRICS = ["micro_map", "macro_map"] #  "mr1"
 
 # TODO: ncdg
 # TODO: GAP@k
@@ -93,6 +93,7 @@ if __name__=="__main__":
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
         print(f"Micro-Averaged mAP@15: {micro_map_at_15:.5f} | Time: {time_str}")
 
+    # TODO: fix names
     # Calculate Macro Averaged Precision@15 if required
     if "macro_map" in args.metrics:
 
