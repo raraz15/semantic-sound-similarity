@@ -51,9 +51,6 @@ def evaluate_relevance(query_fname, result, df, query_label=None):
                 relevance.append(0)
     return relevance
 
-####################################################################################
-# mAP Related Metrics
-
 def precision_at_k(relevance, k):
     """ Calculate precision@k where k is and index in range(0,len(relevance)). Since 
     relevance is a list of 0s (fp) and 1s (tp), the precision is the sum of the 
@@ -64,63 +61,96 @@ def precision_at_k(relevance, k):
 
     return sum(relevance[:k+1])/(k+1)
 
-def average_precision(relevance):
-    """ Calculate the average presicion for a list of relevance values. The average 
-    precision is defined as the 'average of the precision@k values of the relevant 
-    documents in the top k resulst'. If there are no relevant documents, the average 
-    precision is defined to be 0."""
+####################################################################################
+# Average Precision and Average Precision@n
 
-    # Number of relevant documents
-    tp = sum(relevance)
+def average_precision(relevance, n_relevant):
+    """ Calculate the average presicion for a list of relevance values. The average 
+    precision is defined as the 'average of the precision@k values of all the relevant 
+    documents in the collection'. If there are no relevant documents, the average 
+    precision is defined to be 0. This calculation is based on the definition 
+    in https://link.springer.com/referenceworkentry/10.1007/978-1-4899-7993-3_482-2
+    """
+
+    assert sum(relevance)==n_relevant, "Number of relevant documents does not match relevance list"
+
     # If there are no relevant documents, define the average precision as 0
-    if tp==0:
+    if n_relevant==0:
         ap = 0
     else:
-        # Calculate average precision
         total = sum([rel_k*precision_at_k(relevance,k) for k,rel_k in enumerate(relevance)])
-        ap = total / tp
+        ap = total / n_relevant
     return ap
 
-def test_average_precision():
-    """ Test the average precision function."""
+def average_precision_at_n(relevance, n, n_relevant=None):
+    """ Calculate the average presicion@n for a list of relevance values. The average 
+    precision@n is defined as the 'average of the precision@k values of the relevant 
+    documents at the top n rankings'. If there are no relevant documents, the average 
+    precision is defined to be 0. This calculation is based on the definition 
+    in https://link.springer.com/referenceworkentry/10.1007/978-0-387-39940-9_487
+    You can provide n_relevant if you know the number of relevant documents in the
+    collection and it is smaller than n. This way you do not punish rankings for 
+    documents with less than n relevant documents in the collection.
+    """
 
-    results = [
-            [[0,0,0,0,0,0], 0.0],
-            [[1,1,0,0,0,0], 1.0],
-            [[0,0,0,0,1,1], 0.266],
-            [[0,1,0,1,0,0], 0.5],
+    assert n>0, "n must be greater than 0"
+    assert len(relevance)==n, f"Number of relevance values={len(relevance)} does not match n={n}"
+
+    # If there are no relevant documents in top n, define the average precision@n as 0
+    if sum(relevance)==0:
+        ap_at_n = 0
+    else:
+        total = sum([rel_k*precision_at_k(relevance,k) for k,rel_k in enumerate(relevance)])
+        # If n_relevant is provided, compare it with ranking length and
+        # use the smaller to normalize the total
+        normalization = min(n,n_relevant) if n_relevant is not None else n
+        ap_at_n = total / normalization
+    return ap_at_n
+
+def test_average_precision_at_n():
+    """ Test the average_precision_at_n function."""
+
+    tests = [
+            [[0,0,0,0,0,0], 6, 10, 0.0],
+            [[1,1,0,0,0,0], 6,  2, 1.0],
+            [[0,0,0,0,1,1], 6,  2, 0.266],
+            [[0,1,0,1,0,0], 6,  2, 0.5],
+            [[1,0,0,1,0,1], 6,  3, 0.666],
+            [[1,1,1,0,0], 5,  8, 0.6]
             ]
-    for result,answer in results:
-        delta = average_precision(result)-answer
+    for relevance,length,n_relevant,answer in tests:
+        delta = average_precision_at_n(relevance, length, n_relevant)-answer
         if abs(delta)>0.001:
-            print("Error")
+            print("Error at test_average_precision_at_n")
             import sys
             sys.exit(1)
 
-def calculate_micro_map_at_k(results_dict, df, k):
-    """ Calculates the mean average precision@k (map@k) for the whole dataset (Micro 
-    metric). That is, each element in the dataset is considered as a query and the 
-    average precision@k is calculated for each query result. The mean of all these 
-    values is returned."""
+####################################################################################
+# AP@n Related Metrics
+
+def instance_based_map_at_n(results_dict, df, n, n_relevant=None):
+    """ Calculates the mean of the average precision@n (mAP@n) over the whole dataset. 
+    That is, each element in the dataset is considered as a query and the average 
+    precision@n (ap@n) is calculated for the ranking. The mean of all these values 
+    is returned (Micro metric)."""
 
     # Calculate the average precision for each query
     aps = []
     for query_fname, result in results_dict.items():
         # Evaluate the relevance of the result
-        relevance = evaluate_relevance(query_fname, result[:k], df) # Cutoff at k
+        relevance = evaluate_relevance(query_fname, result[:n], df) # Cutoff at n
         # Calculate the average precision with the relevance
-        ap = average_precision(relevance)
+        ap_at_n = average_precision_at_n(relevance, n, n_relevant=n_relevant)
         # Append the results
-        aps.append(ap)
+        aps.append(ap_at_n)
     # Mean average precision for the whole dataset
     map_at_k = sum(aps)/len(aps)
     return map_at_k
 
-def calculate_map_at_k_for_labels(results_dict, df, k=15):
+def calculate_map_at_n_for_labels(results_dict, df, n):
     """ For each label in the dataset, the elements containing that label are considered 
-    as queries and the mean average precision@k (map@k) is calculated. Here, relevance is 
-    defined as: if a result contains the query label it. We also weigh each label's map@k 
-    by the number of elements containing that label divided by total number of elements."""
+    as queries and the average precision@n (AP@n) is averaged for all the rankings. Here, 
+    relevance is defined as: if a result contains the query label. """
 
     # Get all the labels from the df
     labels = set([l for ls in df["labels"].apply(lambda x: x.split(",")).to_list() for l in ls])
@@ -129,39 +159,33 @@ def calculate_map_at_k_for_labels(results_dict, df, k=15):
     for query_label in labels:
         # Get the fnames containing this label
         fnames_with_label = df[find_indices_containing_label(query_label, df)]["fname"].to_list()
-        # For each fname containing the label, calculate the total tp and fp
+        # Find how many elements contain this label, for the case of FSD50K.eval, 
+        # we know that n_relevant is always bigger than 15
+        n_relevant = len(fnames_with_label)
+        # For each fname containing the label, aggregate the AP@n
         label_aps = []
         for query_fname in fnames_with_label:
             # Get the result for this query
-            result = results_dict[str(query_fname)][:k] # Cutoff at k
+            result = results_dict[str(query_fname)][:n] # Cutoff at n
             # Evaluate the relevance of the result
             relevance = evaluate_relevance(query_fname, result, df, query_label=query_label)
-            # Calculate ap@k for this query
-            ap = average_precision(relevance)
+            # Calculate ap@n for this query
+            ap_at_n = average_precision_at_n(relevance, n, n_relevant=n_relevant)
             # Append the results
-            label_aps.append(ap)
-        # Calculate the mean average precision for this label
-        label_map_at_k = sum(label_aps)/len(label_aps)
-        # Calculate the weight of the label and weigh the label map@k
-        label_weight = len(fnames_with_label)/len(df)
-        weighted_label_map_at_k = label_map_at_k * label_weight
+            label_aps.append(ap_at_n)
+        # Calculate the mean average precision@n for this label
+        label_map_at_n = sum(label_aps)/len(label_aps)
         # Append the results
-        label_maps.append([query_label, label_map_at_k, weighted_label_map_at_k, label_weight])
-    # Sort the label maps by the map@k value
+        label_maps.append([query_label, label_map_at_n, n_relevant])
+    # Sort the label maps by the mAP@n value
     label_maps.sort(key=lambda x: x[1], reverse=True)
-    return label_maps, ["label", "map@15", "weighted_map@k", "weight"]
+    return label_maps, ["label", f"map@{n}", "n_relevant"]
 
-def calculate_macro_map(label_maps):
+def label_based_map_at_n(label_maps):
     """ Calculates the macro mean average precision (map) for the whole dataset. 
     That is, the map@k values for each label is averaged."""
 
     return sum([label_map[1] for label_map in label_maps])/len(label_maps)
-
-def calculate_weighted_macro_map(label_maps):
-    """ Calculates the weighted macro mean average precision (map) for the whole
-    dataset. That is, the weighted map@k values for each label is averaged."""
-
-    return sum([label_map[2] for label_map in label_maps])/len(label_maps)
 
 ####################################################################################
 # Ranking Related Metrics

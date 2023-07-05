@@ -152,12 +152,10 @@ def plot_micro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_na
     # Read the mAP for each model
     maps = []
     for model in models:
-        model_dir = os.path.join(eval_dir, dataset_name, model[0])
-        results_dir = os.path.join(model_dir, model[1])
-        map_path = os.path.join(results_dir, "micro_mAP.csv")
-        map = pd.read_csv(map_path)
-        map = map[map["k"]==15]["mAP"].values[0]
-        maps.append((model[0], model[1], map))
+        map_path = os.path.join(eval_dir, dataset_name, model[0], model[1], "micro_mAP@15.txt")
+        with open(map_path, "r") as in_f:
+            micro_map_at_15 = float(in_f.read())
+        maps.append((model[0], model[1], micro_map_at_15))
 
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     fig_name = fig_name if fig_name else default_fig_name
@@ -215,11 +213,10 @@ def plot_macro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_na
     # Read the mAP for each model
     maps = []
     for model in models:
-        model_dir = os.path.join(eval_dir, dataset_name, model[0])
-        results_dir = os.path.join(model_dir, model[1])
-        map_path = os.path.join(results_dir, "macro_mAP@15.csv")
-        map = pd.read_csv(map_path)["macro_map@15"].values[0]
-        maps.append((model[0], model[1], map))
+        map_path = os.path.join(eval_dir, dataset_name, model[0],  model[1], "balanced_mAP@15.txt")
+        with open(map_path, "r") as in_f:
+            balanced_map_at_15 = float(in_f.read())
+        maps.append((model[0], model[1], balanced_map_at_15))
 
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     fig_name = fig_name if fig_name else default_fig_name

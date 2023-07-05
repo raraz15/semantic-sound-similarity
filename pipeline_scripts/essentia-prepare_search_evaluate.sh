@@ -49,7 +49,7 @@ echo $EVAL_DIR
 # Prepare the embeddings
 echo "======================================================================="
 echo "Preparation"
-python fs-essentia-extractor_legacy-embedding_prepare.py $EMBED_DIR -N=$1
+python fs-essentia-extractor_legacy-create_clip_level_embedding.py $EMBED_DIR -N=$1
 echo $PREP_EMBED_DIR
 echo
 

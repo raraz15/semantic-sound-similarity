@@ -57,7 +57,7 @@ echo $EVAL_DIR
 # Prepare the embeddings
 echo "======================================================================="
 echo "Preparation"
-python prepare_embeddings.py $EMBED_DIR -a=$1 -N=$2 $3
+python create_clip_level_embedding.py $EMBED_DIR -a=$1 -N=$2 $3
 echo $PREP_EMBED_DIR
 echo
 
