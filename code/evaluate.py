@@ -85,7 +85,6 @@ if __name__=="__main__":
         # Calculate mAP@k for k=15
         print("\nCalculating Micro-Averaged mAP@15...")
         micro_map_at_15 = metrics.instance_based_map_at_n(results_dict, df, n=15)
-
         # Export the micro mAP@15 to txt
         output_path = os.path.join(output_dir, "micro_mAP@15.txt")
         with open(output_path, "w") as outfile:
@@ -133,7 +132,7 @@ if __name__=="__main__":
         # Export the labels' maps to CSV
         output_path = os.path.join(output_dir, "families_mAP@15.csv")
         _df.to_csv(output_path, index=False)
-        print("\nmAP@15 for each family:")
+        print("mAP@15 for each family:")
         for family, val in family_maps:
             print(f"{family:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
         print(f"Results are exported to{output_path}")
