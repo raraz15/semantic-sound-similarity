@@ -154,7 +154,7 @@ def calculate_map_at_n_for_labels(results_dict, df, n):
 
     # Get all the labels from the df
     labels = set([l for ls in df["labels"].apply(lambda x: x.split(",")).to_list() for l in ls])
-    # Calculate map@k for each label and the weighted map@k 
+    # Calculate map@k for each label
     label_maps = []
     for query_label in labels:
         # Get the fnames containing this label
@@ -186,6 +186,23 @@ def label_based_map_at_n(label_maps):
     That is, the map@k values for each label is averaged."""
 
     return sum([label_map[1] for label_map in label_maps])/len(label_maps)
+
+def family_based_map_at_n(label_maps, families=dict()):
+    """ Using families dict which specifies the family names and the list of all its child names
+    inside the FSD50K labels, averages the map@n for each family."""
+
+    # Calculate the map@k for each family
+    family_maps = []
+    for family_name, child_names in families.items():
+        # Get the label maps for this family
+        family_label_maps = [label_map[1] for label_map in label_maps if label_map[0] in child_names]
+        # Calculate the family map@k
+        family_map_at_n = sum(family_label_maps)/len(family_label_maps)
+        # Append the results
+        family_maps.append([family_name, family_map_at_n])
+    # Sort the family maps by the mAP@n value
+    family_maps.sort(key=lambda x: x[1], reverse=True)
+    return family_maps, ["family", "map"]
 
 ####################################################################################
 # Ranking Related Metrics
