@@ -1,38 +1,28 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(pwd)/pipeline_scripts/"
+SCRIPT_DIR="$(pwd)/scripts_pipeline/"
 DATA_DIR="$(pwd)/data"
 export PATH="$SCRIPT_DIR:$PATH"
 
 #############################################################################
 
-if [ $# == 0 ]; then
-    echo "Description: Takes extracted yamnet embeddings and prepares them, 
-    searches for similarity, and performs the evaluation pipeline."
-    echo "Usage: $0 param1"
-    echo "param1: openl3 name"
-    exit 0
-fi
-
-#############################################################################
-
+MODEL_NAME="fs-essentia-extractor_legacy"
 DATASET_NAME="FSD50K.eval_audio"
 EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME"
 
 #############################################################################
-
 for file in "$EMBED_DIR/"*; do # for each embedding dir
     f=$(basename -- "$file")   # get the basename=embed_name
-    if [[ $f == "$1-"* ]]; then # if the embed contains model-
+    if [[ $f == "$MODEL_NAME-"* ]]; then # if the embed contains model-
         echo "======================================================================="
         echo $f
-        SUFFIX="${f/$1-/""}" # Strip model name to get the suffix
-        openl3-search_evaluate.sh $SUFFIX
+        readarray -d - -t strarr <<< $f # Split from -
+        SUFFIX="${strarr[3]}"     # 3rd is the PCA for essentia
+        essentia-search_evaluate.sh $SUFFIX "nn"
     fi
 done
 
 # Compare the results of the experiments
-python plot_evaluation_results.py =$1
-
+python code/plot_evaluation_results.py =$MODEL_NAME
 
 #############################################################################

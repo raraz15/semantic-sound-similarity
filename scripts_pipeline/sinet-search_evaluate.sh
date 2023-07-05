@@ -8,7 +8,7 @@ if [ $# == 0 ]; then
     echo "Description: Takes prepared embeddings, searches for similarity, 
     and performs the evaluation pipeline."
     echo "Usage: $0 param1 param2 param3"
-    echo "param1: openl3 name"
+    echo "param1: fsd_sinet name"
     echo "param2: suffix of prepared embedding"
     echo "param3: search_type"
     exit 0
@@ -43,7 +43,7 @@ echo
 # Perform similarity search
 echo "======================================================================="
 echo "Similarity Search"
-python similarity_search.py $PREP_EMBED_DIR -s=$3
+python code/similarity_search.py $PREP_EMBED_DIR -s=$3
 SIMILARITY_PATH="$SIMILARITY_DIR/similarity_results.json"
 echo
 
@@ -52,7 +52,7 @@ echo
 # Evaluate
 echo "======================================================================="
 echo "Evaluation"
-python evaluate.py $SIMILARITY_PATH
+python code/evaluate.py $SIMILARITY_PATH
 echo
 echo "======================================================================="
 

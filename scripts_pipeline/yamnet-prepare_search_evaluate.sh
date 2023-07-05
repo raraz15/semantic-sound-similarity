@@ -7,18 +7,17 @@ source ps/bin/activate
 if [ $# == 0 ]; then
     echo "Description: Takes extracted yamnet embeddings and prepares them, 
     searches for similarity, and performs the evaluation pipeline."
-    echo "Usage: $0 param1 param2 param3 param4 param5"
-    echo "param1: fsd_sinet name"
-    echo "param2: aggregation"
-    echo "param3: N_PCA"
-    echo "param4: normalization"
-    echo "param5: search type"
+    echo "Usage: $0 param1 param2 param3 param4"
+    echo "param1: aggregation"
+    echo "param2: N_PCA"
+    echo "param3: normalization"
+    echo "param4: search type"
     exit 0
 fi
 
 #############################################################################
 
-MODEL_NAME=$1
+MODEL_NAME="audioset-yamnet-1"
 DATASET_NAME="FSD50K.eval_audio"
 
 #############################################################################
@@ -36,26 +35,15 @@ echo
 #############################################################################
 
 # Deal with No PCA case
-if [[ $3 == -1 ]]; then
-    if [[ $MODEL_NAME == "fsd-sinet-vgg41-tlpf-1" ]]; then
-        N=256
-    elif [[ $MODEL_NAME == "fsd-sinet-vgg42-aps-1" ]]; then
-        N=512
-    elif [[ $MODEL_NAME == "fsd-sinet-vgg42-tlpf_aps-1" ]]; then
-        N=512
-    elif [[ $MODEL_NAME == "fsd-sinet-vgg42-tlpf-1" ]]; then
-        N=512
-    else
-        echo "Wrong FSD-SINet name"
-        exit 1
-    fi
+if [[ $2 == -1 ]]; then
+    N=1024
 else
-    N=$3
+    N=$2
 fi
-if [[ $4 == "--no-normalization" ]]; then
-    SUFFIX="Agg_$2-PCA_$N-Norm_False"
+if [[ $3 == "--no-normalization" ]]; then
+    SUFFIX="Agg_$1-PCA_$N-Norm_False"
 else
-    SUFFIX="Agg_$2-PCA_$N-Norm_True"
+    SUFFIX="Agg_$1-PCA_$N-Norm_True"
 fi
 PREP_EMBED_DIR="$EMBED_DIR-$SUFFIX"
 
@@ -69,7 +57,7 @@ echo $EVAL_DIR
 # Prepare the embeddings
 echo "======================================================================="
 echo "Preparation"
-python create_clip_level_embedding.py $EMBED_DIR -a=$2 -N=$3 $4
+python code/create_clip_level_embedding.py $EMBED_DIR -a=$1 -N=$2 $3
 echo $PREP_EMBED_DIR
 echo
 
@@ -78,8 +66,8 @@ echo
 # Perform similarity search
 echo "======================================================================="
 echo "Similarity Search"
-python similarity_search.py $PREP_EMBED_DIR -s=$5
-SIMILARITY_PATH="$SIMILARITY_DIR-$SUFFIX/$5/similarity_results.json"
+python code/similarity_search.py $PREP_EMBED_DIR -s=$4
+SIMILARITY_PATH="$SIMILARITY_DIR-$SUFFIX/$4/similarity_results.json"
 echo $SIMILARITY_PATH
 echo
 
@@ -88,7 +76,7 @@ echo
 # Evaluate
 echo "======================================================================="
 echo "Evaluation"
-python evaluate.py $SIMILARITY_PATH
+python code/evaluate.py $SIMILARITY_PATH
 echo
 echo "======================================================================="
 

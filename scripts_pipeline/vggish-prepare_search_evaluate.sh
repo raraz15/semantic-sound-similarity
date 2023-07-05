@@ -57,7 +57,7 @@ echo $EVAL_DIR
 # Prepare the embeddings
 echo "======================================================================="
 echo "Preparation"
-python create_clip_level_embedding.py $EMBED_DIR -a=$1 -N=$2 $3
+python code/create_clip_level_embedding.py $EMBED_DIR -a=$1 -N=$2 $3
 echo $PREP_EMBED_DIR
 echo
 
@@ -66,7 +66,7 @@ echo
 # Perform similarity search
 echo "======================================================================="
 echo "Similarity Search"
-python similarity_search.py $PREP_EMBED_DIR -s=$4
+python code/similarity_search.py $PREP_EMBED_DIR -s=$4
 SIMILARITY_PATH="$SIMILARITY_DIR-$SUFFIX/$4/similarity_results.json"
 echo $SIMILARITY_PATH
 echo
@@ -76,7 +76,7 @@ echo
 # Evaluate
 echo "======================================================================="
 echo "Evaluation"
-python evaluate.py $SIMILARITY_PATH
+python code/evaluate.py $SIMILARITY_PATH
 echo
 echo "======================================================================="
 

@@ -31,7 +31,7 @@ EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$EMBED_NAME/$2"
 echo "======================================================================="
 echo "Input Directory:"
 echo $PREP_EMBED_DIR
-echo 
+echo
 echo "Output Directories:"
 echo $SIMILARITY_DIR
 echo $EVAL_DIR
@@ -41,7 +41,7 @@ echo
 # Perform similarity search
 echo "======================================================================="
 echo "Similarity Search"
-python similarity_search.py $PREP_EMBED_DIR -s=$2
+python code/similarity_search.py $PREP_EMBED_DIR -s=$2
 SIMILARITY_PATH="$SIMILARITY_DIR/similarity_results.json"
 echo
 
@@ -50,7 +50,7 @@ echo
 # Evaluate
 echo "======================================================================="
 echo "Evaluation"
-python evaluate.py $SIMILARITY_PATH
+python code/evaluate.py $SIMILARITY_PATH
 echo
 echo "======================================================================="
 

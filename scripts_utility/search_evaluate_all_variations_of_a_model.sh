@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(pwd)/pipeline_scripts/"
+SCRIPT_DIR="$(pwd)/scripts_pipeline/"
 export PATH="$SCRIPT_DIR:$PATH"
 
 #############################################################################

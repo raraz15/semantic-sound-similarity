@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(pwd)/pipeline_scripts/"
+SCRIPT_DIR="$(pwd)/scripts_pipeline/"
 export PATH="$SCRIPT_DIR:$PATH"
 
 #############################################################################
@@ -37,6 +37,6 @@ for v1 in ${variable1[@]}; do
 done
 
 # Compare the results of the experiments
-python plot_evaluation_results.py =$1
+python code/plot_evaluation_results.py =$1
 
 #############################################################################
