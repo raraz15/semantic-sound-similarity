@@ -1,10 +1,10 @@
-""" Takes a model variation and search anem and plots the evaluation results for it.
-"""
+""" For a model with its embedding aggregation variation and search, plots the evaluation results.
+Namely, the label-based and family-based mAP@15."""
 
 import os
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
-from lib.plotting import plot_label_based_map_at_15
+from lib.plotting import plot_label_based_map_at_15, plot_family_based_map_at_15
 
 from lib.directories import FIGURES_DIR, EVAL_DIR
 
@@ -40,6 +40,11 @@ if __name__=="__main__":
 
     # Plot the figures
     plot_label_based_map_at_15((args.model, args.variation, args.search),
+                                EVAL_DIR,
+                                dataset_name=args.dataset,
+                                save_fig=True,
+                                save_dir=args.save_dir)
+    plot_family_based_map_at_15((args.model, args.variation, args.search),
                                 EVAL_DIR,
                                 dataset_name=args.dataset,
                                 save_fig=True,

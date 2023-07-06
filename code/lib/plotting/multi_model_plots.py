@@ -35,6 +35,7 @@ def plot_micro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_na
             micro_map_at_15 = float(in_f.read())
         maps.append((model[0], model[1], micro_map_at_15))
 
+    # Plot the micro-mAP for each model
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     fig_name = fig_name if fig_name else default_fig_name
     fig.suptitle(fig_name, fontsize=19, weight='bold')
