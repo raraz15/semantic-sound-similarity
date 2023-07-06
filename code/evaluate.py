@@ -15,15 +15,13 @@ from lib.directories import GT_PATH, EVAL_DIR, TAXONOMY_FAMILY_JSON
 
 METRICS = ["micro_map@15", "macro_map@15"] #  "mr1"
 
-# TODO: ncdg
-# TODO: GAP@k
 if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
                         formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('results_path',
                         type=str,
-                        help='Path to similartiy_results.json file.')
+                        help='Path to similarity_results.json file.')
     parser.add_argument('--metrics',
                         type=str,
                         nargs='+',
@@ -94,7 +92,6 @@ if __name__=="__main__":
         print(f"Micro-Averaged mAP@15: {micro_map_at_15:.5f} | Time: {time_str}")
         print(f"Results are exported to {output_path}")
 
-    # TODO: fix names
     # Calculate Macro Averaged Precision@15 if required
     if "macro_map@15" in args.metrics:
 

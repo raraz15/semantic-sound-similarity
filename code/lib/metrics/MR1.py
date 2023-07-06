@@ -5,7 +5,7 @@ from .utils import get_labels
 ####################################################################################
 # MR1
 
-# TODO: MR1 NaNs
+# TODO: MR1 NaNs, relevance options
 def R1(query_fname, result, df):
     query_labels = get_labels(query_fname, df)
     for i,ref_result in enumerate(result):
