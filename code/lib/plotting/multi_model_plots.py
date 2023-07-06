@@ -19,7 +19,7 @@ DATASET_NAME = "FSD50K.eval_audio"
 
 # TODO: how to encode variation and the search?
 
-def save_function(save_fig, save_dir, default_name, fig, models):
+def _save_function(save_fig, save_dir, default_name, fig, models):
 
     if save_fig:
         if save_dir == "":
@@ -86,7 +86,7 @@ def plot_micro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_nam
     ax.legend(loc="best", fontsize=10, title_fontsize=11, fancybox=True)
 
     # Save and show
-    save_function(save_fig, save_dir, "best_embeddings-micro_mAP@15-comparison.png", fig, models)
+    _save_function(save_fig, save_dir, "best_embeddings-micro_mAP@15-comparison.png", fig, models)
     plt.show()
 
 def plot_macro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
@@ -137,7 +137,7 @@ def plot_macro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_nam
     ax.grid()
     ax.legend(loc="best", fontsize=10, title_fontsize=11, fancybox=True)
 
-    save_function(save_fig, save_dir, "best_embeddings-macro_mAP@15-comparison.png", fig, models)
+    _save_function(save_fig, save_dir, "best_embeddings-macro_mAP@15-comparison.png", fig, models)
     plt.show()
 
 def plot_family_map_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
@@ -187,7 +187,7 @@ def plot_family_map_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_N
         if i==0:
             ax[i].legend(loc="upper center", fontsize=10, title_fontsize=11, fancybox=True, ncol=len(models))
 
-    save_function(save_fig, save_dir, "family_based_mAP@15-comparison.png", fig, models)
+    _save_function(save_fig, save_dir, "family_based_mAP@15-comparison.png", fig, models)
     plt.show()
 
 ####################################################################################################
@@ -238,5 +238,5 @@ def plot_mr1_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATA
             title_fontsize=11, 
             fancybox=True)
 
-    save_function(save_fig, save_dir, "best_embeddings-MR1_comparison.png", fig, models)
+    _save_function(save_fig, save_dir, "best_embeddings-MR1_comparison.png", fig, models)
     plt.show()

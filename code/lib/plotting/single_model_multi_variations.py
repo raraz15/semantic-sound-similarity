@@ -42,6 +42,16 @@ def sort_variation_paths(model, variation_paths):
     else:
         return variation_paths
 
+def _save_function(save_fig, save_dir, default_name, fig):
+    if save_fig:
+        if save_dir == "":
+            print("Please provide a save directory if you want to save the figure.")
+            sys.exit(1)
+        os.makedirs(save_dir, exist_ok=True)
+        fig_path = os.path.join(save_dir, default_name)
+        print(f"Saving figure to {fig_path}")
+        fig.savefig(fig_path)
+
 ###################################################################################################
 # Micro-averaged map@k
 
@@ -121,14 +131,8 @@ def plot_micro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATA
     ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
                         title_fontsize=10, fancybox=True)
     ax.set_ylim([0,1])
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, "micro_mAP@15-comparisons.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
+
+    _save_function(save_fig, save_dir, "micro_mAP@15-comparisons.png", fig)
     plt.show()
 
 ####################################################################################################
@@ -210,14 +214,8 @@ def plot_macro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATA
     ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
                         title_fontsize=10, fancybox=True)
     ax.set_ylim([0,1])
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, "macro_map@15-comparisons.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
+
+    _save_function(save_fig, save_dir, "macro_map@15-comparisons.png", fig)
     plt.show()
 
 ###################################################################################################
@@ -296,12 +294,6 @@ def plot_mr1(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", s
     ax.legend(loc=4, fontsize=11, title="Search Algorithms", 
               title_fontsize=12, fancybox=True)
     ax.grid()
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, "MR1.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
+
+    _save_function(save_fig, save_dir, "mr1-comparisons.png", fig)
     plt.show()

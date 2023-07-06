@@ -14,6 +14,16 @@ from ..directories import EVAL_DIR
 
 DATASET_NAME = "FSD50K.eval_audio"
 
+def _save_function(save_fig, save_dir, default_name, fig):
+    if save_fig:
+        if save_dir == "":
+            print("Please provide a save directory if you want to save the figure.")
+            sys.exit(1)
+        os.makedirs(save_dir, exist_ok=True)
+        fig_path = os.path.join(save_dir, default_name)
+        print(f"Saving figure to {fig_path}")
+        fig.savefig(fig_path)
+
 def plot_label_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name, aggregation variation and search name and plots the label-based mAP@15 for it.
     That is, the mAP@15 is plotted for each individual label."""
@@ -48,15 +58,9 @@ def plot_label_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, datase
         ax[i].grid()
         ax[i].set_ylim([0, 1.05])
         ax[i].set_ylabel("mAP@15")
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, "label_based_mAP@15.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
-        plt.close()
+
+    _save_function(save_fig, save_dir, "label_based_mAP@15.png", fig)
+    plt.close()
 
 def plot_family_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name, aggregation variation and search name and plots the label_family-based mAP@15 for it.
@@ -98,12 +102,5 @@ def plot_family_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, datas
     ax.set_ylim([0,1])
     ax.grid()
 
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, "family_based_mAP@15.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
-        plt.close()
+    _save_function(save_fig, save_dir, "family_based_mAP@15.png", fig)
+    plt.close()
