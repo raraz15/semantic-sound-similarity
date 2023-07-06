@@ -12,12 +12,10 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
-def get_model_name(full_name):
-    return full_name.split("-PCA")[0].split("-Agg")[0]
-
 ####################################################################################################
 # mAP
 
+# TODO: how to encode variation and the search?
 def plot_micro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
     """Takes a list of [(embedding,search)] and plots all the Micro Averaged mAP@k in the same figure."""
 
@@ -29,28 +27,28 @@ def plot_micro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_na
 
     # Read the mAP for each model
     maps = []
-    for model in models:
-        map_path = os.path.join(eval_dir, dataset_name, model[0], model[1], "micro_mAP@15.txt")
+    for model, variation, search in models:
+        map_path = os.path.join(eval_dir, dataset_name, model+"-"+variation, search, "micro_mAP@15.txt")
         with open(map_path, "r") as in_f:
             micro_map_at_15 = float(in_f.read())
-        maps.append((model[0], model[1], micro_map_at_15))
+        maps.append((model, variation, search, micro_map_at_15))
 
     # Plot the micro-mAP for each model
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     fig_name = fig_name if fig_name else default_fig_name
     fig.suptitle(fig_name, fontsize=19, weight='bold')
     ax.set_title("Page 1 Results", fontsize=15)
-    for j,(model_name,search,map) in enumerate(maps):
-        ax.bar(0+positions[j], 
-                map, 
-                label=get_model_name(model_name),
+    for j,(model,variation,search,micro_map_at_15) in enumerate(maps):
+        ax.bar(positions[j], 
+                micro_map_at_15, 
+                label=model,
                 width=delta*0.80, 
                 color=COLORS[j], 
                 edgecolor='k'
                 )
-        ax.text(0+positions[j], 
-                map+0.01, 
-                f"{map:.3f}", 
+        ax.text(positions[j], 
+                micro_map_at_15+0.01, 
+                f"{micro_map_at_15:.3f}", 
                 ha='center', 
                 va='bottom', 
                 fontsize=10, 
@@ -91,27 +89,27 @@ def plot_macro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_na
 
     # Read the mAP for each model
     maps = []
-    for model in models:
-        map_path = os.path.join(eval_dir, dataset_name, model[0],  model[1], "balanced_mAP@15.txt")
+    for model, variation, search in models:
+        map_path = os.path.join(eval_dir, dataset_name, model+"-"+variation, search, "balanced_mAP@15.txt")
         with open(map_path, "r") as in_f:
             balanced_map_at_15 = float(in_f.read())
-        maps.append((model[0], model[1], balanced_map_at_15))
+        maps.append((model, variation, search, balanced_map_at_15))
 
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     fig_name = fig_name if fig_name else default_fig_name
     fig.suptitle(fig_name, fontsize=19, weight='bold')
     ax.set_title("Page 1 Results", fontsize=15)
-    for j,(model_name,search,map) in enumerate(maps):
-        ax.bar(0+positions[j], 
-                map, 
-                label=get_model_name(model_name) if 0==0 else "",
+    for j,(model,variation,search,balanced_map_at_15) in enumerate(maps):
+        ax.bar(positions[j], 
+                balanced_map_at_15, 
+                label=model,
                 width=delta*0.80, 
                 color=COLORS[j], 
                 edgecolor='k'
                 )
-        ax.text(0+positions[j], 
-                map+0.01, 
-                f"{map:.3f}", 
+        ax.text(positions[j], 
+                balanced_map_at_15+0.01, 
+                f"{balanced_map_at_15:.3f}", 
                 ha='center', 
                 va='bottom', 
                 fontsize=10, 
@@ -150,24 +148,22 @@ def plot_mr1_comparisons_multimodel(models, eval_dir, dataset_name, fig_name="",
 
     # Read the MR1s for each model
     mr1s = []
-    for model in models:
-        model_dir = os.path.join(eval_dir, dataset_name, model[0])
-        results_dir = os.path.join(model_dir, model[1])
-        mr1_path = os.path.join(results_dir, "MR1.txt")
+    for model, variation, search in models:
+        mr1_path = os.path.join(eval_dir, dataset_name, model+"-"+variation, search, "MR1.txt")
         with open(mr1_path,"r") as infile:
             mr1 = float(infile.read())
-        mr1s.append((model[0], model[1], mr1))
+        mr1s.append((model, variation, search, mr1))
 
     # Plot the MR1s
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     fig_name = fig_name if fig_name else f"Embedding Performances using MR1 Evaluated on {dataset_name} Set"
     fig.suptitle(fig_name, fontsize=19, weight='bold')
-    ax.set_title("For each model, the best performing processing parameters are used", fontsize=15)
-    for i,(model_name,search,mr1) in enumerate(mr1s):
+    #ax.set_title("For each model, the best performing processing parameters are used", fontsize=15)
+    for i,(model,search,mr1) in enumerate(mr1s):
             ax.bar(i, 
                 mr1, 
-                label=get_model_name(model_name),
-                width=1*0.85, 
+                label=model,
+                width=0.85, 
                 color=COLORS[i], 
                 edgecolor='k'
                 )
