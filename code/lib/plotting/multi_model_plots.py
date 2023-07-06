@@ -4,7 +4,6 @@ and plots the results in the same plot for comparison.
 """
 
 import os
-import sys
 from collections import defaultdict
 
 import numpy as np
@@ -134,8 +133,7 @@ def plot_macro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_nam
     ax.legend(loc="best", fontsize=10, title_fontsize=11, fancybox=True)
     if save_fig:
         if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
+            raise("Please provide a save directory if you want to save the figure.")
         os.makedirs(save_dir, exist_ok=True)
         fig_path = os.path.join(save_dir, "best_embeddings-macro_mAP@15-comparison.png")
         print(f"Saving figure to {fig_path}")
@@ -195,13 +193,15 @@ def plot_family_map_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_N
 
     if save_fig:
         if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
+            raise("Please provide a save directory if you want to save the figure.")
         os.makedirs(save_dir, exist_ok=True)
         fig_path = os.path.join(save_dir, "family_based_mAP@15-comparison.png")
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
-        plt.close()
+        txt_path = os.path.splitext(fig_path)[0]+".txt"
+        with open(txt_path, "w") as infile:
+            for model in models:
+                infile.write(f"{model[0]}-{model[1]}\n")
     plt.show()
 
 
@@ -254,8 +254,7 @@ def plot_mr1_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATA
             fancybox=True)
     if save_fig:
         if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
+            raise("Please provide a save directory if you want to save the figure.")
         os.makedirs(save_dir, exist_ok=True)
         fig_path = os.path.join(save_dir, "best_embeddings-MR1_comparison.png")
         print(f"Saving figure to {fig_path}")
