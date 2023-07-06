@@ -89,10 +89,10 @@ if __name__=="__main__":
         output_path = os.path.join(output_dir, "micro_mAP@15.txt")
         with open(output_path, "w") as outfile:
             outfile.write(str(micro_map_at_15))
-        print(f"Results are exported to {output_path}")
 
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
         print(f"Micro-Averaged mAP@15: {micro_map_at_15:.5f} | Time: {time_str}")
+        print(f"Results are exported to {output_path}")
 
     # TODO: fix names
     # Calculate Macro Averaged Precision@15 if required

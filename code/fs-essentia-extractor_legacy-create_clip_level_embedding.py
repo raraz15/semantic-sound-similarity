@@ -98,12 +98,14 @@ if __name__=="__main__":
     print("Creating the initial embeddings...")
     start_time = time.time()
     fnames,embeddings = [],[]
-    for embed_path in embed_paths:
+    for i,embed_path in enumerate(embed_paths):
         # Get the fname from the path
         fnames += [get_file_name(embed_path).split("-")[0]]
         # Load the features and select the subset
         feat_dict = load_yaml(embed_path)
         embeddings += [select_subset(feat_dict)]
+        if i%1000==0:
+            print(f"Processed {i} embeddings...")
     total_time = time.time()-start_time
     print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
