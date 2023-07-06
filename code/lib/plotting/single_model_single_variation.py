@@ -22,8 +22,6 @@ def plot_label_based_map_at_15(model_variation_search, eval_dir, dataset_name="F
     # Get the path to the label-based mAP@15
     variation_dir = os.path.join(eval_dir, dataset_name, model+"-"+variation)
     map_path = os.path.join(variation_dir, search, "labels_mAP@15.csv")
-    # embedding_search = variation + "-" + search
-
     # Read the label-based mAP@15
     labels_map = pd.read_csv(map_path)
     # Get the labels and maps
