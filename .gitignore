@@ -1,16 +1,22 @@
 ps/*
 
-models/*
+models/*.json
+models/*.h5
+models/*.hdf5
+models/*.hdf5.*
+models/*.hdf5/*
+models/*.pb
 
 __pycache__/*
+*.pyc
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 
 *.csv
 *.png
 *.jpeg
+*.jpg
+
 freesound_api.json
 queries.json
 TODO.md
-
-*.pyc
