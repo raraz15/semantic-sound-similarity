@@ -6,10 +6,10 @@ export PATH="$SCRIPT_DIR:$PATH"
 #############################################################################
 
 # Define here the variables of the experiment
-variable1=("max" "median")
-variable2=(100 200 -1)
-variable3=("--no-normalization" "--normalization")
-variable4=("dot" "nn")
+variable1=("mean")
+variable2=(20 40 60 80)
+variable3=("--normalization")
+variable4=("nn")
 
 #############################################################################
 
