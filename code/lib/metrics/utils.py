@@ -20,11 +20,13 @@ def find_indices_containing_label(label, df):
     pattern = re.compile(r"(?:"+pattern+r")") # Compile the pattern with matching group
     return df["labels"].str.contains(pattern)
 
-def evaluate_relevance(query_fname, result, df, query_label=None):
+def evaluate_relevance(query_fname, result, df, query_label=None, cutoff=False):
     """Evaluates the relevance of a result for a query. By default, A result is considered
     relevant if it has at least one label in common with the query. If a query label is 
-    provided, a result is considered relevant if it contains the label. Relevance: list of 
-    relevance values (1: relevant, 0: not relevant)."""
+    provided, a result is considered relevant if it contains the label. You can cutoff the
+    relevance from the last 1 by setting cutoff to True.
+    Returns:
+        Relevance: list of relevance values (1: relevant, 0: not relevant)."""
 
     # Get the labels of the query
     query_item_labels = get_labels(query_fname, df)
@@ -45,4 +47,8 @@ def evaluate_relevance(query_fname, result, df, query_label=None):
                 relevance.append(1)
             else:
                 relevance.append(0)
+    # Cutoff the relevance from the last 1 if cutoff is True
+    if cutoff:
+        last_one = relevance[::-1].index(1)
+        relevance = relevance[:-last_one]
     return relevance
