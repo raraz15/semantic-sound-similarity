@@ -43,7 +43,7 @@ def sort_variation_paths(model, variation_paths):
             new_sort.extend(agg_sorted)
         return new_sort
     else:
-        return variation_paths
+        return sorted(variation_paths, key=lambda x: int(x.split("-PCA_")[1]))
 
 def _save_function(save_fig, save_dir, default_name, fig):
     if save_fig:
@@ -233,7 +233,10 @@ def plot_macro_map_at_15_PCA_comparisons(model_search, eval_dir=EVAL_DIR, datase
                 f"Label-Averaged mAP@15\n{model} Evaluated on {dataset_name}"
 
     # Find all the variation_paths of the model
-    wildcard = f"{model}-Agg_{agg}-PCA_*-Norm_{norm}"
+    if model=="fs-essentia-extractor_legacy":
+        wildcard = f"{model}-PCA_*"
+    else:
+        wildcard = f"{model}-Agg_{agg}-PCA_*-Norm_{norm}"
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, wildcard)))
     # Sort by PCA components
     variation_paths = sort_variation_paths(model, variation_paths)
@@ -245,7 +248,10 @@ def plot_macro_map_at_15_PCA_comparisons(model_search, eval_dir=EVAL_DIR, datase
         with open(map_path, "r") as in_f:
             balanced_map_at_15 = float(in_f.read())
         full_model_name = variation_path.split("/")[-1]
-        variation = "-".join(full_model_name.split("-")[-3:])
+        if "fs-essentia-extractor_legacy" in full_model_name:
+            variation = "-"+full_model_name.split("-")[-1]
+        else:
+            variation = "-".join(full_model_name.split("-")[-3:])
         maps.append(balanced_map_at_15)
         variations.append(variation)
 
