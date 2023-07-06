@@ -1,15 +1,18 @@
-"""Contains functions for plotting single model performance."""
+"""Contains functions for plotting each variation of a model on the same figure."""
 
 import os
 import sys
 import glob
 
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
 from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
+
+from ..directories import EVAL_DIR
+
+DATASET_NAME = "FSD50K.eval_audio"
 
 ###################################################################################################
 # Utility functions
@@ -39,10 +42,20 @@ def sort_variation_paths(model, variation_paths):
     else:
         return variation_paths
 
+def _save_function(save_fig, save_dir, default_name, fig):
+    if save_fig:
+        if save_dir == "":
+            print("Please provide a save directory if you want to save the figure.")
+            sys.exit(1)
+        os.makedirs(save_dir, exist_ok=True)
+        fig_path = os.path.join(save_dir, default_name)
+        print(f"Saving figure to {fig_path}")
+        fig.savefig(fig_path)
+
 ###################################################################################################
 # Micro-averaged map@k
 
-def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
+def plot_micro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and for each variation inside eval_dir,
     plots all the the micro-averaged AP@15 values in a single plot ."""
 
@@ -51,7 +64,6 @@ def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
-    print(os.path.join(eval_dir, dataset_name, f"{model}-*"))
     # Sort further
     variation_paths = sort_variation_paths(model, variation_paths)
     # Read one variation's folder to get the searches
@@ -119,20 +131,14 @@ def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_
     ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
                         title_fontsize=10, fancybox=True)
     ax.set_ylim([0,1])
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, f"{model}-micro_mAP@15-comparisons.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
+
+    _save_function(save_fig, save_dir, "micro_mAP@15-comparisons.png", fig)
     plt.show()
 
 ####################################################################################################
 # Macro-averaged mAP@k
 
-def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
+def plot_macro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and for each model variation inside eval_dir, 
     plots the Class-averaged mAP@15 in a single plot."""
 
@@ -208,73 +214,14 @@ def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_
     ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
                         title_fontsize=10, fancybox=True)
     ax.set_ylim([0,1])
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, f"{model}-macro_map@15-comparisons.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
+
+    _save_function(save_fig, save_dir, "macro_map@15-comparisons.png", fig)
     plt.show()
-
-def plot_label_based_map_at_15(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
-    """Takes a model name and finds all its variations in eval_dir. For each variation,
-    plots the mAP@15 of the labels."""
-
-    default_fig_name = f"mAP@15 Values of Labels\n{model} Evaluated on {dataset_name}"
-
-    # Find all the variation_paths of the model
-    variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
-    # Read one variation's folder to get the searches
-    searches = os.listdir(variation_paths[0])
-
-    # For each variation of the model and the search path
-    for variation_path in variation_paths:
-        for search in searches:
-
-            # Read the label-based mAP@15
-            in_path = os.path.join(variation_path, search, "labels_mAP@15.csv")
-            labels_map = pd.read_csv(in_path)
-
-            # Get the labels and maps
-            labels = labels_map["label"].to_list()
-            maps = labels_map["map@15"].to_list()
-            # Sort the labels and maps
-            label_aps = sorted(zip(labels, maps), key=lambda x: x[1], reverse=True)
-
-            # Determine some plot parameters
-            N = 10 # Number of rows
-            delta = len(maps) // N
-            embedding_search = os.path.basename(variation_path).replace(model+"-", "") + "-" + search
-            fig_name = fig_name if fig_name else default_fig_name
-
-            # Plot the label-based mAP@15
-            fig, ax = plt.subplots(figsize=(18, 24), nrows=N, constrained_layout=True)
-            fig.suptitle(fig_name, fontsize=16)
-            for i in range(N):
-                ax[i].bar(
-                        [label.replace("_","\n") for label,_ in label_aps[i*delta:(i+1)*delta]], 
-                        [prec for _,prec in label_aps[i*delta:(i+1)*delta]]
-                        )
-                ax[i].set_yticks(np.arange(0, 1.05, 0.2))
-                ax[i].grid()
-                ax[i].set_ylim([0, 1.05])
-                ax[i].set_ylabel("mAP@15")
-            if save_fig:
-                if save_dir == "":
-                    print("Please provide a save directory if you want to save the figure.")
-                    sys.exit(1)
-                os.makedirs(save_dir, exist_ok=True)
-                fig_path = os.path.join(save_dir, f"{embedding_search}-label_based_mAP@15.png")
-                print(f"Saving figure to {fig_path}")
-                fig.savefig(fig_path)
-                plt.close()
 
 ###################################################################################################
 # MR1
 
-def plot_mr1(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
+def plot_mr1(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and plots the MR1 for all the variations of the model."""
 
     default_fig_name = "Embedding Processing and Search Algorithm " +\
@@ -347,12 +294,6 @@ def plot_mr1(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", sav
     ax.legend(loc=4, fontsize=11, title="Search Algorithms", 
               title_fontsize=12, fancybox=True)
     ax.grid()
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, f"{model}-MR1.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
+
+    _save_function(save_fig, save_dir, "mr1-comparisons.png", fig)
     plt.show()

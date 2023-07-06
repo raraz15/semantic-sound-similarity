@@ -1,8 +1,10 @@
+""" Takes a model name and plots the evaluation results for all its 
+variations. Namely, it plots the micro and macro mAP@15."""
+
 import os
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
-from lib.plotting import (plot_micro_map_at_15_comparisons, plot_label_based_map_at_15, 
-                        plot_macro_map_at_15_comparisons, plot_mr1)
+from lib.plotting import plot_micro_map_at_15_comparisons, plot_macro_map_at_15_comparisons
 
 from lib.directories import FIGURES_DIR, EVAL_DIR
 
@@ -38,14 +40,4 @@ if __name__=="__main__":
                                     dataset_name=args.dataset, 
                                     save_fig=True, 
                                     save_dir=args.save_dir)
-    plot_label_based_map_at_15(args.model, 
-                                EVAL_DIR, 
-                                dataset_name=args.dataset, 
-                                save_fig=True, 
-                                save_dir=args.save_dir)
-    plot_mr1(args.model, 
-            EVAL_DIR, 
-            dataset_name=args.dataset, 
-            save_fig=True, 
-            save_dir=args.save_dir)
     print("Done!")

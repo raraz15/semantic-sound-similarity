@@ -11,9 +11,9 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import pandas as pd
 
 import lib.metrics as metrics
-from lib.directories import GT_PATH, EVAL_DIR
+from lib.directories import GT_PATH, EVAL_DIR, TAXONOMY_FAMILY_JSON
 
-METRICS = ["micro_map", "macro_map"] #  "mr1"
+METRICS = ["micro_map@15", "macro_map@15"] #  "mr1"
 
 # TODO: ncdg
 # TODO: GAP@k
@@ -23,11 +23,7 @@ if __name__=="__main__":
                         formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('results_path',
                         type=str,
-                        help='Path to results.json file.')
-    parser.add_argument('--increment', 
-                        type=int, 
-                        default=15, 
-                        help="MAP@k calculation increments.")
+                        help='Path to similartiy_results.json file.')
     parser.add_argument('--metrics',
                         type=str,
                         nargs='+',
@@ -39,6 +35,12 @@ if __name__=="__main__":
                         help="Path to the ground truth CSV file. "
                         "You can provide a subset of the ground truth by "
                         "filtering the CSV file before passing it to this script.")
+    parser.add_argument("--families-json",
+                        type=str,
+                        default=TAXONOMY_FAMILY_JSON,
+                        help="Path to the JSON file containing the family information "
+                        "of the FSD50K Taxonomy. You can also provide the family information from "
+                        "an ontology")
     parser.add_argument("--output-dir",
                         type=str,
                         default=EVAL_DIR,
@@ -76,14 +78,13 @@ if __name__=="__main__":
     os.makedirs(output_dir, exist_ok=True)
 
     # Calculate Micro-Averaged mAP@15 if required
-    if "micro_map" in args.metrics:
+    if "micro_map@15" in args.metrics:
 
         start_time = time.time()
 
         # Calculate mAP@k for k=15
         print("\nCalculating Micro-Averaged mAP@15...")
         micro_map_at_15 = metrics.instance_based_map_at_n(results_dict, df, n=15)
-
         # Export the micro mAP@15 to txt
         output_path = os.path.join(output_dir, "micro_mAP@15.txt")
         with open(output_path, "w") as outfile:
@@ -95,7 +96,7 @@ if __name__=="__main__":
 
     # TODO: fix names
     # Calculate Macro Averaged Precision@15 if required
-    if "macro_map" in args.metrics:
+    if "macro_map@15" in args.metrics:
 
         start_time = time.time()
 
@@ -113,15 +114,31 @@ if __name__=="__main__":
         # with equal weight across all classes to yield the overall performance"
         print("\nCalculating the Balanced mAP@15...")
         balanced_map_at_15 = metrics.label_based_map_at_n(label_maps)
-
-        # Export the micro mAP@15 to txt
+        # Export the balanced mAP@15 to txt
         output_path = os.path.join(output_dir, "balanced_mAP@15.txt")
         with open(output_path, "w") as outfile:
             outfile.write(str(balanced_map_at_15))
+        print(f"Balanced mAP@15: {balanced_map_at_15:.5f}")
         print(f"Results are exported to {output_path}")
 
+        # Calculate the Family-based mAP@15
+        # Read the family information
+        with open(args.families_json, "r") as infile:
+            families = json.load(infile)
+        print("\nCalculating the Family-based mAP@15...")
+        family_maps, columns = metrics.family_based_map_at_n(label_maps, families)
+        # Convert to a dataframe
+        _df = pd.DataFrame(family_maps, columns=columns)
+        # Export the labels' maps to CSV
+        output_path = os.path.join(output_dir, "families_mAP@15.csv")
+        _df.to_csv(output_path, index=False)
+        print("mAP@15 for each family:")
+        for family, val in family_maps:
+            print(f"{family:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
+        print(f"Results are exported to{output_path}")
+
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
-        print(f"Balanced mAP@15: {balanced_map_at_15:.5f} | Time: {time_str}")
+        print(f"Time: {time_str}")
 
     # Calculate MR1 if requested
     if "mr1" in args.metrics:
