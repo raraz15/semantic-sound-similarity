@@ -11,11 +11,4 @@ contact: <oguza97@gmail.com>
 
 ## Installation
 
-- For freesound-audio_analzyer you will need permission
-- Put where FSd50K is stored in directories.py
-
-## TODO
-
-- When the yamnet config is fixed read those configs and delete configs directory
-- write the instrucitons of installation and how to use
-  - fs-essentia hwo to install...
+Coming Soon...
