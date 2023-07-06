@@ -5,8 +5,10 @@ and plots the results in the same plot for comparison.
 
 import os
 import sys
+from collections import defaultdict
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 from matplotlib.colors import TABLEAU_COLORS
@@ -16,12 +18,13 @@ from ..directories import EVAL_DIR
 
 DATASET_NAME = "FSD50K.eval_audio"
 
+# TODO: how to encode variation and the search?
+
 ####################################################################################################
 # mAP
 
-# TODO: how to encode variation and the search?
 def plot_micro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
-    """Takes a list of [(embedding,search)] and plots all the Micro Averaged mAP@k in the same figure."""
+    """Takes a list of [(model,variation,search)] and plots all the Micro Averaged mAP@k in the same figure."""
 
     default_fig_name = f"Embedding Performances using Instance-Based mAP@15 (Micro-Averaged) on {dataset_name}"
 
@@ -73,7 +76,7 @@ def plot_micro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_nam
             print("Please provide a save directory if you want to save the figure.")
             sys.exit(1)
         os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, f"best_embeddings-micro_mAP@15-comparison.png")
+        fig_path = os.path.join(save_dir, "best_embeddings-micro_mAP@15-comparison.png")
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
         txt_path = os.path.splitext(fig_path)[0]+".txt"
@@ -83,7 +86,7 @@ def plot_micro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_nam
     plt.show()
 
 def plot_macro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
-    """Takes a list of [(embedding,search)] and plots all the Macro Averaged mAP@15 in the same figure."""
+    """Takes a list of [(model,variation,search)] and plots all the Macro Averaged mAP@15 in the same figure."""
 
     default_fig_name = f"Embedding Performances using Label-Based mAP@15 (Macro-Averaged) on {dataset_name}"
 
@@ -134,7 +137,7 @@ def plot_macro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_nam
             print("Please provide a save directory if you want to save the figure.")
             sys.exit(1)
         os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, f"best_embeddings-macro_mAP@15-comparison.png")
+        fig_path = os.path.join(save_dir, "best_embeddings-macro_mAP@15-comparison.png")
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
         txt_path = os.path.splitext(fig_path)[0]+".txt"
@@ -142,6 +145,65 @@ def plot_macro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_nam
             for model in models:
                 infile.write(f"{model[0]}-{model[1]}\n")
     plt.show()
+
+def plot_family_map_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
+    """Takes a list of [(model,variation,search)] and plots all the Macro Averaged mAP@15 in the same figure."""
+
+    default_fig_name = f"Embedding-Search Performances over Label-Families Averaged mAP@15 on {dataset_name}"
+
+    # Read the mAP for each model
+    model_maps = defaultdict(list)
+    for model, variation, search in models:
+        map_path = os.path.join(eval_dir, dataset_name, model+"-"+variation, search, "families_mAP@15.csv")
+        labels_map = pd.read_csv(map_path)
+        families = labels_map["family"].to_list()
+        maps = labels_map["map"].to_list()
+        for family, family_map in zip(families, maps):
+            model_maps[family].append((model, variation, search, family_map))
+    
+    fig,ax = plt.subplots(nrows=len(model_maps) ,figsize=(18,12), constrained_layout=True)
+    fig_name = fig_name if fig_name else default_fig_name
+    fig.suptitle(fig_name, fontsize=19, weight='bold')
+    for i, (family, family_aps) in enumerate(model_maps.items()):
+        for j,(model,variation,search,ap) in enumerate(family_aps):
+            ax[i].bar(j, 
+                    ap, 
+                    label=model,
+                    width=0.8, 
+                    color=COLORS[j], 
+                    edgecolor='k'
+                    )
+            ax[i].text(j, 
+                    ap+0.01, 
+                    f"{ap:.3f}", 
+                    ha='center', 
+                    va='bottom', 
+                    fontsize=10, 
+                    weight='bold'
+                    )
+
+        # Set the plot parameters
+        ax[i].set_title(family.replace("_", " ").title(), fontsize=15)
+        ax[i].set_yticks(np.arange(0,1.05,0.1))
+        ax[i].tick_params(axis='x', which='major', labelsize=0)
+        ax[i].tick_params(axis='y', which='major', labelsize=11)
+        ax[i].set_ylabel("mAP@15 (↑)", fontsize=15)
+        ax[i].set_ylim([0,1])
+        ax[i].grid()
+        if i==0:
+            ax[i].legend(loc="upper center", fontsize=10, title_fontsize=11, fancybox=True, ncol=len(models))
+
+    if save_fig:
+        if save_dir == "":
+            print("Please provide a save directory if you want to save the figure.")
+            sys.exit(1)
+        os.makedirs(save_dir, exist_ok=True)
+        fig_path = os.path.join(save_dir, "family_based_mAP@15-comparison.png")
+        print(f"Saving figure to {fig_path}")
+        fig.savefig(fig_path)
+        plt.close()
+    plt.show()
+
 
 ####################################################################################################
 # MR1
@@ -195,7 +257,7 @@ def plot_mr1_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATA
             print("Please provide a save directory if you want to save the figure.")
             sys.exit(1)
         os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, f"best_embeddings-MR1_comparison.png")
+        fig_path = os.path.join(save_dir, "best_embeddings-MR1_comparison.png")
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
     plt.show()
