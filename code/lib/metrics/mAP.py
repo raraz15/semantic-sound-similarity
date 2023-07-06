@@ -1,55 +1,9 @@
-"""Script to contain the metrics used for evaluation."""
+""" This script contains functions to calculate the mean average precision (MAP)
+and MAP@n metrics."""
 
-import re
-
-# TODO: ncdg
+from .utils import evaluate_relevance, find_indices_containing_label
 
 ####################################################################################
-# Utilities
-
-def get_labels(fname, df):
-    """Returns the set of labels of the fname from the dataframe."""
-
-    return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
-
-def find_indices_containing_label(label, df):
-    """Returns the list of fnames that contain the label. Uses a regular expression to
-    find the label in the labels column."""
-
-    label = re.escape(label)
-    # Create the pattern to search the label in the labels column
-    pattern = ""
-    for p in ["\A"+label+",|", ","+label+",|", ","+label+"\Z", r"|\A"+label+r"\Z"]:
-        pattern += p
-    pattern = re.compile(r"(?:"+pattern+r")") # Compile the pattern with matching group
-    return df["labels"].str.contains(pattern)
-
-def evaluate_relevance(query_fname, result, df, query_label=None):
-    """Evaluates the relevance of a result for a query. By default, A result is considered
-    relevant if it has at least one label in common with the query. If a query label is 
-    provided, a result is considered relevant if it contains the label. Relevance: list of 
-    relevance values (1: relevant, 0: not relevant)."""
-
-    # Get the labels of the query
-    query_item_labels = get_labels(query_fname, df)
-    # Evaluate the relevance of each retrieved document
-    relevance = []
-    for ref_result in result:
-        ref_fname = ref_result["result_fname"]
-        ref_item_labels = get_labels(ref_fname, df)
-        if query_label is None:
-            # Find if the retrieved element is relevant
-            if len(query_item_labels.intersection(ref_item_labels)) > 0:
-                relevance.append(1)
-            else:
-                relevance.append(0)
-        else:
-            # Find if the retrieved element contains the label
-            if query_label in ref_item_labels:
-                relevance.append(1)
-            else:
-                relevance.append(0)
-    return relevance
 
 def precision_at_k(relevance, k):
     """ Calculate precision@k where k is and index in range(0,len(relevance)). Since 
@@ -57,12 +11,13 @@ def precision_at_k(relevance, k):
     relevance values up to k, which is equal to sum of tps up to k, divided by the 
     length (tp+fp)."""
 
+    assert k>=0 and k<len(relevance), "k must be an index in range(0,len(relevance))"
     assert set(relevance).issubset({0,1}), "Relevance values must be 0 or 1"
 
     return sum(relevance[:k+1])/(k+1)
 
 ####################################################################################
-# Average Precision and Average Precision@n
+# Average Precision
 
 def average_precision(relevance, n_relevant):
     """ Calculate the average presicion for a list of relevance values. The average 
@@ -81,6 +36,9 @@ def average_precision(relevance, n_relevant):
         total = sum([rel_k*precision_at_k(relevance,k) for k,rel_k in enumerate(relevance)])
         ap = total / n_relevant
     return ap
+
+####################################################################################
+# AP@n
 
 def average_precision_at_n(relevance, n, n_relevant=None):
     """ Calculate the average presicion@n for a list of relevance values. The average 
@@ -126,7 +84,7 @@ def test_average_precision_at_n():
             sys.exit(1)
 
 ####################################################################################
-# AP@n Related Metrics
+# Related Metrics
 
 def instance_based_map_at_n(results_dict, df, n, n_relevant=None):
     """ Calculates the mean of the average precision@n (mAP@n) over the whole dataset. 
@@ -203,26 +161,3 @@ def family_based_map_at_n(label_maps, families=dict()):
     # Sort the family maps by the mAP@n value
     family_maps.sort(key=lambda x: x[1], reverse=True)
     return family_maps, ["family", "map"]
-
-####################################################################################
-# Ranking Related Metrics
-
-# TODO: MR1 NaNs
-def R1(query_fname, result, df):
-    query_labels = get_labels(query_fname, df)
-    for i,ref_result in enumerate(result):
-        ref_fname = ref_result["result_fname"]
-        ref_labels = get_labels(ref_fname, df)
-        # Find if there is a match in the labels
-        if len(query_labels.intersection(ref_labels)) > 0:
-            return i # Return the rank of the first match
-    return None # No match
-
-def calculate_MR1(results_dict, df):
-    # Calculate the R1 for each query
-    r1s = [R1(query_fname, result, df) for query_fname, result in results_dict.items()]
-    # Remove entries with no matches
-    r1s = [x for x in r1s if x]
-    # Calculate the mean
-    mr1 = sum(r1s)/len(r1s)
-    return mr1
