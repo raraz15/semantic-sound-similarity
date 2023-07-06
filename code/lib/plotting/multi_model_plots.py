@@ -19,6 +19,20 @@ DATASET_NAME = "FSD50K.eval_audio"
 
 # TODO: how to encode variation and the search?
 
+def save_function(save_fig, save_dir, default_name, fig, models):
+
+    if save_fig:
+        if save_dir == "":
+            raise("Please provide a save directory if you want to save the figure.")
+        os.makedirs(save_dir, exist_ok=True)
+        fig_path = os.path.join(save_dir, default_name)
+        print(f"Saving figure to {fig_path}")
+        fig.savefig(fig_path)
+        txt_path = os.path.splitext(fig_path)[0]+".txt"
+        with open(txt_path, "w") as infile:
+            for model in models:
+                infile.write(f"{model[0]}-{model[1]}\n")
+
 ####################################################################################################
 # mAP
 
@@ -70,18 +84,9 @@ def plot_micro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_nam
     ax.set_ylim([0,1])
     ax.grid()
     ax.legend(loc="best", fontsize=10, title_fontsize=11, fancybox=True)
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, "best_embeddings-micro_mAP@15-comparison.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
-        txt_path = os.path.splitext(fig_path)[0]+".txt"
-        with open(txt_path, "w") as infile:
-            for model in models:
-                infile.write(f"{model[0]}-{model[1]}\n")
+
+    # Save and show
+    save_function(save_fig, save_dir, "best_embeddings-micro_mAP@15-comparison.png", fig, models)
     plt.show()
 
 def plot_macro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
@@ -131,17 +136,8 @@ def plot_macro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_nam
     ax.set_ylim([0,1])
     ax.grid()
     ax.legend(loc="best", fontsize=10, title_fontsize=11, fancybox=True)
-    if save_fig:
-        if save_dir == "":
-            raise("Please provide a save directory if you want to save the figure.")
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, "best_embeddings-macro_mAP@15-comparison.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
-        txt_path = os.path.splitext(fig_path)[0]+".txt"
-        with open(txt_path, "w") as infile:
-            for model in models:
-                infile.write(f"{model[0]}-{model[1]}\n")
+
+    save_function(save_fig, save_dir, "best_embeddings-macro_mAP@15-comparison.png", fig, models)
     plt.show()
 
 def plot_family_map_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
@@ -191,19 +187,8 @@ def plot_family_map_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_N
         if i==0:
             ax[i].legend(loc="upper center", fontsize=10, title_fontsize=11, fancybox=True, ncol=len(models))
 
-    if save_fig:
-        if save_dir == "":
-            raise("Please provide a save directory if you want to save the figure.")
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, "family_based_mAP@15-comparison.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
-        txt_path = os.path.splitext(fig_path)[0]+".txt"
-        with open(txt_path, "w") as infile:
-            for model in models:
-                infile.write(f"{model[0]}-{model[1]}\n")
+    save_function(save_fig, save_dir, "family_based_mAP@15-comparison.png", fig, models)
     plt.show()
-
 
 ####################################################################################################
 # MR1
@@ -252,11 +237,6 @@ def plot_mr1_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATA
     ax.legend(loc=4, fontsize=10, title="Embedding, Search Combinations", 
             title_fontsize=11, 
             fancybox=True)
-    if save_fig:
-        if save_dir == "":
-            raise("Please provide a save directory if you want to save the figure.")
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, "best_embeddings-MR1_comparison.png")
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
+
+    save_function(save_fig, save_dir, "best_embeddings-MR1_comparison.png", fig, models)
     plt.show()
