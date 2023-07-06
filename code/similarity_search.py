@@ -22,8 +22,13 @@ def dot_product_search(query, corpus, N):
     Returns a dictionary with the query fname and a list of dictionaries with 
     the results and their scores."""
 
+    # Get the query embedding and path
     query_embed, query_path = query[0], query[1]
-    assert len(query_embed.shape)==1, f"To use dot product search, queries should be aggregated! {query_embed.shape}"
+    assert len(query_embed.shape)==1, "To use dot product search, "\
+        f"queries should be aggregated! {query_embed.shape}"
+    # If N is -1, return all the results
+    if N==-1:
+        N = len(corpus)
     # For each reference in the dataset, compute the dot product with the query
     products = [np.dot(query_embed, ref[0]) for ref in corpus]
     # Get the indices of the top N similar elements in the corpus
@@ -40,6 +45,10 @@ def nn_search(query, corpus, N):
     Assumes that the query is aggregated and the query is removed from the corpus. 
     Returns a dictionary with the query fname and a list of dictionaries with 
     the results and their scores."""
+
+    # If N is -1, return all the results
+    if N==-1:
+        N = len(corpus)
 
     query_embed, query_path = query[0], query[1]
     # For each reference in the dataset, compute the distance to the query
@@ -73,7 +82,7 @@ if __name__=="__main__":
                         "--search", 
                         type=str, 
                         choices=["dot", "nn"], 
-                        default="dot", 
+                        default="nn", 
                         help="Type of similarity search algorithm.")
     parser.add_argument('-N', 
                         type=int, 
