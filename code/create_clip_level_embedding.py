@@ -63,6 +63,11 @@ if __name__=="__main__":
     parser.add_argument('--plot-scree', 
                         action='store_true', 
                         help="Plot variance contributions of PCA components.")
+    parser.add_argument("--output-dir",
+                        type=str,
+                        default="",
+                        help="Path to output directory. If not provided, "
+                        "a directory will be created in the same directory as the embed_dir.")
     args=parser.parse_args()
 
     if args.normalization and args.no_normalization:
@@ -89,9 +94,14 @@ if __name__=="__main__":
     print(f"{len(embeddings)} embeddings were read.")
     print(f"Total pre-processing time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
-    # Create the output dir
+    # Determine PCA components
     n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
-    output_dir = f"{args.embed_dir}-Agg_{args.a}-PCA_{n_components}-Norm_{not args.no_normalization}"
+
+    # Determine the output directory and create it
+    if args.output_dir=="":
+        output_dir = f"{args.embed_dir}-Agg_{args.a}-PCA_{n_components}-Norm_{not args.no_normalization}"
+    else:
+        output_dir = os.path.join(args.output_dir, os.path.basename(args.embed_dir))
     os.makedirs(output_dir, exist_ok=True)
     print(f"Output directory: {output_dir}")
 
