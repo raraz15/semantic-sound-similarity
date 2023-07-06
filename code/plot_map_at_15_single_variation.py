@@ -36,7 +36,7 @@ if __name__=="__main__":
 
     # Create the save directory if it does not exist
     if args.save_dir == "":
-        args.save_dir = os.path.join(FIGURES_DIR, args.model)
+        args.save_dir = os.path.join(FIGURES_DIR, args.model, args.variation, args.search)
 
     # Plot the figures
     plot_label_based_map_at_15((args.model, args.variation, args.search),

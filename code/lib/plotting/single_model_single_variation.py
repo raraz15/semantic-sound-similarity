@@ -22,7 +22,7 @@ def plot_label_based_map_at_15(model_variation_search, eval_dir, dataset_name="F
     # Get the path to the label-based mAP@15
     variation_dir = os.path.join(eval_dir, dataset_name, model+"-"+variation)
     map_path = os.path.join(variation_dir, search, "labels_mAP@15.csv")
-    embedding_search = variation + "-" + search
+    # embedding_search = variation + "-" + search
 
     # Read the label-based mAP@15
     labels_map = pd.read_csv(map_path)
@@ -51,7 +51,7 @@ def plot_label_based_map_at_15(model_variation_search, eval_dir, dataset_name="F
             print("Please provide a save directory if you want to save the figure.")
             sys.exit(1)
         os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, f"{embedding_search}-label_based_mAP@15.png")
+        fig_path = os.path.join(save_dir, "label_based_mAP@15.png")
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
         plt.close()
@@ -69,7 +69,7 @@ def plot_family_based_map_at_15(model_variation_search, eval_dir, dataset_name="
     # Get the path to the family-based mAP@15
     variation_dir = os.path.join(eval_dir, dataset_name, model+"-"+variation)
     map_path = os.path.join(variation_dir, search, "families_mAP@15.csv")
-    embedding_search = variation + "-" + search
+    #embedding_search = variation + "-" + search
 
     # Read the family-based mAP@15
     labels_map = pd.read_csv(map_path)
@@ -101,7 +101,7 @@ def plot_family_based_map_at_15(model_variation_search, eval_dir, dataset_name="
             print("Please provide a save directory if you want to save the figure.")
             sys.exit(1)
         os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, f"{embedding_search}-family_based_mAP@15.png")
+        fig_path = os.path.join(save_dir, "family_based_mAP@15.png")
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
         plt.close()
