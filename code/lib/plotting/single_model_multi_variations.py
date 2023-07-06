@@ -10,6 +10,10 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
+from ..directories import EVAL_DIR
+
+DATASET_NAME = "FSD50K.eval_audio"
+
 ###################################################################################################
 # Utility functions
 
@@ -41,7 +45,7 @@ def sort_variation_paths(model, variation_paths):
 ###################################################################################################
 # Micro-averaged map@k
 
-def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
+def plot_micro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and for each variation inside eval_dir,
     plots all the the micro-averaged AP@15 values in a single plot ."""
 
@@ -130,7 +134,7 @@ def plot_micro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_
 ####################################################################################################
 # Macro-averaged mAP@k
 
-def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
+def plot_macro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and for each model variation inside eval_dir, 
     plots the Class-averaged mAP@15 in a single plot."""
 
@@ -219,7 +223,7 @@ def plot_macro_map_at_15_comparisons(model, eval_dir, dataset_name="FSD50K.eval_
 ###################################################################################################
 # MR1
 
-def plot_mr1(model, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
+def plot_mr1(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and plots the MR1 for all the variations of the model."""
 
     default_fig_name = "Embedding Processing and Search Algorithm " +\

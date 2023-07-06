@@ -12,11 +12,15 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
+from ..directories import EVAL_DIR
+
+DATASET_NAME = "FSD50K.eval_audio"
+
 ####################################################################################################
 # mAP
 
 # TODO: how to encode variation and the search?
-def plot_micro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
+def plot_micro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a list of [(embedding,search)] and plots all the Micro Averaged mAP@k in the same figure."""
 
     default_fig_name = f"Embedding Performances using Instance-Based mAP@15 (Micro-Averaged) on {dataset_name}"
@@ -78,7 +82,7 @@ def plot_micro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_na
                 infile.write(f"{model[0]}-{model[1]}\n")
     plt.show()
 
-def plot_macro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
+def plot_macro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a list of [(embedding,search)] and plots all the Macro Averaged mAP@15 in the same figure."""
 
     default_fig_name = f"Embedding Performances using Label-Based mAP@15 (Macro-Averaged) on {dataset_name}"
@@ -142,7 +146,7 @@ def plot_macro_map_comparisons_multimodel(models, eval_dir, dataset_name, fig_na
 ####################################################################################################
 # MR1
 
-def plot_mr1_comparisons_multimodel(models, eval_dir, dataset_name, fig_name="", save_fig=False, save_dir=""):
+def plot_mr1_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a list of models and plots the mAP@k for all the variations of the model.
     Each model must be a tupple of (model_name, [variations], search_algorithm)"""
 

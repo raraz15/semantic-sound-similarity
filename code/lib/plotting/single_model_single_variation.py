@@ -10,7 +10,11 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
-def plot_label_based_map_at_15(model_variation_search, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
+from ..directories import EVAL_DIR
+
+DATASET_NAME = "FSD50K.eval_audio"
+
+def plot_label_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name, aggregation variation and search name and plots the label-based mAP@15 for it.
     That is, the mAP@15 is plotted for each individual label."""
 
@@ -54,7 +58,7 @@ def plot_label_based_map_at_15(model_variation_search, eval_dir, dataset_name="F
         fig.savefig(fig_path)
         plt.close()
 
-def plot_family_based_map_at_15(model_variation_search, eval_dir, dataset_name="FSD50K.eval_audio", fig_name="", save_fig=False, save_dir=""):
+def plot_family_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name, aggregation variation and search name and plots the label_family-based mAP@15 for it.
     That is, the mAP@15 is plotted for each individual label family."""
 
