@@ -17,6 +17,9 @@ DATASET_NAME = "FSD50K.eval_audio"
 ###################################################################################################
 # Utility functions
 
+def _get_pca(variation):
+    return int(variation.split("-")[1].split("_")[1])
+
 def sort_variation_paths(model, variation_paths):
     # Sort based on the aggregation method, PCA, norm
 
@@ -36,7 +39,7 @@ def sort_variation_paths(model, variation_paths):
                 variation = var_path.split(model+"-")[1]
                 if agg in variation:
                     agg_sorted.append(var_path)
-            agg_sorted = sorted(agg_sorted, key=lambda x: int(x.split(model+"-")[1].split("-")[1].split("_")[1]))
+            agg_sorted = sorted(agg_sorted, key=lambda x: _get_pca(x.split(model+"-")[1]))
             new_sort.extend(agg_sorted)
         return new_sort
     else:
@@ -218,6 +221,67 @@ def plot_macro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATA
     _save_function(save_fig, save_dir, "macro_map@15-comparisons.png", fig)
     plt.show()
 
+def plot_macro_map_at_15_PCA_comparisons(model_search, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
+    """ Takes a model name, a fixed aggregation, normalization, and fixed search type 
+    and plots the map@15 of each model variation inside eval_dir following these parameters in the same
+    plot.
+    """
+
+    model, agg, norm, search = model_search
+
+    default_fig_name = f"Effect of the Number of PCA Components on Similarity Performace by "+\
+                f"Label-Averaged mAP@15\n{model} Evaluated on {dataset_name}"
+
+    # Find all the variation_paths of the model
+    wildcard = f"{model}-Agg_{agg}-PCA_*-Norm_{norm}"
+    variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, wildcard)))
+    # Sort by PCA components
+    variation_paths = sort_variation_paths(model, variation_paths)
+
+    # Read all the maps
+    variations, maps = [], []
+    for variation_path in variation_paths:
+        map_path = os.path.join(variation_path, search, "balanced_mAP@15.txt")
+        with open(map_path, "r") as in_f:
+            balanced_map_at_15 = float(in_f.read())
+        full_model_name = variation_path.split("/")[-1]
+        variation = "-".join(full_model_name.split("-")[-3:])
+        maps.append(balanced_map_at_15)
+        variations.append(variation)
+
+    # Determine some plot parameters
+    fig_name = fig_name if fig_name else default_fig_name
+
+    # Plot the maps
+    fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
+    fig.suptitle(default_fig_name, fontsize=19, weight='bold')
+
+    xticks = []
+    for i,(variation,balanced_mAP) in enumerate(zip(variations, maps)):
+        ax.bar(i,
+                height=balanced_mAP, 
+                width=0.85,
+                color=COLORS[0],
+                edgecolor='k')
+        ax.text(i, 
+                balanced_mAP+0.01, 
+                f"{balanced_mAP:.3f}", 
+                ha='center', 
+                va='bottom', 
+                fontsize=10)
+        xticks.append(_get_pca(variation))
+
+    ax.tick_params(axis='y', which='major', labelsize=11)
+    ax.tick_params(axis='x', which='major', labelsize=12)
+    ax.set_xticks(np.arange(len(xticks)), xticks)
+    ax.set_yticks(np.arange(0,1.05,0.05))
+    ax.grid()
+    ax.set_ylabel("mAP@15 (↑)", fontsize=15)
+    ax.set_xlabel("Number of PCA Components", fontsize=15)
+    ax.set_ylim([0,1])
+
+    _save_function(save_fig, save_dir, "macro_map@15-PCA_comparisons.png", fig)
+    plt.show()
 ###################################################################################################
 # MR1
 
