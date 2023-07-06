@@ -82,6 +82,12 @@ if __name__=="__main__":
     parser.add_argument('--plot-scree', 
                         action='store_true', 
                         help="Plot variance contributions of PCA components.")
+    parser.add_argument("--output-dir",
+                        type=str,
+                        default="",
+                        help="Path to output directory. If not provided, "
+                        "a directory will be created in the same directory "
+                        "as the embed_dir.")
     args = parser.parse_args()
 
     # Read all the embeddins
@@ -137,9 +143,14 @@ if __name__=="__main__":
     total_time = time.time()-start_time
     print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
+    # Determine PCA components
+    n_components = args.N if args.N!=-1 else embeddings.shape[1]
+
     # Create the output dir
-    n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
-    output_dir = f"{args.embed_dir}-PCA_{n_components}"
+    if args.output_dir == "":
+        output_dir = f"{args.embed_dir}-PCA_{n_components}"
+    else:
+        output_dir = os.path.join(args.output_dir, os.path.basename(args.embed_dir))
     os.makedirs(output_dir, exist_ok=True)
     print(f"Exporting the embeddings to: {output_dir}")
 

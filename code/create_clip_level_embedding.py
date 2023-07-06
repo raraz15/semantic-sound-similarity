@@ -67,7 +67,8 @@ if __name__=="__main__":
                         type=str,
                         default="",
                         help="Path to output directory. If not provided, "
-                        "a directory will be created in the same directory as the embed_dir.")
+                        "a directory will be created in the same directory "
+                        "as the embed_dir.")
     args=parser.parse_args()
 
     if args.normalization and args.no_normalization:
