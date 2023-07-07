@@ -11,7 +11,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import streamlit as st
 import pandas as pd
 
-from lib.metrics import evaluate_relevance, average_precision
+from lib.metrics import evaluate_relevance, average_precision_at_n
 from lib.utils import find_indices_containing_label, get_labels_of_fname
 from lib.directories import *
 
@@ -117,25 +117,25 @@ def display_query_and_similar_sounds(query_fname, df, model_result_dcts, N=15, h
                 # Calculate and display the relevance and theaverage precision for the query sound with this embedding-search combination
                 if query_label is None: # If a query label is provided, check for inclusion
                     relevance_intersection = evaluate_relevance(query_fname, 
-                            model_result_dct['results'][query_fname][:N], 
-                            df)
-                    ap_at_15_intersection = average_precision(relevance_intersection)
+                                                                model_result_dct['results'][query_fname][:N], 
+                                                                df)
+                    ap_at_15_intersection = average_precision_at_n(relevance_intersection, n=N)
                     st.write(f":green[{sum(relevance_intersection)}] sound(s) share a label with the query sound. "
                             f"[AP@{N}: **{ap_at_15_intersection:.3f}**]")
                 else: # If a query label is provided, check for inclusion and intersection
                     # Inclusion
                     relevance_inclusion = evaluate_relevance(query_fname, 
-                                                model_result_dct['results'][query_fname][:N], 
-                                                df,
-                                                query_label=query_label)
-                    ap_at_15_inclusion = average_precision(relevance_inclusion)
+                                                            model_result_dct['results'][query_fname][:N], 
+                                                            df,
+                                                            query_label=query_label)
+                    ap_at_15_inclusion = average_precision_at_n(relevance_inclusion, n=N)
                     st.write(f":blue[{sum(relevance_inclusion)}] sound(s) contain the query label. "
                              f"[AP@{N}: **{ap_at_15_inclusion:.3f}**]")
                     # Intersection
                     relevance_intersection = evaluate_relevance(query_fname, 
-                                                model_result_dct['results'][query_fname][:N], 
-                                                df)
-                    ap_at_15_intersection = average_precision(relevance_intersection)
+                                                                model_result_dct['results'][query_fname][:N], 
+                                                                df)
+                    ap_at_15_intersection = average_precision_at_n(relevance_intersection, n=N)
                     # See how many items can be potentially relevant
                     diff = [1 if (x==0 and y==1) else 0 for x,y in zip(relevance_inclusion, relevance_intersection)]
                     st.write(f":green[{sum(diff)}] sound(s) share a label with the query sound other than the query label. "
@@ -263,10 +263,15 @@ if __name__=="__main__":
     model_results_dcts = load_results(paths)
 
     # Display general information
-    st.title("Evaluate Sound Similarity Results for Embeddings")
-    st.header("Choose Sound Categories and Click The Speaker Icon.")
-    st.write("This will select a random sound containing all the categories and display \
-             the top similar sounds returned by each embedding.")
+    st.title("Sound Similarity Performances of Embeddings and Search Algorithms")
+    st.write("This application is designed to simulate the Sound Similarity "
+            "functionality of Audio Information Retrieval (AIR) Systems. "
+            "Sound collection is taken from the [FSD50K dataset](https://zenodo.org/record/4060432#.YJZ6Z-hKjIU).")
+    st.header("Choose A Sound Category")
+    st.write("This will make a Query-by-Tag to the FSD50K dataset and sample a random sound with that label. "
+            "The chosen AIR Systems will then provide top 15 similar sounds to the query.")
+    # "" and Click The Speaker IconThis will select a random sound containing all the categories and display \
+    #          the top similar sounds returned by each embedding.")
 
     # Select sound categories
     sound_classes = st.multiselect("FSD50K Sound Classes", 
