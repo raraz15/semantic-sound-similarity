@@ -58,12 +58,14 @@ def _save_function(save_fig, save_dir, default_name, fig):
 ###################################################################################################
 # Micro-averaged map@k
 
-def plot_micro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
+def plot_micro_map_at_15_comparisons(model, 
+                                     eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
+                                     fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and for each variation inside eval_dir,
     plots all the the micro-averaged AP@15 values in a single plot ."""
 
-    default_fig_name = "Embedding Processing and Search Algorithm Performances by "+ \
-                f"Instance-Averaged AP@15 Values\n{model} Evaluated on {dataset_name}"
+    default_fig_name = f"Sound Similarity Performances of AIR Systems using " \
+                        f"Instance-Based mAP@15\n{model} Evaluated on {dataset_name}"
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
@@ -85,7 +87,7 @@ def plot_micro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATA
 
     # Determine some plot parameters
     if len(searches)>1:
-        positions = np.linspace(-0.25, 0.25, len(searches))
+        positions = np.linspace(-0.2, 0.2, len(searches))
         delta = positions[1]-positions[0]
     else:
         positions = [0]
@@ -115,25 +117,27 @@ def plot_micro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATA
                             width=delta*0.6, 
                             label=label, 
                             color=COLORS[j], 
-                            edgecolor='k')
-            ax.text(z+positions[j], 
+                            edgecolor='k',
+                            linewidth=1.2)
+            ax.text(z+positions[j]+0.05*(-1)**(j+1) , 
                             map+0.01, 
                             f"{map:.3f}", 
                             ha='center', 
                             va='bottom', 
                             fontsize=10)
 
-    ax.set_title(f"Page 1 Results", fontsize=17)
+    #ax.set_title(f"Page 1 Results", fontsize=17)
     ax.tick_params(axis='y', which='major', labelsize=11)
     ax.tick_params(axis='x', which='major', labelsize=10)
     ax.set_xticks(np.arange(len(xticks)), xticks)
     ax.set_yticks(np.arange(0,1.05,0.05))
-    ax.grid()
-    ax.set_ylabel("mAP@15 (↑)", fontsize=15)
-    ax.set_xlabel("Processing Parameters", fontsize=15)
-    ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
-                        title_fontsize=10, fancybox=True)
     ax.set_ylim([0,1])
+    ax.set_xlim([-0.75, len(xticks)-0.25])
+    ax.set_ylabel("mAP@15 (↑)", fontsize=15)
+    ax.set_xlabel("Embedding Processing Parameters", fontsize=15)
+    ax.grid(alpha=0.5)
+    ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
+            title_fontsize=10, fancybox=True)
 
     _save_function(save_fig, save_dir, "micro_mAP@15-comparisons.png", fig)
     plt.show()
@@ -141,7 +145,9 @@ def plot_micro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATA
 ####################################################################################################
 # Macro-averaged mAP@k
 
-def plot_macro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
+def plot_macro_map_at_15_comparisons(model, 
+                                     eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
+                                     fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and for each model variation inside eval_dir, 
     plots the Class-averaged mAP@15 in a single plot."""
 
@@ -198,7 +204,8 @@ def plot_macro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATA
                             width=delta*0.6, 
                             label=label, 
                             color=COLORS[j], 
-                            edgecolor='k')
+                            edgecolor='k',
+                            linewidth=1.2)
             ax.text(z+positions[j], 
                             map+0.01, 
                             f"{map:.3f}", 
@@ -211,7 +218,7 @@ def plot_macro_map_at_15_comparisons(model, eval_dir=EVAL_DIR, dataset_name=DATA
     ax.tick_params(axis='x', which='major', labelsize=10)
     ax.set_xticks(np.arange(len(xticks)), xticks)
     ax.set_yticks(np.arange(0,1.05,0.05))
-    ax.grid()
+    ax.grid(alpha=0.5)
     ax.set_ylabel("mAP@15 (↑)", fontsize=15)
     ax.set_xlabel("Processing Parameters", fontsize=15)
     ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
@@ -268,7 +275,8 @@ def plot_macro_map_at_15_PCA_comparisons(model_search, eval_dir=EVAL_DIR, datase
                 height=balanced_mAP, 
                 width=0.85,
                 color=COLORS[0],
-                edgecolor='k')
+                edgecolor='k',
+                linewidth=1.2)
         ax.text(i, 
                 balanced_mAP+0.01, 
                 f"{balanced_mAP:.3f}", 
@@ -281,16 +289,18 @@ def plot_macro_map_at_15_PCA_comparisons(model_search, eval_dir=EVAL_DIR, datase
     ax.tick_params(axis='x', which='major', labelsize=12)
     ax.set_xticks(np.arange(len(xticks)), xticks)
     ax.set_yticks(np.arange(0,1.05,0.05))
-    ax.grid()
+    ax.grid(alpha=0.5)
     ax.set_ylabel("mAP@15 (↑)", fontsize=15)
     ax.set_xlabel("Number of PCA Components", fontsize=15)
     ax.set_ylim([0,1])
 
     _save_function(save_fig, save_dir, "macro_map@15-PCA_comparisons.png", fig)
     plt.show()
+
 ###################################################################################################
 # MR1
 
+# TODO: since we dont compute MR1 for all models, this function is not useful anymore
 def plot_mr1(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and plots the MR1 for all the variations of the model."""
 
@@ -345,7 +355,8 @@ def plot_mr1(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", s
                 width=0.35, 
                 label=label, 
                 color=COLORS[j], 
-                edgecolor='k')
+                edgecolor='k',
+                linewidth=1.2)
             ax.text(i+positions[j], 
                     mr1+0.01, 
                     f"{mr1:.2f}", 
@@ -363,7 +374,7 @@ def plot_mr1(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", s
     ax.set_xlabel("Embedding Processing Parameters", fontsize=15)
     ax.legend(loc=4, fontsize=11, title="Search Algorithms", 
               title_fontsize=12, fancybox=True)
-    ax.grid()
+    ax.grid(alpha=0.5)
 
     _save_function(save_fig, save_dir, "mr1-comparisons.png", fig)
     plt.show()
