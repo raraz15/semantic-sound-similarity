@@ -18,11 +18,11 @@ for file in "$SIMILARITY_DIR/"*; do # for each similarity dir
         echo "$file"
         if [[ "$file" == *"fs-essentia-extractor_legacy-"* ]]; then
             # Run the script
-            python code/evaluate.py $file/nn/similarity_results.json #--metrics=$2
+            python code/evaluate_map_at_15.py $file/nn/similarity_results.json #--metrics=$2
         else
             # Run the script for each search type
             for search in "${searches[@]}"; do
-                python code/evaluate.py $file/$search/similarity_results.json #--metrics=$2
+                python code/evaluate_map_at_15.py $file/$search/similarity_results.json #--metrics=$2
             done
         fi
     fi
