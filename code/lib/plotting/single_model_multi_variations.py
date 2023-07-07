@@ -58,18 +58,31 @@ def _save_function(save_fig, save_dir, default_name, fig):
 ###################################################################################################
 # Micro-averaged map@k
 
-def plot_micro_map_at_15_comparisons(model, 
+
+def plot_map_at_15_comparisons(model, map_type,
                                      eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
                                      fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and for each variation inside eval_dir,
     plots all the the micro-averaged AP@15 values in a single plot ."""
 
-    default_fig_name = f"Sound Similarity Performances of AIR Systems using " \
-                        f"Instance-Based mAP@15\n{model} Evaluated on {dataset_name}"
+    # Determine the file name and figure name
+    # TODO: Instead of Label Class?
+    if map_type=="micro":
+        file_name = "micro_mAP@15.txt"
+        default_fig_name = f"Sound Similarity Performances of AIR Systems using " \
+                            f"Instance-Based mAP@15\n{model} Evaluated on {dataset_name}"
+        figure_save_name = "micro_mAP@15-comparisons.png"
+    elif map_type=="macro":
+        file_name = "balanced_mAP@15.txt"
+        default_fig_name = f"Sound Similarity Performances of AIR Systems using " \
+                            f"Label-Based mAP@15\n{model} Evaluated on {dataset_name}"
+        figure_save_name = "macro_map@15-comparisons.png"
+    else:
+        raise("map_type must be one of 'micro', 'macro'")
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
-    # Sort further
+    # Sort further by PCA
     variation_paths = sort_variation_paths(model, variation_paths)
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
@@ -78,7 +91,7 @@ def plot_micro_map_at_15_comparisons(model,
     map_dict = {search: [] for search in searches}
     for search in searches:
         for model_dir in variation_paths:
-            map_path = os.path.join(model_dir, search, "micro_mAP@15.txt")
+            map_path = os.path.join(model_dir, search, file_name)
             with open(map_path, "r") as in_f:
                 micro_map_at_15 = float(in_f.read())
             full_model_name = model_dir.split("/")[-1]
@@ -113,18 +126,18 @@ def plot_micro_map_at_15_comparisons(model,
             else:
                 label = ""
             ax.bar(z+positions[j], 
-                            height=map, 
-                            width=delta*0.6, 
-                            label=label, 
-                            color=COLORS[j], 
-                            edgecolor='k',
-                            linewidth=1.2)
+                    height=map, 
+                    width=delta*0.6, 
+                    label=label, 
+                    color=COLORS[j], 
+                    edgecolor='k',
+                    linewidth=1.2)
             ax.text(z+positions[j]+0.05*(-1)**(j+1) , 
-                            map+0.01, 
-                            f"{map:.3f}", 
-                            ha='center', 
-                            va='bottom', 
-                            fontsize=10)
+                    map+0.01, 
+                    f"{map:.3f}", 
+                    ha='center', 
+                    va='bottom', 
+                    fontsize=10)
 
     #ax.set_title(f"Page 1 Results", fontsize=17)
     ax.tick_params(axis='y', which='major', labelsize=11)
@@ -139,94 +152,11 @@ def plot_micro_map_at_15_comparisons(model,
     ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
             title_fontsize=10, fancybox=True)
 
-    _save_function(save_fig, save_dir, "micro_mAP@15-comparisons.png", fig)
+    _save_function(save_fig, save_dir, figure_save_name, fig)
     plt.show()
 
 ####################################################################################################
 # Macro-averaged mAP@k
-
-def plot_macro_map_at_15_comparisons(model, 
-                                     eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                                     fig_name="", save_fig=False, save_dir=""):
-    """Takes a model name and for each model variation inside eval_dir, 
-    plots the Class-averaged mAP@15 in a single plot."""
-
-    default_fig_name = "Embedding Processing and Search Algorithm Performances by "+\
-                f"Label-Averaged mAP@15\n{model} Evaluated on {dataset_name}"
-
-    # Find all the variation_paths of the model
-    variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
-    # Sort further
-    variation_paths = sort_variation_paths(model, variation_paths)
-    # Read one variation's folder to get the searches
-    searches = os.listdir(variation_paths[0])
-
-    # Read all the maps
-    map_dict = {search: [] for search in searches}
-    for search in searches:
-        for variation_path in variation_paths:
-            map_path = os.path.join(variation_path, search, "balanced_mAP@15.txt")
-            with open(map_path, "r") as in_f:
-                balanced_map_at_15 = float(in_f.read())
-            full_model_name = variation_path.split("/")[-1]
-            variation = "-".join(full_model_name.split("-")[-3:])
-            map_dict[search].append((variation, balanced_map_at_15))
-
-    # Determine some plot parameters
-    if len(searches)>1:
-        positions = np.linspace(-0.25, 0.25, len(searches))
-        delta = positions[1]-positions[0]
-    else:
-        positions = [0]
-        delta = 1
-    fig_name = fig_name if fig_name else default_fig_name
-
-    # Plot the maps
-    fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(fig_name, fontsize=19, weight='bold')
-    xticks = []
-    for j,search in enumerate(map_dict.keys()):
-        for z,(variation,map) in enumerate(map_dict[search]):
-            if j==0:
-                if "essentia" not in variation:
-                    xticks.append(variation.replace("-","\n").replace("Agg_", ""))
-                else:
-                    xticks.append(variation.replace("essentia-extractor_legacy-", ""))
-            if z==0:
-                if search=="dot":
-                    label = "Dot Product"
-                elif search=="nn":
-                    label = "Nearest Neighbors"
-            else:
-                label = ""
-            ax.bar(z+positions[j], 
-                            height=map, 
-                            width=delta*0.6, 
-                            label=label, 
-                            color=COLORS[j], 
-                            edgecolor='k',
-                            linewidth=1.2)
-            ax.text(z+positions[j], 
-                            map+0.01, 
-                            f"{map:.3f}", 
-                            ha='center', 
-                            va='bottom', 
-                            fontsize=10)
-
-    ax.set_title(f"Page 1 Results", fontsize=17)
-    ax.tick_params(axis='y', which='major', labelsize=11)
-    ax.tick_params(axis='x', which='major', labelsize=10)
-    ax.set_xticks(np.arange(len(xticks)), xticks)
-    ax.set_yticks(np.arange(0,1.05,0.05))
-    ax.grid(alpha=0.5)
-    ax.set_ylabel("mAP@15 (↑)", fontsize=15)
-    ax.set_xlabel("Processing Parameters", fontsize=15)
-    ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
-                        title_fontsize=10, fancybox=True)
-    ax.set_ylim([0,1])
-
-    _save_function(save_fig, save_dir, "macro_map@15-comparisons.png", fig)
-    plt.show()
 
 def plot_macro_map_at_15_PCA_comparisons(model_search, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """ Takes a model name, a fixed aggregation, normalization, and fixed search type 
