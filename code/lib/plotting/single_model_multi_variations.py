@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
-from .utils import save_function, sort_variation_paths, _get_pca
+from .utils import save_function, sort_variation_paths, get_pca
 from ..directories import EVAL_DIR
 
 DATASET_NAME = "FSD50K.eval_audio"
@@ -18,8 +18,9 @@ DATASET_NAME = "FSD50K.eval_audio"
 # Micro-averaged map@k
 
 def plot_map_at_15_comparisons(model, map_type,
-                                     eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                                     fig_name="", save_fig=False, save_dir=""):
+                                eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
+                                fig_name="", save_fig=False, save_dir="",
+                                presentation_mode=False):
     """Takes a model name and for each variation inside eval_dir,
     plots all the the micro-averaged AP@15 values in a single plot ."""
 
@@ -42,6 +43,14 @@ def plot_map_at_15_comparisons(model, map_type,
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))
     # Sort further by PCA
     variation_paths = sort_variation_paths(model, variation_paths)
+    # Deal with presentation mode
+    if presentation_mode:
+        for var_path in variation_paths:
+            n_pca = int(var_path.split("/")[-1].split("-PCA_")[1].split("-Norm")[0])
+            if n_pca<100:
+                if "vggish" in model and n_pca==64:
+                    continue
+                variation_paths.remove(var_path)
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
 
@@ -116,7 +125,9 @@ def plot_map_at_15_comparisons(model, map_type,
 ####################################################################################################
 # Macro-averaged mAP@k
 
-def plot_macro_map_at_15_PCA_comparisons(model_search, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
+def plot_macro_map_at_15_PCA_comparisons(model_search, 
+                                         eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
+                                         fig_name="", save_fig=False, save_dir=""):
     """ Takes a model name, a fixed aggregation, normalization, and fixed search type 
     and plots the map@15 of each model variation inside eval_dir following these parameters in the same
     plot.
@@ -171,7 +182,7 @@ def plot_macro_map_at_15_PCA_comparisons(model_search, eval_dir=EVAL_DIR, datase
                 ha='center', 
                 va='bottom', 
                 fontsize=12)
-        xticks.append(_get_pca(variation))
+        xticks.append(get_pca(variation))
 
     ax.tick_params(axis='y', which='major', labelsize=11)
     ax.tick_params(axis='x', which='major', labelsize=12)
