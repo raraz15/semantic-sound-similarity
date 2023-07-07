@@ -60,7 +60,7 @@ def plot_label_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, datase
         ax[i].set_ylabel("mAP@15")
 
     _save_function(save_fig, save_dir, "label_based_mAP@15.png", fig)
-    plt.close()
+    plt.show()
 
 def plot_family_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a model name, aggregation variation and search name and plots the label_family-based mAP@15 for it.
@@ -103,4 +103,4 @@ def plot_family_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, datas
     ax.grid()
 
     _save_function(save_fig, save_dir, "family_based_mAP@15.png", fig)
-    plt.close()
+    plt.show()
