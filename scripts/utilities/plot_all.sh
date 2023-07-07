@@ -14,7 +14,7 @@ model_names=("fs-essentia-extractor_legacy" "audioset-vggish-3"
 
 for model_name in ${model_names[@]}; do
     echo $model_name
-    python code/plot_evaluation_results_comparisons.py $model_name
+    python code/plot_evaluation_results_comparisons.py $model_name --presentation
 done
 
 #############################################################################
