@@ -1,4 +1,5 @@
-"""This module contains functions to calculate the MR1 metric."""
+""" This script contains functions to calculate R1 and related 
+metrics such as Instance-based MR1, Label-based MR1 and Family-based MR1."""
 
 import numpy as np
 
