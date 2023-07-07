@@ -3,7 +3,7 @@ metrics such as Instance-based MR1, Label-based MR1 and Family-based MR1."""
 
 import numpy as np
 
-from ..utils import get_labels, find_indices_containing_label
+from ..utils import get_labels_of_fname, find_indices_containing_label, get_all_labels
 
 ####################################################################################
 # R1
@@ -14,10 +14,10 @@ def R1(query_fname, result, df, query_label=None):
     the query_label in the result labels. If the query_label is None, it evaluates 
     relevance by intersection of the query labels and the result labels."""
 
-    query_labels = get_labels(query_fname, df)
+    query_labels = get_labels_of_fname(query_fname, df)
     for i,ref_result in enumerate(result):
         ref_fname = ref_result["result_fname"]
-        ref_labels = get_labels(ref_fname, df)
+        ref_labels = get_labels_of_fname(ref_fname, df)
         # Check if the ref is relevant
         if query_label is not None:
             if query_label in ref_labels:
@@ -54,7 +54,7 @@ def instance_based_MR1(embeddings, df):
 def calculate_mr1_for_labels(embeddings, df):
 
     # Get all the labels from the df
-    labels = set([l for ls in df["labels"].apply(lambda x: x.split(",")).to_list() for l in ls])
+    labels = get_all_labels(df)
 
     label_mr1s = []
     for i, query_label in enumerate(labels):

@@ -1,4 +1,4 @@
-from ..utils import get_labels
+from ..utils import get_labels_of_fname
 
 ####################################################################################
 # Utilities
@@ -12,12 +12,12 @@ def evaluate_relevance(query_fname, result, df, query_label=None, cutoff=False):
         Relevance: list of relevance values (1: relevant, 0: not relevant)."""
 
     # Get the labels of the query
-    query_item_labels = get_labels(query_fname, df)
+    query_item_labels = get_labels_of_fname(query_fname, df)
     # Evaluate the relevance of each retrieved document
     relevance = []
     for ref_result in result:
         ref_fname = ref_result["result_fname"]
-        ref_item_labels = get_labels(ref_fname, df)
+        ref_item_labels = get_labels_of_fname(ref_fname, df)
         if query_label is None:
             # Find if the retrieved element is relevant
             if len(query_item_labels.intersection(ref_item_labels)) > 0:

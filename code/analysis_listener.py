@@ -12,7 +12,7 @@ import streamlit as st
 import pandas as pd
 
 from lib.metrics import evaluate_relevance, average_precision
-from lib.utils import find_indices_containing_label, get_labels
+from lib.utils import find_indices_containing_label, get_labels_of_fname
 from lib.directories import *
 
 FREESOUND_STRING = '<iframe frameborder="0" scrolling="no" \
@@ -71,7 +71,7 @@ def display_query_and_similar_sounds(query_fname, df, model_result_dcts, N=15, h
         st.subheader("Random Query Sound")
         st.caption(f"Sound ID: {query_fname}")
         # Get the query labels and highlight the query label if provided
-        query_labels = get_labels(query_fname, df)
+        query_labels = get_labels_of_fname(query_fname, df)
         query_labels = [f":blue[{query_label}]" if label==query_label else label for label in query_labels]
         st.write(f"Labels: {', '.join(query_labels)}")
         # Display the query sound
@@ -152,7 +152,7 @@ def display_query_and_similar_sounds(query_fname, df, model_result_dcts, N=15, h
                     ref_fname = result["result_fname"]
                     st.caption(f"Sound ID: {ref_fname}")
                     # Highlight the common labels between the query and the reference sound
-                    ref_labels = get_labels(ref_fname,df)
+                    ref_labels = get_labels_of_fname(ref_fname,df)
                     for common_label in query_labels.intersection(set(ref_labels)):
                         ref_labels = [f":green[{label}]" if label==common_label else label for label in ref_labels]
                     # Highlight the query label if provided

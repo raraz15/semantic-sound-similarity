@@ -3,7 +3,7 @@ metrics such as Instance-based mAP@n, Label-based mAP@n and Family-based mAP@n."
 
 from .relevance import evaluate_relevance
 from .mAP import precision_at_k
-from ..utils import find_indices_containing_label
+from ..utils import find_indices_containing_label, get_all_labels
 
 ####################################################################################
 # AP@n
@@ -79,7 +79,7 @@ def calculate_map_at_n_for_labels(results_dict, df, n):
     relevance is defined as: if a result contains the query label. """
 
     # Get all the labels from the df
-    labels = set([l for ls in df["labels"].apply(lambda x: x.split(",")).to_list() for l in ls])
+    labels = get_all_labels(df)
     # Calculate map@k for each label
     label_maps = []
     for query_label in labels:
