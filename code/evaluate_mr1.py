@@ -14,7 +14,7 @@ import pandas as pd
 
 import lib.metrics as metrics
 from lib.utils import get_fname
-from lib.directories import ANALYSIS_DIR, GT_PATH, TAXONOMY_FAMILY_JSON
+from lib.directories import EVAL_DIR, GT_PATH, TAXONOMY_FAMILY_JSON
 
 METRICS = ["micro_mr1", "macro_mr1"]
 
@@ -51,7 +51,7 @@ if __name__=="__main__":
                         "an ontology")
     parser.add_argument("--output-dir",
                         type=str,
-                        default=ANALYSIS_DIR,
+                        default=EVAL_DIR,
                         help="Path to the output directory.")
     args=parser.parse_args()
 
@@ -113,7 +113,7 @@ if __name__=="__main__":
 
         # Calculate MR1 for each label
         print("\nCalculating MR1 for each label...")
-        label_mr1s, columns = macro_mR1 = metrics.calculate_mr1_for_labels(embeddings, df)
+        label_mr1s, columns = metrics.calculate_mr1_for_labels(embeddings, df)
         print("MR1 for Top 5 labels:")
         for label, val, _ in label_mr1s[:5]:
             print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.3f}")
