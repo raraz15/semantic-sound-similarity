@@ -58,7 +58,6 @@ def _save_function(save_fig, save_dir, default_name, fig):
 ###################################################################################################
 # Micro-averaged map@k
 
-
 def plot_map_at_15_comparisons(model, map_type,
                                      eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
                                      fig_name="", save_fig=False, save_dir=""):
@@ -166,7 +165,7 @@ def plot_macro_map_at_15_PCA_comparisons(model_search, eval_dir=EVAL_DIR, datase
 
     model, agg, norm, search = model_search
 
-    default_fig_name = f"Effect of the Number of PCA Components on Similarity Performace by "+\
+    default_fig_name = f"Effect of the Number of PCA Components on Sound Similarity Performace by "+\
                 f"Label-Averaged mAP@15\n{model} Evaluated on {dataset_name}"
 
     # Find all the variation_paths of the model
@@ -212,7 +211,7 @@ def plot_macro_map_at_15_PCA_comparisons(model_search, eval_dir=EVAL_DIR, datase
                 f"{balanced_mAP:.3f}", 
                 ha='center', 
                 va='bottom', 
-                fontsize=10)
+                fontsize=12)
         xticks.append(_get_pca(variation))
 
     ax.tick_params(axis='y', which='major', labelsize=11)

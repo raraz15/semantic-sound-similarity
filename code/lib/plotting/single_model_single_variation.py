@@ -24,7 +24,9 @@ def _save_function(save_fig, save_dir, default_name, fig):
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
 
-def plot_label_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
+def plot_label_based_map_at_15(model_variation_search, 
+                               eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
+                               fig_name="", save_fig=False, save_dir=""):
     """Takes a model name, aggregation variation and search name and plots the label-based mAP@15 for it.
     That is, the mAP@15 is plotted for each individual label."""
 
@@ -56,13 +58,16 @@ def plot_label_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, datase
                   [prec for _,prec in label_aps[i*delta:(i+1)*delta]])
         ax[i].set_yticks(np.arange(0, 1.05, 0.2))
         ax[i].grid()
-        ax[i].set_ylim([0, 1.05])
+        ax[i].set_ylim([0, 1])
+        ax[i].set_xlim([-0.5, len(label_aps[i*delta:(i+1)*delta])-0.5])
         ax[i].set_ylabel("mAP@15")
 
     _save_function(save_fig, save_dir, "label_based_mAP@15.png", fig)
     plt.show()
 
-def plot_family_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
+def plot_family_based_map_at_15(model_variation_search, 
+                                eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
+                                fig_name="", save_fig=False, save_dir=""):
     """Takes a model name, aggregation variation and search name and plots the label_family-based mAP@15 for it.
     That is, the mAP@15 is plotted for each individual label family."""
 
@@ -75,7 +80,6 @@ def plot_family_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, datas
     # Get the path to the family-based mAP@15
     variation_dir = os.path.join(eval_dir, dataset_name, model+"-"+variation)
     map_path = os.path.join(variation_dir, search, "families_mAP@15.csv")
-    #embedding_search = variation + "-" + search
 
     # Read the family-based mAP@15
     labels_map = pd.read_csv(map_path)
@@ -87,15 +91,23 @@ def plot_family_based_map_at_15(model_variation_search, eval_dir=EVAL_DIR, datas
 
     # Plot the family-based mAP@15
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig_name = fig_name if fig_name else default_fig_name
     fig.suptitle(fig_name, fontsize=19, weight='bold')
-    ax.set_title("Page 1 Results", fontsize=15)
+    # ax.set_title("Page 1 Results", fontsize=15)
     ax.bar([f.replace("_", " ").title() for f,_ in family_aps], 
            [m for _,m in family_aps], 
            edgecolor='k')
+    for j, m in enumerate([m for _,m in family_aps]):
+        ax.text(j, 
+                m+0.01, 
+                f"{m:.3f}", 
+                ha='center', 
+                va='bottom', 
+                fontsize=11, 
+                weight='bold',
+                )
 
     # Set the plot parameters
-    ax.set_yticks(np.arange(0,1.05,0.05))
+    ax.set_yticks(np.arange(0,1.05,0.10))
     ax.tick_params(axis='y', which='major', labelsize=11)
     ax.set_xlabel("Label Families", fontsize=15)
     ax.set_ylabel("mAP@15 (↑)", fontsize=15)
