@@ -13,7 +13,7 @@ import pandas as pd
 import lib.metrics as metrics
 from lib.directories import GT_PATH, EVAL_DIR, TAXONOMY_FAMILY_JSON
 
-METRICS = ["micro_map@15", "macro_map@15"] #  "mr1"
+METRICS = ["micro_map@15", "macro_map@15"]
 
 if __name__=="__main__":
 
@@ -92,7 +92,7 @@ if __name__=="__main__":
         print(f"Micro-Averaged mAP@15: {micro_map_at_15:.5f} | Time: {time_str}")
         print(f"Results are exported to {output_path}")
 
-    # Calculate Macro Averaged Precision@15 if required
+    # Calculate Macro Averaged Precision@15 (mAP@15) if required
     if "macro_map@15" in args.metrics:
 
         start_time = time.time()
@@ -100,9 +100,16 @@ if __name__=="__main__":
         # Calculate mAP for each label
         print("\nCalculating mAP@15 for each label ...")
         label_maps, columns = metrics.calculate_map_at_n_for_labels(results_dict, df, n=15)
+        print("mAP@15 for Top 5 labels:")
+        for label, val in label_maps[:5]:
+            print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
+        print("mAP@15 for Bottom 5 labels:")
+        for label, val in label_maps[-5:]:
+            print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
+
         # Convert to a dataframe
         _df = pd.DataFrame(label_maps, columns=columns)
-        # Export the labels' maps to CSV
+        # Export the mAP@15s to CSV
         output_path = os.path.join(output_dir, "labels_mAP@15.csv")
         _df.to_csv(output_path, index=False)
         print(f"Results are exported to{output_path}")
@@ -129,31 +136,13 @@ if __name__=="__main__":
         # Export the labels' maps to CSV
         output_path = os.path.join(output_dir, "families_mAP@15.csv")
         _df.to_csv(output_path, index=False)
-        print("mAP@15 for each family:")
+        print(" mAP@15 for each family:")
         for family, val in family_maps:
             print(f"{family:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
         print(f"Results are exported to{output_path}")
 
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
         print(f"Time: {time_str}")
-
-    # Calculate MR1 if requested
-    if "mr1" in args.metrics:
-
-        start_time = time.time()
-
-        # Calculate MR1 for each query
-        print("\nCalculating MR1...")
-        mr1 = metrics.calculate_MR1(results_dict, df)
-
-        # Export the MR1s to txt
-        output_path = os.path.join(output_dir, "MR1.txt")
-        with open(output_path, "w") as outfile:
-            outfile.write(str(mr1))
-        print(f"Results are exported to {output_path}")
-
-        time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
-        print(f"MR1: {mr1:.1f} | Time: {time_str}")
 
     #############
     print("Done!")
