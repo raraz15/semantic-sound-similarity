@@ -1,7 +1,6 @@
 """Contains functions for plotting each variation of a model on the same figure."""
 
 import os
-import sys
 import glob
 
 import numpy as np
@@ -10,50 +9,10 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
+from .utils import save_function, sort_variation_paths, _get_pca
 from ..directories import EVAL_DIR
 
 DATASET_NAME = "FSD50K.eval_audio"
-
-###################################################################################################
-# Utility functions
-
-def _get_pca(variation):
-    return int(variation.split("-")[1].split("_")[1])
-
-def sort_variation_paths(model, variation_paths):
-    # Sort based on the aggregation method, PCA, norm
-
-    if model != "fs-essentia-extractor_legacy":
-
-        all_agg = []
-        for var_path in variation_paths:
-            variation = var_path.split(model+"-")[1]
-            agg = variation.split("-")[0]
-            all_agg.append(agg)
-        all_agg = sorted(list(set(all_agg)))
-
-        new_sort = []
-        for agg in all_agg:
-            agg_sorted = []
-            for var_path in variation_paths:
-                variation = var_path.split(model+"-")[1]
-                if agg in variation:
-                    agg_sorted.append(var_path)
-            agg_sorted = sorted(agg_sorted, key=lambda x: _get_pca(x.split(model+"-")[1]))
-            new_sort.extend(agg_sorted)
-        return new_sort
-    else:
-        return sorted(variation_paths, key=lambda x: int(x.split("-PCA_")[1]))
-
-def _save_function(save_fig, save_dir, default_name, fig):
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, default_name)
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
 
 ###################################################################################################
 # Micro-averaged map@k
@@ -151,7 +110,7 @@ def plot_map_at_15_comparisons(model, map_type,
     ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
             title_fontsize=10, fancybox=True)
 
-    _save_function(save_fig, save_dir, figure_save_name, fig)
+    save_function(save_fig, save_dir, figure_save_name, fig)
     plt.show()
 
 ####################################################################################################
@@ -223,7 +182,7 @@ def plot_macro_map_at_15_PCA_comparisons(model_search, eval_dir=EVAL_DIR, datase
     ax.set_xlabel("Number of PCA Components", fontsize=15)
     ax.set_ylim([0,1])
 
-    _save_function(save_fig, save_dir, "macro_map@15-PCA_comparisons.png", fig)
+    save_function(save_fig, save_dir, "macro_map@15-PCA_comparisons.png", fig)
     plt.show()
 
 ###################################################################################################
@@ -305,5 +264,5 @@ def plot_mr1(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", s
               title_fontsize=12, fancybox=True)
     ax.grid(alpha=0.5)
 
-    _save_function(save_fig, save_dir, "mr1-comparisons.png", fig)
+    save_function(save_fig, save_dir, "mr1-comparisons.png", fig)
     plt.show()

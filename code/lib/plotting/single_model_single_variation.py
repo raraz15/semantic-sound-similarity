@@ -1,7 +1,6 @@
 """Contains functions that plot mAP@15 for individual labels and label families."""
 
 import os
-import sys
 
 import numpy as np
 import pandas as pd
@@ -10,19 +9,10 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
+from .utils import save_function
 from ..directories import EVAL_DIR
 
 DATASET_NAME = "FSD50K.eval_audio"
-
-def _save_function(save_fig, save_dir, default_name, fig):
-    if save_fig:
-        if save_dir == "":
-            print("Please provide a save directory if you want to save the figure.")
-            sys.exit(1)
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, default_name)
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
 
 def plot_label_based_map_at_15(model_variation_search, 
                                eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
@@ -62,7 +52,7 @@ def plot_label_based_map_at_15(model_variation_search,
         ax[i].set_xlim([-0.5, len(label_aps[i*delta:(i+1)*delta])-0.5])
         ax[i].set_ylabel("mAP@15")
 
-    _save_function(save_fig, save_dir, "label_based_mAP@15.png", fig)
+    save_function(save_fig, save_dir, "label_based_mAP@15.png", fig)
     plt.show()
 
 def plot_family_based_map_at_15(model_variation_search, 
@@ -114,5 +104,5 @@ def plot_family_based_map_at_15(model_variation_search,
     ax.set_ylim([0,1])
     ax.grid()
 
-    _save_function(save_fig, save_dir, "family_based_mAP@15.png", fig)
+    save_function(save_fig, save_dir, "family_based_mAP@15.png", fig)
     plt.show()

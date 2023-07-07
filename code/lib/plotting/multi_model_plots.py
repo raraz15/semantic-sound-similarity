@@ -13,25 +13,10 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
+from .utils import save_function
 from ..directories import EVAL_DIR
 
 DATASET_NAME = "FSD50K.eval_audio"
-
-###################################################################################
-
-def _save_function(save_fig, save_dir, default_name, fig, models):
-
-    if save_fig:
-        if save_dir == "":
-            raise("Please provide a save directory if you want to save the figure.")
-        os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, default_name)
-        print(f"Saving figure to {fig_path}")
-        fig.savefig(fig_path)
-        txt_path = os.path.splitext(fig_path)[0]+".txt"
-        with open(txt_path, "w") as infile:
-            for model in models:
-                infile.write(f"{model[0]}-{model[1]}\n")
 
 ###################################################################################
 # mAP
@@ -103,7 +88,7 @@ def plot_map_comparisons_multimodel(models, map_type,
     ax.legend(loc="best", fontsize=11)
 
     # Save and show
-    _save_function(save_fig, save_dir, figure_save_name, fig, models)
+    save_function(save_fig, save_dir, figure_save_name, fig, models)
     plt.show()
 
 def plot_family_map_comparisons_multimodel(models, 
@@ -159,7 +144,7 @@ def plot_family_map_comparisons_multimodel(models,
             ax[i].legend(loc="upper center", fontsize=12, 
                          fancybox=True, ncol=len(models))
 
-    _save_function(save_fig, save_dir, "family_based_mAP@15-comparison.png", fig, models)
+    save_function(save_fig, save_dir, "family_based_mAP@15-comparison.png", fig, models)
     plt.show()
 
 ####################################################################################################
@@ -230,7 +215,7 @@ def plot_mr1_comparisons_multimodel(models, mr1_type,
     ax.grid(alpha=0.5)
     ax.legend(loc=4, fontsize=11)
 
-    _save_function(save_fig, save_dir, figure_save_name, fig, models)
+    save_function(save_fig, save_dir, figure_save_name, fig, models)
     plt.show()
 
 def plot_family_mr1_comparisons_multimodel(models, 
@@ -289,6 +274,6 @@ def plot_family_mr1_comparisons_multimodel(models,
             ax[i].legend(loc="lower center", fontsize=12, 
                          fancybox=True, ncol=len(models))
 
-    _save_function(save_fig, save_dir, 
+    save_function(save_fig, save_dir, 
                    "family_based_MR1-comparison.png", fig, models)
     plt.show()
