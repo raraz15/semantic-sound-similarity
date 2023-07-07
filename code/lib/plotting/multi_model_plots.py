@@ -140,7 +140,7 @@ def plot_macro_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_nam
     _save_function(save_fig, save_dir, "best_embeddings-macro_mAP@15-comparison.png", fig, models)
     plt.show()
 
-def plot_family_map_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
+def plot_family_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
     """Takes a list of [(model,variation,search)] and plots all the Macro Averaged mAP@15 in the same figure."""
 
     default_fig_name = f"Embedding-Search Performances over Label-Families Averaged mAP@15 on {dataset_name}"
@@ -200,7 +200,7 @@ def plot_mr1_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATA
     # Read the MR1s for each model
     mr1s = []
     for model, variation, search in models:
-        mr1_path = os.path.join(eval_dir, dataset_name, model+"-"+variation, search, "MR1.txt")
+        mr1_path = os.path.join(eval_dir, dataset_name, model+"-"+variation, search, "micro_MR1.txt")
         with open(mr1_path,"r") as infile:
             mr1 = float(infile.read())
         mr1s.append((model, variation, search, mr1))
@@ -210,7 +210,7 @@ def plot_mr1_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATA
     fig_name = fig_name if fig_name else f"Embedding Performances using MR1 Evaluated on {dataset_name} Set"
     fig.suptitle(fig_name, fontsize=19, weight='bold')
     #ax.set_title("For each model, the best performing processing parameters are used", fontsize=15)
-    for i,(model,search,mr1) in enumerate(mr1s):
+    for i,(model,variation,search,mr1) in enumerate(mr1s):
             ax.bar(i, 
                 mr1, 
                 label=model,
@@ -230,7 +230,7 @@ def plot_mr1_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATA
     # Set the plot parameters
     ax.tick_params(axis='x', which='major', labelsize=0)
     ax.tick_params(axis='y', which='major', labelsize=11)
-    ax.set_yticks(np.arange(0,max([m[2] for m in mr1s])+1.0,0.5))
+    ax.set_yticks(np.arange(0,max([m[3] for m in mr1s])+1.0,0.5))
     ax.set_ylabel("MR1@90 (↓)", fontsize=15)
     #ax.set_title(models[0][0].split("-")[-1].replace("_"," "), fontsize=17)
     ax.grid()
