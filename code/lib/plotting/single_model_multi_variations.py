@@ -10,12 +10,7 @@ from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
 from .utils import save_function, sort_variation_paths, get_pca
-from ..directories import EVAL_DIR
-
-DATASET_NAME = "FSD50K.eval_audio"
-
-###################################################################################################
-# Micro-averaged map@k
+from ..directories import EVAL_DIR, DATASET_NAME
 
 def plot_map_at_15_comparisons(model, map_type,
                                 eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
@@ -122,9 +117,6 @@ def plot_map_at_15_comparisons(model, map_type,
     save_function(save_fig, save_dir, figure_save_name, fig)
     plt.show()
 
-####################################################################################################
-# Macro-averaged mAP@k
-
 def plot_macro_map_at_15_PCA_comparisons(model_search, 
                                          eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
                                          fig_name="", save_fig=False, save_dir=""):
@@ -196,11 +188,10 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
     save_function(save_fig, save_dir, "macro_map@15-PCA_comparisons.png", fig)
     plt.show()
 
-###################################################################################################
-# MR1
-
 # TODO: since we dont compute MR1 for all models, this function is not useful anymore
-def plot_mr1(model, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
+def plot_mr1(model, 
+             eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
+             fig_name="", save_fig=False, save_dir=""):
     """Takes a model name and plots the MR1 for all the variations of the model."""
 
     default_fig_name = "Embedding Processing and Search Algorithm " +\

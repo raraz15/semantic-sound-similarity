@@ -14,9 +14,7 @@ from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
 from .utils import save_function
-from ..directories import EVAL_DIR
-
-DATASET_NAME = "FSD50K.eval_audio"
+from ..directories import EVAL_DIR, DATASET_NAME
 
 ###################################################################################
 # mAP

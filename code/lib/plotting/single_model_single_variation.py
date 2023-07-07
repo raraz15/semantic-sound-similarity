@@ -10,9 +10,7 @@ from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
 from .utils import save_function
-from ..directories import EVAL_DIR
-
-DATASET_NAME = "FSD50K.eval_audio"
+from ..directories import EVAL_DIR, DATASET_NAME
 
 def plot_label_based_map_at_15(model_variation_search, 
                                eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 

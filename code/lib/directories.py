@@ -2,6 +2,7 @@ import os
 
 # These directories should point to the FSD50K dataset
 ######################################################
+DATASET_NAME = "FSD50K.eval_audio"
 FSD50K_DIR = "/data/FSD50K"
 AUDIO_DIR = f"{FSD50K_DIR}/FSD50K.eval_audio"
 GT_PATH = f"{FSD50K_DIR}/FSD50K.ground_truth/eval.csv"
