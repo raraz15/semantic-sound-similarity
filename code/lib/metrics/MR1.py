@@ -8,6 +8,11 @@ from .utils import get_labels, find_indices_containing_label
 # MR1
 
 def R1(query_fname, result, df, query_label=None):
+    """Returns the first index of a relevant result in the result list.
+    If the query_label is not None, it evaluates relevance by inclusion of 
+    the query_label in the result labels. If the query_label is None, it evaluates 
+    relevance by intersection of the query labels and the result labels."""
+
     query_labels = get_labels(query_fname, df)
     for i,ref_result in enumerate(result):
         ref_fname = ref_result["result_fname"]
@@ -81,7 +86,7 @@ def label_based_mr1(label_mr1s):
 
     return sum([label_mr1[1] for label_mr1 in label_mr1s])/len(label_mr1s)
 
-def family_based_map_at_n(label_MR1s, families=dict()):
+def family_based_mr1(label_MR1s, families=dict()):
     """ Using families dict which specifies the family names and the list of all its child names
     inside the FSD50K labels, averages the MR1 for each family."""
 

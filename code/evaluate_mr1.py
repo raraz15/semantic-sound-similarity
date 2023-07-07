@@ -1,3 +1,8 @@
+""" Since calculation of R1 requires the complete ranking for each query,
+instead of first running similarity_search.py with N=-1 and storing the results,
+here we first do a similarity_search with N=-1 without saving the results
+ and then calculate the R1 for each query."""
+
 import os
 import time
 import json
@@ -7,7 +12,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import numpy as np
 import pandas as pd
 
-from similarity_search import search_similar_sounds, get_fname
+from similarity_search import get_fname
 from lib.directories import ANALYSIS_DIR, GT_PATH, TAXONOMY_FAMILY_JSON
 import lib.metrics as metrics
 
@@ -116,11 +121,10 @@ if __name__=="__main__":
         for label, val in label_mr1s[-5:]:
             print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.3f}")
 
-
         # Convert to a dataframe
         _df = pd.DataFrame(label_mr1s, columns=columns)
         # Export the MR1s to CSV
-        output_path = os.path.join(output_dir, "labels_mAP@15.csv")
+        output_path = os.path.join(output_dir, "labels_MR1.csv")
         _df.to_csv(output_path, index=False)
         print(f"Results are exported to{output_path}")
 
@@ -153,4 +157,5 @@ if __name__=="__main__":
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
         print(f"Time: {time_str}")
 
-
+    #############
+    print("Done!")
