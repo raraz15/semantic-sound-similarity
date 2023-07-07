@@ -78,7 +78,7 @@ def calculate_mr1_for_labels(embeddings, df):
         # Append the results
         label_mr1s.append([query_label, label_mr1, len(fnames_with_label)])
     # Sort the label MR1s by the mAP@n value
-    label_mr1s.sort(key=lambda x: x[1], reverse=True)
+    label_mr1s.sort(key=lambda x: x[1], reverse=False)
     return label_mr1s, ["label", "MR1", "n_relevant"]
 
 def label_based_mr1(label_mr1s):
@@ -101,5 +101,5 @@ def family_based_mr1(label_MR1s, families=dict()):
         # Append the results
         family_maps.append([family_name, family_mr1])
     # Sort the family MR1s by the mAP@n value
-    family_maps.sort(key=lambda x: x[1], reverse=True)
+    family_maps.sort(key=lambda x: x[1], reverse=False)
     return family_maps, ["family", "mr1"]
