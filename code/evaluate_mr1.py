@@ -115,10 +115,10 @@ if __name__=="__main__":
         print("\nCalculating MR1 for each label...")
         label_mr1s, columns = macro_mR1 = metrics.calculate_mr1_for_labels(embeddings, df)
         print("MR1 for Top 5 labels:")
-        for label, val in label_mr1s[:5]:
+        for label, val, _ in label_mr1s[:5]:
             print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.3f}")
         print("MR1 for Bottom 5 labels:")
-        for label, val in label_mr1s[-5:]:
+        for label, val, _ in label_mr1s[-5:]:
             print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.3f}")
 
         # Convert to a dataframe
