@@ -100,7 +100,7 @@ def plot_map_comparisons_multimodel(models, map_type,
     ax.set_xlabel("Embeddings", fontsize=15) # , Search Combinations
     ax.set_ylabel("mAP@15 (↑)", fontsize=15) # TODO: change name?
     ax.set_ylim([0,1])
-    ax.grid()
+    ax.grid(alpha=0.5)
     ax.legend(loc="best", fontsize=11, title="Embeddings", 
               title_fontsize=11, fancybox=True)
 
@@ -108,10 +108,14 @@ def plot_map_comparisons_multimodel(models, map_type,
     _save_function(save_fig, save_dir, figure_save_name, fig, models)
     plt.show()
 
-def plot_family_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, fig_name="", save_fig=False, save_dir=""):
-    """Takes a list of [(model,variation,search)] and plots all the Macro Averaged mAP@15 in the same figure."""
+def plot_family_map_comparisons_multimodel(models, 
+                                           eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
+                                           fig_name="", save_fig=False, save_dir=""):
+    """Takes a list of [(model,variation,search)] and plots all the Family-based 
+    mAP@15 in the same figure."""
 
-    default_fig_name = f"Embedding-Search Performances over Label-Families Averaged mAP@15 on {dataset_name}"
+    default_fig_name = "Sound Similarity Performances of Embeddings using " \
+                        f"Label-Family-Based mAP@15 on {dataset_name}"
 
     # Read the mAP for each model
     model_maps = defaultdict(list)
@@ -122,6 +126,7 @@ def plot_family_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_na
         families = labels_map["family"].to_list()
         maps = labels_map["map"].to_list()
         for family, family_map in zip(families, maps):
+            family = family.replace("_", " ").title()
             model_maps[family].append((model, variation, search, family_map))
     
     fig,ax = plt.subplots(nrows=len(model_maps) ,figsize=(18,12), constrained_layout=True)
@@ -134,27 +139,27 @@ def plot_family_map_comparisons_multimodel(models, eval_dir=EVAL_DIR, dataset_na
                     label=model,
                     width=0.8, 
                     color=COLORS[j], 
-                    edgecolor='k'
-                    )
+                    edgecolor='k',
+                    linewidth=1.3)
             ax[i].text(j, 
                     ap+0.01, 
                     f"{ap:.3f}", 
                     ha='center', 
                     va='bottom', 
-                    fontsize=10, 
-                    weight='bold'
-                    )
+                    fontsize=12, 
+                    weight='bold')
 
         # Set the plot parameters
-        ax[i].set_title(family.replace("_", " ").title(), fontsize=15)
+        ax[i].set_title(family, fontsize=15)
         ax[i].set_yticks(np.arange(0,1.05,0.1))
         ax[i].tick_params(axis='x', which='major', labelsize=0)
-        ax[i].tick_params(axis='y', which='major', labelsize=11)
-        ax[i].set_ylabel("mAP@15 (↑)", fontsize=15)
+        ax[i].tick_params(axis='y', which='major', labelsize=10)
+        ax[i].set_ylabel("mAP@15 (↑)", fontsize=13)
         ax[i].set_ylim([0,1])
-        ax[i].grid()
+        ax[i].grid(alpha=0.5)
         if i==0:
-            ax[i].legend(loc="upper center", fontsize=10, title_fontsize=11, fancybox=True, ncol=len(models))
+            ax[i].legend(loc="upper center", fontsize=12, 
+                         fancybox=True, ncol=len(models))
 
     _save_function(save_fig, save_dir, "family_based_mAP@15-comparison.png", fig, models)
     plt.show()
