@@ -40,12 +40,14 @@ def plot_map_at_15_comparisons(model, map_type,
     variation_paths = sort_variation_paths(model, variation_paths)
     # Deal with presentation mode
     if presentation_mode:
+        _variation_paths = []
         for var_path in variation_paths:
             n_pca = int(var_path.split("/")[-1].split("-PCA_")[1].split("-Norm")[0])
-            if n_pca<100:
-                if "vggish" in model and n_pca==64:
-                    continue
-                variation_paths.remove(var_path)
+            if n_pca>=100:
+                _variation_paths.append(var_path)
+            elif n_pca==64 and "vggish" in model:
+                _variation_paths.append(var_path)
+        variation_paths = _variation_paths
     # Read one variation's folder to get the searches
     searches = os.listdir(variation_paths[0])
 
