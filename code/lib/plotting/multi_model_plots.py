@@ -86,7 +86,7 @@ def plot_map_comparisons_multimodel(models, map_type,
     ax.legend(loc="best", fontsize=11)
 
     # Save and show
-    save_function(save_fig, save_dir, figure_save_name, fig, models)
+    save_function(save_fig, save_dir, figure_save_name, fig)
     plt.show()
 
 def plot_family_map_comparisons_multimodel(models, 
@@ -97,6 +97,7 @@ def plot_family_map_comparisons_multimodel(models,
 
     default_fig_name = "Sound Similarity Performances of Embeddings using " \
                         f"Label-Family-Based mAP@15 on {dataset_name}"
+    fig_name = fig_name if fig_name else default_fig_name
 
     # Read the mAP for each model
     model_maps = defaultdict(list)
@@ -109,9 +110,9 @@ def plot_family_map_comparisons_multimodel(models,
         for family, family_map in zip(families, maps):
             family = family.replace("_", " ").title()
             model_maps[family].append((model, variation, search, family_map))
-    
+    model_maps = dict(sorted(model_maps.items(), key=lambda x: x[0]))
+
     fig,ax = plt.subplots(nrows=len(model_maps) ,figsize=(18,12), constrained_layout=True)
-    fig_name = fig_name if fig_name else default_fig_name
     fig.suptitle(fig_name, fontsize=19, weight='bold')
     for i, (family, family_aps) in enumerate(model_maps.items()):
         for j,(model,variation,search,ap) in enumerate(family_aps):
@@ -142,7 +143,7 @@ def plot_family_map_comparisons_multimodel(models,
             ax[i].legend(loc="upper center", fontsize=12, 
                          fancybox=True, ncol=len(models))
 
-    save_function(save_fig, save_dir, "family_based_mAP@15-comparison.png", fig, models)
+    save_function(save_fig, save_dir, "family_based_mAP@15-comparison.png", fig)
     plt.show()
 
 ####################################################################################################
@@ -213,7 +214,7 @@ def plot_mr1_comparisons_multimodel(models, mr1_type,
     ax.grid(alpha=0.5)
     ax.legend(loc=4, fontsize=11)
 
-    save_function(save_fig, save_dir, figure_save_name, fig, models)
+    save_function(save_fig, save_dir, figure_save_name, fig)
     plt.show()
 
 def plot_family_mr1_comparisons_multimodel(models, 
@@ -240,6 +241,7 @@ def plot_family_mr1_comparisons_multimodel(models,
             if family_mr1>max_mr1:
                 max_mr1 = family_mr1
             model_mr1s[family].append((model, variation, search, family_mr1))
+    model_mr1s = dict(sorted(model_mr1s.items(), key=lambda x: x[0]))
 
     fig,ax = plt.subplots(nrows=len(model_mr1s) ,figsize=(18,12), constrained_layout=True)
     fig.suptitle(fig_name, fontsize=19, weight='bold')
@@ -268,10 +270,10 @@ def plot_family_mr1_comparisons_multimodel(models,
         ax[i].set_ylabel("MR1 (↓)", fontsize=13)
         ax[i].set_ylim([0, max_mr1+10])
         ax[i].grid(alpha=0.5)
-        if i==0:
-            ax[i].legend(loc="lower center", fontsize=12, 
+        if i==1:
+            ax[i].legend(loc="upper center", fontsize=11, 
                          fancybox=True, ncol=len(models))
 
     save_function(save_fig, save_dir, 
-                   "family_based_MR1-comparison.png", fig, models)
+                   "family_based_MR1-comparison.png", fig)
     plt.show()

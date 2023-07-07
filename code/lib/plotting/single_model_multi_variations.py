@@ -187,7 +187,7 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
     ax.set_xlabel("Number of PCA Components", fontsize=15)
     ax.set_ylim([0,1])
 
-    save_function(save_fig, save_dir, "macro_map@15-PCA_comparisons.png", fig)
+    save_function(save_fig, save_dir, f"{'-'.join(model_search)}-macro_map@15-PCA_comparisons.png", fig)
     plt.show()
 
 # TODO: since we dont compute MR1 for all models, this function is not useful anymore
