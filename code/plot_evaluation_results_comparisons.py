@@ -5,7 +5,6 @@ import os
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 from lib.plotting import plot_micro_map_at_15_comparisons, plot_macro_map_at_15_comparisons
-
 from lib.directories import FIGURES_DIR, EVAL_DIR
 
 if __name__=="__main__":

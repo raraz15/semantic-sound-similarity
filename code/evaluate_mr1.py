@@ -3,18 +3,18 @@ instead of first running similarity_search.py with N=-1 and storing the results,
 here we first do a similarity_search with N=-1 without saving the results
  and then calculate the R1 for each query."""
 
+import glob
+import json
 import os
 import time
-import json
-import glob
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import numpy as np
 import pandas as pd
 
-from similarity_search import get_fname
-from lib.directories import ANALYSIS_DIR, GT_PATH, TAXONOMY_FAMILY_JSON
 import lib.metrics as metrics
+from lib.utils import get_fname
+from lib.directories import ANALYSIS_DIR, GT_PATH, TAXONOMY_FAMILY_JSON
 
 METRICS = ["micro_mr1", "macro_mr1"]
 

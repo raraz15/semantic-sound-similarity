@@ -11,7 +11,8 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import streamlit as st
 import pandas as pd
 
-from lib.metrics import evaluate_relevance,average_precision, find_indices_containing_label, get_labels
+from lib.metrics import evaluate_relevance, average_precision
+from lib.utils import find_indices_containing_label, get_labels
 from lib.directories import *
 
 FREESOUND_STRING = '<iframe frameborder="0" scrolling="no" \

@@ -1,8 +1,9 @@
 """ This script contains functions to calculate average precision@n and related 
 metrics such as Instance-based mAP@n, Label-based mAP@n and Family-based mAP@n."""
 
-from .utils import evaluate_relevance, find_indices_containing_label
+from .relevance import evaluate_relevance
 from .mAP import precision_at_k
+from ..utils import find_indices_containing_label
 
 ####################################################################################
 # AP@n

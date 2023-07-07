@@ -3,7 +3,7 @@ metrics such as Instance-based MR1, Label-based MR1 and Family-based MR1."""
 
 import numpy as np
 
-from .utils import get_labels, find_indices_containing_label
+from ..utils import get_labels, find_indices_containing_label
 
 ####################################################################################
 # MR1
