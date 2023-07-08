@@ -4,6 +4,7 @@ and plots the results in the same plot for comparison.
 """
 
 import os
+from glob import glob
 from collections import defaultdict
 
 import numpy as np
@@ -13,7 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
-from .utils import save_function
+from .utils import save_function, sort_variation_paths, get_pca
 from ..directories import EVAL_DIR, DATASET_NAME
 
 ###################################################################################
@@ -144,6 +145,85 @@ def plot_family_map_comparisons_multimodel(models,
                          fancybox=True, ncol=len(models))
 
     save_function(save_fig, save_dir, "family_based_mAP@15-comparison.png", fig)
+    plt.show()
+
+def plot_macro_map_comparisons_multimodel(models,
+                                        eval_dir=EVAL_DIR, dataset_name=DATASET_NAME,
+                                        fig_name="", save_fig=False, save_dir=""):
+
+    default_fig_name = "Effect of the Number of PCA Components on Sound " \
+                        "Similarity Performace by Label-Averaged mAP@15"
+    fig_name = fig_name if fig_name else default_fig_name
+
+    fig, ax = plt.subplots(nrows=len(models), figsize=(18,12), constrained_layout=True)
+    fig.suptitle(default_fig_name, fontsize=20, weight='bold')
+    
+    for i,model_search in enumerate(models):
+
+        model, agg, norm, search = model_search
+
+        # Find all the variation_paths of the model
+        if model=="fs-essentia-extractor_legacy":
+            wildcard = f"{model}-PCA_*"
+        else:
+            wildcard = f"{model}-Agg_{agg}-PCA_*-Norm_{norm}"
+        variation_paths = sorted(glob(os.path.join(eval_dir, dataset_name, wildcard)))
+        # Sort by PCA components
+        variation_paths = sort_variation_paths(model, variation_paths)
+
+        # Read all the maps
+        variations, maps = [], []
+        for variation_path in variation_paths:
+            map_path = os.path.join(variation_path, search, "balanced_mAP@15.txt")
+            with open(map_path, "r") as in_f:
+                balanced_map_at_15 = float(in_f.read())
+            full_model_name = variation_path.split("/")[-1]
+            if "fs-essentia-extractor_legacy" in full_model_name:
+                variation = "-"+full_model_name.split("-")[-1]
+            else:
+                variation = "-".join(full_model_name.split("-")[-3:])
+            maps.append(balanced_map_at_15)
+            variations.append(variation)
+
+        # Determine color for presentation
+        if model=="fs-essentia-extractor_legacy":
+            color = COLORS[0]
+        elif model=="audioset-yamnet-1":
+            color = COLORS[1]
+        elif model=="fsd-sinet-vgg41-tlpf-1":
+            color = COLORS[3]
+        elif model=="fsd-sinet-vgg42-tlpf-1":
+            color = COLORS[4]
+
+        # Plot the maps
+        xticks = []
+        for j,(variation,balanced_mAP) in enumerate(zip(variations, maps)):
+            ax[i].bar(j,
+                    height=balanced_mAP, 
+                    width=0.85,
+                    color=color,
+                    edgecolor='k',
+                    linewidth=1.2)
+            ax[i].text(j, 
+                    balanced_mAP+0.01, 
+                    f"{balanced_mAP:.3f}", 
+                    ha='center', 
+                    va='bottom', 
+                    fontsize=12)
+            xticks.append(get_pca(variation))
+
+        ax[i].set_title(f"{model}", fontsize=19, weight='bold')
+        ax[i].tick_params(axis='y', which='major', labelsize=11)
+        ax[i].tick_params(axis='x', which='major', labelsize=13)
+        ax[i].set_xticks(np.arange(len(xticks)), xticks)
+        ax[i].set_yticks(np.arange(0, 1.05, 0.1))
+        ax[i].grid(alpha=0.5)
+        ax[i].set_ylabel("mAP@15 (↑)", fontsize=13)
+        ax[i].set_xlabel("Number of PCA Components", fontsize=13)
+        ax[i].set_ylim([0,1])
+
+    save_function(save_fig, save_dir, 
+                  f"macro_map@15-PCA_comparisons-multi_models.png", fig)
     plt.show()
 
 ####################################################################################################
