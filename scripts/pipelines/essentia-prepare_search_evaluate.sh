@@ -73,7 +73,7 @@ echo
 # Evaluate
 echo "======================================================================="
 echo "Evaluation"
-python code/evaluate_map_at_15.py $SIMILARITY_PATH
+python code/evaluate_map_at_n.py $SIMILARITY_PATH
 echo
 echo "======================================================================="
 

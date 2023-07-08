@@ -30,7 +30,7 @@ if __name__=="__main__":
                         help="Type of similarity search algorithm.")
     parser.add_argument('-N', 
                         type=int, 
-                        default=30, 
+                        default=15, 
                         help="Number of queries to return.")
     parser.add_argument("--ground-truth",
                         type=str,
