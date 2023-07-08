@@ -23,13 +23,13 @@ def plot_map_at_15_comparisons(model, map_type,
     # TODO: Instead of Label Class?
     if map_type=="micro":
         file_name = "micro_mAP@15.txt"
-        default_fig_name = f"Sound Similarity Performances of AIR Systems using " \
-                            f"Instance-Based mAP@15\n{model} Evaluated on {dataset_name}"
+        default_fig_name = f"Sound Similarity Performances of AIR Systems by " \
+                            f"Instance-Based mAP@15\n{model}"
         figure_save_name = "micro_mAP@15-comparisons.png"
     elif map_type=="macro":
         file_name = "balanced_mAP@15.txt"
-        default_fig_name = f"Sound Similarity Performances of AIR Systems using " \
-                            f"Label-Based mAP@15\n{model} Evaluated on {dataset_name}"
+        default_fig_name = f"Sound Similarity Performances of AIR Systems by " \
+                            f"Label-Based mAP@15\n{model}"
         figure_save_name = "macro_map@15-comparisons.png"
     else:
         raise("map_type must be one of 'micro', 'macro'")
@@ -129,7 +129,7 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
     model, agg, norm, search = model_search
 
     default_fig_name = f"Effect of the Number of PCA Components on Sound Similarity Performace by "+\
-                f"Label-Averaged mAP@15\n{model} Evaluated on {dataset_name}"
+                f"Label-Averaged mAP@15\n{model}"
     fig_name = fig_name if fig_name else default_fig_name
 
     # Find all the variation_paths of the model
@@ -195,7 +195,7 @@ def plot_mr1(model,
     """Takes a model name and plots the MR1 for all the variations of the model."""
 
     default_fig_name = "Embedding Processing and Search Algorithm " +\
-                f"Performances by MR1 Values\n{model} Evaluated on {dataset_name}"
+                f"Performances by MR1 Values\n{model}"
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))

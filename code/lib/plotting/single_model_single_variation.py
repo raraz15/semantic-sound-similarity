@@ -12,15 +12,23 @@ COLORS = list(TABLEAU_COLORS.values())
 from .utils import save_function
 from ..directories import EVAL_DIR, DATASET_NAME
 
+# TODO: find a way to wrap the text better
 def plot_label_based_map_at_15(model_variation_search, 
                                eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
                                fig_name="", save_fig=False, save_dir=""):
-    """Takes a model name, aggregation variation and search name and plots the label-based mAP@15 for it.
-    That is, the mAP@15 is plotted for each individual label."""
+    """Takes a model name, aggregation variation and search name and plots 
+    the label-based mAP@15 for it. That is, the mAP@15 is plotted for each 
+    individual label."""
 
     model, variation, search = model_variation_search
-    default_fig_name = f"Model: {model} Aggregation: {variation} Search: {search}\n"\
-                            f"{dataset_name} Labels mAP@15 "
+
+    # Determine the figure name
+    if search=="dot":
+        _search = "Dot Product"
+    elif search=="nn":
+        _search = "Nearest Neighbors"
+    default_fig_name = f"{model} mAP@15 Values for All Labels\n" \
+                        f"({variation} Processing, {_search} Search)"
     fig_name = fig_name if fig_name else default_fig_name
 
     # Get the path to the label-based mAP@15
@@ -61,8 +69,13 @@ def plot_family_based_map_at_15(model_variation_search,
 
     model, variation, search = model_variation_search
 
-    default_fig_name = f"Model: {model} Aggregation: {variation} Search: {search}\n"\
-                            f"{dataset_name} Label Families mAP@15 "
+    # Determine the figure name
+    if search=="dot":
+        _search = "Dot Product"
+    elif search=="nn":
+        _search = "Nearest Neighbors"
+    default_fig_name = f"{model} mAP@15 Values for Label Families\n" \
+                        f"({variation} Processing, {_search} Search)"
     fig_name = fig_name if fig_name else default_fig_name
 
     # Get the path to the family-based mAP@15

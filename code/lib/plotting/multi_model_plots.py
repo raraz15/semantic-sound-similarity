@@ -30,13 +30,13 @@ def plot_map_comparisons_multimodel(models, map_type,
     # Determine the file name and figure name
     if map_type=="micro":
         file_name = "micro_mAP@15.txt"
-        default_fig_name = "Sound Similarity Performances of Embeddings using "\
-                        f"Instance-Based mAP@15 on {dataset_name}" #(Micro-Averaged)
+        default_fig_name = "Sound Similarity Performances of Embeddings by "\
+                        "Instance-Based mAP@15" #(Micro-Averaged)
         figure_save_name = "best_embeddings-micro_mAP@15-comparison.png"
     elif map_type=="macro":
         file_name = "balanced_mAP@15.txt"
-        default_fig_name = "Sound Similarity Performances of Embeddings using "\
-                        f"Label-Based mAP@15 on {dataset_name}" # (Macro-Averaged)
+        default_fig_name = "Sound Similarity Performances of Embeddings by "\
+                        "Label-Based mAP@15" # (Macro-Averaged)
         figure_save_name = "best_embeddings-macro_mAP@15-comparison.png"
     else:
         raise("map_type must be one of 'micro', 'macro'")
@@ -95,8 +95,8 @@ def plot_family_map_comparisons_multimodel(models,
     """Takes a list of [(model,variation,search)] and plots all the Family-based 
     mAP@15 in the same figure."""
 
-    default_fig_name = "Sound Similarity Performances of Embeddings using " \
-                        f"Label-Family-Based mAP@15 on {dataset_name}"
+    default_fig_name = "Sound Similarity Performances of Embeddings by " \
+                        "Label-Family-Based mAP@15"
     fig_name = fig_name if fig_name else default_fig_name
 
     # Read the mAP for each model
@@ -158,13 +158,13 @@ def plot_mr1_comparisons_multimodel(models, mr1_type,
     # Determine the file name and figure name
     if mr1_type=="micro":
         file_name = "micro_MR1.txt"
-        default_fig_name = "Sound Similarity Performances of Embeddings using "\
-                        f"Instance-Based MR1 on {dataset_name}" #(Micro-Averaged)
+        default_fig_name = "Sound Similarity Performances of Embeddings by "\
+                        "Instance-Based MR1" #(Micro-Averaged)
         figure_save_name = "best_embeddings-micro_MR1-comparison.png"
     elif mr1_type=="macro":
         file_name = "balanced_MR1.txt"
-        default_fig_name = "Sound Similarity Performances of Embeddings using "\
-                        f"Label-Based MR1 on {dataset_name}" # (Macro-Averaged)
+        default_fig_name = "Sound Similarity Performances of Embeddings by "\
+                        "Label-Based MR1" # (Macro-Averaged)
         figure_save_name = "best_embeddings-macro_MR1-comparison.png"
     else:
         raise("mr1_type must be one of 'micro', 'macro'")
@@ -223,8 +223,8 @@ def plot_family_mr1_comparisons_multimodel(models,
     """Takes a list of [(model,variation,search)] and plots all the Family-based 
     MR1 in the same figure."""
 
-    default_fig_name = "Sound Similarity Performances of Embeddings using " \
-                        f"Label-Family-Based MR1 on {dataset_name}"
+    default_fig_name = "Sound Similarity Performances of Embeddings by " \
+                        "Label-Family-Based MR1"
     fig_name = fig_name if fig_name else default_fig_name
 
     # Read the MR1 for each embedding-search combination
