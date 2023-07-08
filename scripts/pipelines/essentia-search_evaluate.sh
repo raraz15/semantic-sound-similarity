@@ -27,8 +27,6 @@ PREP_EMBED_DIR="$EMBED_DIR/$EMBED_NAME"
 SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$EMBED_NAME/nn"
 EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$EMBED_NAME/nn"
 
-#############################################################################
-
 echo "======================================================================="
 echo "Input Directory:"
 echo $PREP_EMBED_DIR
@@ -36,24 +34,24 @@ echo
 echo "Output Directories:"
 echo $SIMILARITY_DIR
 echo $EVAL_DIR
+echo "======================================================================="
 echo
 
 #############################################################################
-
 # Perform similarity search
-echo "======================================================================="
+
 echo "Similarity Search"
 python code/similarity_search.py $PREP_EMBED_DIR -s=nn
 SIMILARITY_PATH="$SIMILARITY_DIR/similarity_results.json"
+echo "======================================================================="
 echo
 
 #############################################################################
-
 # Evaluate
-echo "======================================================================="
+
 echo "Evaluation"
 python code/evaluate_map_at_15.py $SIMILARITY_PATH
-echo
 echo "======================================================================="
+echo
 
 #############################################################################
