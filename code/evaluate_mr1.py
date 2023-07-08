@@ -63,6 +63,7 @@ if __name__=="__main__":
     # Read the ground truth annotations
     df = pd.read_csv(args.ground_truth)
     fnames = set(df["fname"].to_list())
+    print(f"Number of queries in the ground truth file: {len(fnames)}")
 
     # Read all the json files in the tree
     embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
