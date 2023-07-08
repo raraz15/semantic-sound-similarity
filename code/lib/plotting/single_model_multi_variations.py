@@ -123,14 +123,14 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
                                          eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
                                          fig_name="", save_fig=False, save_dir=""):
     """ Takes a model name, a fixed aggregation, normalization, and fixed search type 
-    and plots the map@15 of each model variation inside eval_dir following these parameters in the same
-    plot.
-    """
+    and plots the map@15 of each model variation inside eval_dir following these parameters 
+    in the same plot. """
 
     model, agg, norm, search = model_search
 
     default_fig_name = f"Effect of the Number of PCA Components on Sound Similarity Performace by "+\
                 f"Label-Averaged mAP@15\n{model} Evaluated on {dataset_name}"
+    fig_name = fig_name if fig_name else default_fig_name
 
     # Find all the variation_paths of the model
     if model=="fs-essentia-extractor_legacy":
@@ -154,9 +154,6 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
             variation = "-".join(full_model_name.split("-")[-3:])
         maps.append(balanced_map_at_15)
         variations.append(variation)
-
-    # Determine some plot parameters
-    fig_name = fig_name if fig_name else default_fig_name
 
     # Plot the maps
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
@@ -187,7 +184,8 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
     ax.set_xlabel("Number of PCA Components", fontsize=15)
     ax.set_ylim([0,1])
 
-    save_function(save_fig, save_dir, f"{'-'.join(model_search)}-macro_map@15-PCA_comparisons.png", fig)
+    save_function(save_fig, save_dir, 
+                  f"{'-'.join(model_search)}-macro_map@15-PCA_comparisons.png", fig)
     plt.show()
 
 # TODO: since we dont compute MR1 for all models, this function is not useful anymore
