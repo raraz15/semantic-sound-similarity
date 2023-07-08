@@ -20,16 +20,15 @@ DATASET_NAME="FSD50K.eval_audio"
 #############################################################################
 
 DATA_DIR="$(pwd)/data"
-EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME/$MODEL_NAME"
-SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$MODEL_NAME"
-EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$MODEL_NAME"
+RAW_EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME/$MODEL_NAME"
 
 echo "======================================================================="
 echo "Input Directory:"
-echo $EMBED_DIR
+echo $RAW_EMBED_DIR
 echo
 
 #############################################################################
+# Determine the embedding name
 
 # Deal with No PCA case
 if [[ $1 == -1 ]]; then
@@ -37,10 +36,16 @@ if [[ $1 == -1 ]]; then
 else
     N=$1
 fi
-PREP_EMBED_DIR="$EMBED_DIR-PCA_$N"
+EMBED_NAME="$MODEL_NAME-PCA_$N"
+
+#############################################################################
+
+EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME/$EMBED_NAME"
+SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$EMBED_NAME"
+EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$EMBED_NAME"
 
 echo "Output Directories:"
-echo $PREP_EMBED_DIR
+echo $EMBED_DIR
 echo $SIMILARITY_DIR
 echo $EVAL_DIR
 
@@ -49,8 +54,8 @@ echo $EVAL_DIR
 # Prepare the embeddings
 echo "======================================================================="
 echo "Preparation"
-python code/fs-essentia-extractor_legacy-create_clip_level_embedding.py $EMBED_DIR -N=$1
-echo $PREP_EMBED_DIR
+python code/fs-essentia-extractor_legacy-create_clip_level_embedding.py $RAW_EMBED_DIR -N=$1
+echo $EMBED_DIR
 echo
 
 #############################################################################
@@ -58,8 +63,8 @@ echo
 # Perform similarity search
 echo "======================================================================="
 echo "Similarity Search"
-python code/similarity_search.py $PREP_EMBED_DIR -s=nn
-SIMILARITY_PATH="$SIMILARITY_DIR-PCA_$N/nn/similarity_results.json"
+python code/similarity_search.py $EMBED_DIR -s=nn
+SIMILARITY_PATH="$SIMILARITY_DIR/nn/similarity_results.json"
 echo $SIMILARITY_PATH
 echo
 
@@ -68,7 +73,7 @@ echo
 # Evaluate
 echo "======================================================================="
 echo "Evaluation"
-python code/evaluate.py $SIMILARITY_PATH
+python code/evaluate_map_at_15.py $SIMILARITY_PATH
 echo
 echo "======================================================================="
 

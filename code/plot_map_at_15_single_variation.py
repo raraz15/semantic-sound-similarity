@@ -5,7 +5,6 @@ import os
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 from lib.plotting import plot_label_based_map_at_15, plot_family_based_map_at_15
-
 from lib.directories import FIGURES_DIR, EVAL_DIR
 
 if __name__=="__main__":

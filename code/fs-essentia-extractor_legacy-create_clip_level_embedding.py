@@ -15,6 +15,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.decomposition import PCA
 
+from lib.utils import get_fname
 from lib.directories import AUDIO_DIR
 
 # Use these statistics for each feature
@@ -38,15 +39,13 @@ MBAND_FEATURES = [
     "spectral_contrast"
 ]
 
-def get_file_name(path):
-    return os.path.splitext(os.path.basename(path))[0]
-
 def load_yaml(path):
     return yaml.safe_load(Path(path).read_text())
 
 def select_subset(output):
     """ Selects a determined subset from a large set of features"""
-    # Collect statistics of each band separately
+
+    # For multiband features, collect PCA_DESCRIPTORS statistics of each band separately
     mband_feats = {}
     for feat in MBAND_FEATURES:
         n_bands = len(output["lowlevel"][feat][PCA_DESCRIPTORS[0]]) # Get the Number of bands
@@ -55,7 +54,7 @@ def select_subset(output):
             for stat in PCA_DESCRIPTORS:
                 mband_feats[f"{feat}_{i}"][stat] = output["lowlevel"][feat][stat][i]
         del output["lowlevel"][feat]
-    # Insert the collection to the rest
+    # Insert the collection to the rest of the lowlevel features
     for k,v in mband_feats.items():
         output["lowlevel"][k] = v
     # Select the subset of features
@@ -82,6 +81,12 @@ if __name__=="__main__":
     parser.add_argument('--plot-scree', 
                         action='store_true', 
                         help="Plot variance contributions of PCA components.")
+    parser.add_argument("--output-dir",
+                        type=str,
+                        default="",
+                        help="Path to output directory. If not provided, "
+                        "a directory will be created in the same directory "
+                        "as the embed_dir.")
     args = parser.parse_args()
 
     # Read all the embeddins
@@ -92,9 +97,11 @@ if __name__=="__main__":
     print("Creating the initial embeddings...")
     start_time = time.time()
     fnames,embeddings = [],[]
-    for embed_path in embed_paths:
+    for i,embed_path in enumerate(embed_paths):
+        if (i+1)%1000==0:
+            print(f"Processed {i} embeddings...")
         # Get the fname from the path
-        fnames += [get_file_name(embed_path).split("-")[0]]
+        fnames += [get_fname(embed_path).split("-")[0]]
         # Load the features and select the subset
         feat_dict = load_yaml(embed_path)
         embeddings += [select_subset(feat_dict)]
@@ -137,9 +144,14 @@ if __name__=="__main__":
     total_time = time.time()-start_time
     print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
+    # Determine PCA components
+    n_components = args.N if args.N!=-1 else embeddings.shape[1]
+
     # Create the output dir
-    n_components = args.N if args.N!=-1 else embeddings.shape[1] # PCA components
-    output_dir = f"{args.embed_dir}-PCA_{n_components}"
+    if args.output_dir == "":
+        output_dir = f"{args.embed_dir}-PCA_{n_components}"
+    else:
+        output_dir = os.path.join(args.output_dir, os.path.basename(args.embed_dir))
     os.makedirs(output_dir, exist_ok=True)
     print(f"Exporting the embeddings to: {output_dir}")
 

@@ -12,10 +12,8 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import numpy as np
 from sklearn.decomposition import PCA
 
+from lib.utils import get_fname
 from lib.directories import AUDIO_DIR, FIGURES_DIR
-
-def get_file_name(path):
-    return os.path.splitext(os.path.basename(path))[0]
 
 def aggregate_frames(embeds, aggregation="mean"):
     """ Takes a list of frame level embeddings and aggregates 
@@ -67,7 +65,8 @@ if __name__=="__main__":
                         type=str,
                         default="",
                         help="Path to output directory. If not provided, "
-                        "a directory will be created in the same directory as the embed_dir.")
+                        "a directory will be created in the same directory "
+                        "as the embed_dir.")
     args=parser.parse_args()
 
     if args.normalization and args.no_normalization:
@@ -148,7 +147,7 @@ if __name__=="__main__":
     # Export the transformed embeddings
     print("Exporting the embeddings...")
     for embed_path,embed in zip(embed_paths,embeddings):
-        fname = get_file_name(embed_path)
+        fname = get_fname(embed_path)
         embed = {"audio_path": os.path.join(AUDIO_DIR,f"{fname}.wav"),
                 "embeddings": embed.tolist()}
         output_path = os.path.join(output_dir, f"{fname}.json")
