@@ -89,7 +89,7 @@ if __name__=="__main__":
         start_time = time.time()
 
         # Calculate Instance-based mAP@N
-        print(f"\nCalculating Micro-Averaged mAP@{args.N}...")
+        print(f"Calculating Micro-Averaged mAP@{args.N}...")
         micro_map_at_N = metrics.instance_based_map_at_n(results_dict, df, n=args.N)
         # Export the micro mAP@N to txt
         output_path = os.path.join(output_dir, f"micro_mAP@{args.N}.txt")
@@ -97,7 +97,9 @@ if __name__=="__main__":
             outfile.write(str(micro_map_at_N))
 
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
+        print("-"*80)
         print(f"Micro-Averaged mAP@{args.N}: {micro_map_at_N:.5f} | Time: {time_str}")
+        print("-"*80)
         print(f"Results are exported to {output_path}")
 
     # Calculate Macro-Averaged Average Precision@N if required
@@ -108,12 +110,14 @@ if __name__=="__main__":
         # Calculate mAP for each label
         print(f"\nCalculating mAP@{args.N} for each label ...")
         label_maps, columns = metrics.calculate_map_at_n_for_labels(results_dict, df, n=args.N)
+        print("-"*80)
         print(f" mAP@{args.N} for Top 5 labels")
         for label, val, _ in label_maps[:5]:
             print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
         print(f" mAP@{args.N} for Bottom 5 labels")
         for label, val, _ in label_maps[-5:]:
             print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
+        print("-"*80)
 
         # Convert to a dataframe
         _df = pd.DataFrame(label_maps, columns=columns)
@@ -130,7 +134,9 @@ if __name__=="__main__":
         output_path = os.path.join(output_dir, f"balanced_mAP@{args.N}.txt")
         with open(output_path, "w") as outfile:
             outfile.write(str(balanced_map_at_N))
+        print("-"*80)
         print(f"Balanced mAP@{args.N}: {balanced_map_at_N:.5f}")
+        print("-"*80)
         print(f"Results are exported to {output_path}")
 
         # Calculate the Family-based mAP@N
@@ -144,9 +150,11 @@ if __name__=="__main__":
         # Export the labels' maps to CSV
         output_path = os.path.join(output_dir, f"families_mAP@{args.N}.csv")
         _df.to_csv(output_path, index=False)
+        print("-"*80)
         print(f"  mAP@{args.N} for each family")
         for family, val in family_maps:
             print(f"{family:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
+        print("-"*80)
         print(f"Results are exported to{output_path}")
 
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
