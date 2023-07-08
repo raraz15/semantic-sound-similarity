@@ -159,4 +159,4 @@ if __name__=="__main__":
     print(f"{len(tags)} unique tags remaining.")
 
     print("\n############")
-    print("Done!")
+    print("Done!\n")

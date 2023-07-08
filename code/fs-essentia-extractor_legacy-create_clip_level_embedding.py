@@ -196,4 +196,4 @@ if __name__=="__main__":
             json.dump(embed, outfile, indent=4)
 
     #############
-    print("Done!")
+    print("Done!\n")

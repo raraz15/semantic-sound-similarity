@@ -95,4 +95,4 @@ if __name__=="__main__":
     print(f"Average time/file: {total_time/len(embeddings):.3f} sec.")
 
     ##############
-    print("Done!")
+    print("Done!\n")

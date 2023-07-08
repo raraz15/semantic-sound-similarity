@@ -46,4 +46,4 @@ if __name__=="__main__":
                                 save_fig=True, 
                                 save_dir=args.save_dir,
                                 presentation_mode=args.presentation)
-    print("Done!")
+    print("Done!\n")

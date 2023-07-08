@@ -159,4 +159,4 @@ if __name__=="__main__":
         print(f"Time: {time_str}")
 
     #############
-    print("Done!")
+    print("Done!\n")

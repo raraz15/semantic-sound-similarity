@@ -102,4 +102,4 @@ if __name__=="__main__":
         json.dump(queries, json_file, indent=4)
 
     #############
-    print("Done!")
+    print("Done!\n")

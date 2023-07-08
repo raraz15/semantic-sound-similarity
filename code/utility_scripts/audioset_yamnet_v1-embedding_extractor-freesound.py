@@ -83,4 +83,4 @@ if __name__=="__main__":
             process_audio(model_embeddings, audio_path, args.output_dir)
 
     #############
-    print("Done!")
+    print("Done!\n")

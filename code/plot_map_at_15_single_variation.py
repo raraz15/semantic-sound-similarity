@@ -48,4 +48,4 @@ if __name__=="__main__":
                                 dataset_name=args.dataset,
                                 save_fig=True,
                                 save_dir=args.save_dir)
-    print("Done!")
+    print("Done!\n")
