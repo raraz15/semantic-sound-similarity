@@ -133,7 +133,7 @@ def plot_family_map_comparisons_multimodel(models,
                     weight='bold')
 
         # Set the plot parameters
-        ax[i].set_title(family, fontsize=15)
+        ax[i].set_title(family, fontsize=15, weight='bold')
         ax[i].set_yticks(np.arange(0,1.05,0.1))
         ax[i].tick_params(axis='x', which='major', labelsize=0)
         ax[i].tick_params(axis='y', which='major', labelsize=10)
@@ -147,7 +147,7 @@ def plot_family_map_comparisons_multimodel(models,
     save_function(save_fig, save_dir, "family_based_mAP@15-comparison.png", fig)
     plt.show()
 
-def plot_macro_map_comparisons_multimodel(models,
+def plot_macro_map_pca_comparisons_multimodel(models,
                                         eval_dir=EVAL_DIR, dataset_name=DATASET_NAME,
                                         fig_name="", save_fig=False, save_dir=""):
 
@@ -343,7 +343,7 @@ def plot_family_mr1_comparisons_multimodel(models,
                     weight='bold')
 
         # Set the plot parameters
-        ax[i].set_title(family, fontsize=15)
+        ax[i].set_title(family, fontsize=15, weight='bold')
         #ax[i].set_yticks(np.arange(0,1.05,0.1))
         ax[i].tick_params(axis='x', which='major', labelsize=0)
         ax[i].tick_params(axis='y', which='major', labelsize=10)
