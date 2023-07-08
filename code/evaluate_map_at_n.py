@@ -108,11 +108,11 @@ if __name__=="__main__":
         # Calculate mAP for each label
         print(f"\nCalculating mAP@{args.N} for each label ...")
         label_maps, columns = metrics.calculate_map_at_n_for_labels(results_dict, df, n=args.N)
-        print(f"mAP@{args.N} for Top 5 labels:")
-        for label, val in label_maps[:5]:
+        print(f" mAP@{args.N} for Top 5 labels")
+        for label, val, _ in label_maps[:5]:
             print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
-        print(f"mAP@{args.N} for Bottom 5 labels:")
-        for label, val in label_maps[-5:]:
+        print(f" mAP@{args.N} for Bottom 5 labels")
+        for label, val, _ in label_maps[-5:]:
             print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
 
         # Convert to a dataframe
@@ -144,7 +144,7 @@ if __name__=="__main__":
         # Export the labels' maps to CSV
         output_path = os.path.join(output_dir, f"families_mAP@{args.N}.csv")
         _df.to_csv(output_path, index=False)
-        print(f" mAP@{args.N} for each family:")
+        print(f"  mAP@{args.N} for each family")
         for family, val in family_maps:
             print(f"{family:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
         print(f"Results are exported to{output_path}")
