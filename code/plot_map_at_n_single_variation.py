@@ -1,5 +1,6 @@
-""" For a model with its embedding aggregation variation and search, plots the evaluation results.
-Namely, the label-based and family-based mAP@15."""
+""" For a model with its embedding aggregation variation and search, 
+plots the evaluation results. Namely, the label-based and family-based 
+mAP@15."""
 
 import os
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
@@ -17,12 +18,12 @@ if __name__=="__main__":
                         'audioset-yamnet-1 or fs-essentia-extractor_legacy')
     parser.add_argument('variation', 
                         type=str, 
-                        help='Name of the aggregation variation. For example: '
-                        'Agg_mean-PCA_200-Norm_True')
+                        help='Name of the aggregation variation. '
+                        'For example: Agg_mean-PCA_200-Norm_True')
     parser.add_argument('search',
                         type=str,
-                        help='Name of the similarity search. For example: '
-                        'nn or dot')
+                        help='Name of the similarity search. '
+                        'For example: nn or dot')
     parser.add_argument('-N', 
                         type=int, 
                         default=15, 
@@ -39,7 +40,10 @@ if __name__=="__main__":
 
     # Create the save directory if it does not exist
     if args.save_dir == "":
-        args.save_dir = os.path.join(FIGURES_DIR, args.model, args.variation, args.search)
+        args.save_dir = os.path.join(FIGURES_DIR, 
+                                    args.model, 
+                                    args.variation, 
+                                    args.search)
 
     # Plot the figures
     plot_label_based_map_at_15((args.model, args.variation, args.search),
