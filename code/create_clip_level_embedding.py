@@ -18,9 +18,11 @@ from lib.directories import AUDIO_DIR, FIGURES_DIR
 def aggregate_frames(embeds, aggregation="mean"):
     """ Takes a list of frame level embeddings and aggregates 
     them into a clip level embedding, if not already aggregated."""
+
     # Convert to numpy array
     if type(embeds)==list:
         embeds = np.array(embeds)
+
     # Aggreagate if multiple frames exist and specified
     if aggregation!="none" and len(embeds.shape)!=1:
         if aggregation=="mean":
@@ -29,10 +31,15 @@ def aggregate_frames(embeds, aggregation="mean"):
             embeds = np.median(embeds, axis=0)
         elif aggregation=="max":
             embeds = embeds.max(axis=0)
+    elif aggregation=="none" and len(embeds.shape)!=1 and embeds.shape[0]==1:
+        embeds = embeds[0]
+    else:
+        raise ValueError("Cannot aggregate the embeddings.")
     return embeds
 
 def normalize_embedding(embeds):
     """Normalize the clip level embedding"""
+
     assert len(embeds.shape)==1, "Expects a 1D Clip Embedding"
     return embeds/np.linalg.norm(embeds)
 
