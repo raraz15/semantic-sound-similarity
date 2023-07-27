@@ -23,6 +23,10 @@ if __name__=="__main__":
                         type=str,
                         help='Name of the similarity search. For example: '
                         'nn or dot')
+    parser.add_argument('-N', 
+                        type=int, 
+                        default=15, 
+                        help="Cutoff rank.")
     parser.add_argument("--save-dir",
                         type=str,
                         default="",
