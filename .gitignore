@@ -1,11 +1,7 @@
 ps/*
 
-models/*.json
-models/*.h5
-models/*.hdf5
-models/*.hdf5.*
-models/*.hdf5/*
-models/*.pb
+models/*
+
 
 __pycache__/*
 *.pyc
