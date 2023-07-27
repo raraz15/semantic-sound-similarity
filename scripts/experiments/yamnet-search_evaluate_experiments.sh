@@ -12,13 +12,20 @@ EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME"
 
 #############################################################################
 
+# Define here the variables of the experiment
+variable1=(dot nn)
+
+#############################################################################
+
 for file in "$EMBED_DIR/"*; do # for each embedding dir
     f=$(basename -- "$file")   # get the basename=embed_name
     if [[ $f == "$MODEL_NAME-"* ]]; then # if the embed contains model-
         echo "======================================================================="
         echo $f
         SUFFIX="${f/$MODEL_NAME-/""}" # Strip model name to get the suffix
-        yamnet-search_evaluate.sh $SUFFIX
+        for v1 in ${variable1[@]}; do
+            yamnet-search_evaluate.sh $1 $SUFFIX $v1
+        done
     fi
 done
 

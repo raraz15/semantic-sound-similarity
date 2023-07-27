@@ -5,7 +5,7 @@ source ps/bin/activate
 #############################################################################
 
 if [ $# == 0 ]; then
-    echo "Description: Takes extracted yamnet embeddings and prepares them, 
+    echo "Description: Takes extracted OpenL3 embeddings and prepares them, 
     searches for similarity, and performs the evaluation pipeline."
     echo "Usage: $0 param1 param2 param3 param4 param5"
     echo "param1: fsd_sinet name"

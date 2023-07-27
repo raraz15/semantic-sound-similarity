@@ -6,8 +6,9 @@ export PATH="$SCRIPT_DIR:$PATH"
 #############################################################################
 
 if [ $# == 0 ]; then
-    echo "Description: Takes extracted yamnet embeddings and prepares them, 
-    searches for similarity, and performs the evaluation pipeline."
+    echo "Description: Takes extracted CLAP model embeddings and prepares them, 
+    searches for similarity, and performs the evaluation pipeline using the 
+    range of variables defined on this script."
     echo "Usage: $0 param1"
     echo "param1: openl3 name"
     exit 0
