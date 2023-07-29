@@ -11,7 +11,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import pandas as pd
 
-from laion_clap import CLAP_Module
+from lib.laion_clap import CLAP_Module
 from lib.directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
 
 def process_audio(model_embeddings, audio_path, output_dir):
