@@ -77,10 +77,19 @@ done
 ############################################################################################################
 
 echo "====================================================================================================="
-echo "Downloading FSD SID Net Model"
+echo "Downloading ImageBind model"
 
 wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
 
+############################################################################################################
+
+echo "====================================================================================================="
+echo "Downloading AudioCLIP..."
+
+# AudioCLIP trained on AudioSet (text-, image- and audio-head simultaneously)
+wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/bpe_simple_vocab_16e6.txt.gz -P ./models/
+wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/AudioCLIP-Full-Training.pt -P ./models/
+
 echo "Done!"
 
-############################################################################################################
+# ############################################################################################################

@@ -1,6 +1,6 @@
 """Takes a FSD50K csv file specifying audio file names and computes embeddings 
-using a CLAP https://github.com/LAION-AI/CLAP/tree/main .Commit ID: 6b1b4b5
-All frame embeddings are exported as it is."""
+using an AudioCLIP model https://github.com/AndreyGuzhov/AudioCLIP. 
+Commit ID: 45327aa """
 
 import os
 import time
@@ -8,18 +8,44 @@ import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import pandas as pd
+import numpy as np
+import torch
 
-from lib.laion_clap import CLAP_Module
-from lib.directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
+torch.set_grad_enabled(False)
 
-def process_audio(model_embeddings, audio_path, output_dir):
-    """ Reads the audio of given path, creates the embeddings and exports.
-    The model_embeddings should be a CLAP_Module instance. Different from TensorflowPredict
-    models, CLAP models create a clip level embedding."""
+from essentia.standard import EasyLoader
+
+# MODEL_FILENAME = 'AudioCLIP-Full-Training.pt'
+SAMPLE_RATE = 44100
+TRIM_DUR = 30 # seconds
+
+from lib.audio_clip.model import AudioCLIP
+from lib.audio_clip.utils.transforms import ToTensor1D
+
+from lib.directories import MODELS_DIR, EMBEDDINGS_DIR, AUDIO_DIR, GT_PATH
+
+def process_audio(model, audio_path, output_dir, sample_rate=SAMPLE_RATE):
+
+    # Load the audio file
+    loader = EasyLoader()
+    loader.configure(filename=audio_path, 
+                     sampleRate=sample_rate, 
+                     endTime=TRIM_DUR, # FSD50K are already below 30 seconds
+                     replayGain=0 # Do not normalize the audio
+                     )
+    audio = loader()
+    # Zero pad short clips (IN FSD50K 7% of the clips are shorter than 1 second)
+    if audio.shape[0] < sample_rate:
+        audio = np.concatenate((audio, np.zeros((sample_rate-audio.shape[0]))))
+    # Bring to the right format
+    audio = audio.astype(np.float32)
+    audio_transforms = ToTensor1D()
+    audio = torch.stack([audio_transforms(audio.reshape(1,-1))]) #.unsqueeze(0)
 
     # Process
-    embeddings = model_embeddings.get_audio_embedding_from_filelist(x=[audio_path], 
-                                                                     use_tensor=False).tolist()
+    ((embeddings, _, _), _), _ = model(audio=audio)
+    embeddings = embeddings.squeeze(0).tolist()
+    
     # Save results
     fname = os.path.splitext(os.path.basename(audio_path))[0]
     output_path = os.path.join(output_dir, f"{fname}.json")
@@ -30,9 +56,11 @@ if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
                         formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('model_path',
+    parser.add_argument('--model_path',
+                        default=os.path.join(MODELS_DIR, 'AudioCLIP-Full-Training.pt'),
                         type=str, 
-                        help="Path to model.pt chekpoint. Should point to models/")
+                        help="Path to model.pt chekpoint. By default, "
+                        "it points to models/AudioCLIP-Full-Training.pt")
     parser.add_argument('-o', 
                         '--output_dir', 
                         type=str, 
@@ -40,18 +68,11 @@ if __name__=="__main__":
                         help="Path to output directory.")
     args=parser.parse_args()
 
-    # Configure the embedding mode w We append a "clap" to the start 
-    # of the downloaded models
+    # Get the model_name
     model_name = os.path.splitext(os.path.basename(args.model_path))[0]
-    if model_name in ["clap-630k-audioset-fusion-best", "clap-630k-fusion-best"]:
-        model = CLAP_Module(enable_fusion=True)
-    elif "clap-music_speech_audioset_epoch_15_esc_89.98" == model_name:
-        model= CLAP_Module(enable_fusion=False, amodel= 'HTSAT-base')
-    else:
-        raise ValueError(f"Unknown model name: {model_name}")
 
     # Load the model
-    model.load_ckpt(args.model_path)
+    model = AudioCLIP(pretrained=args.model_path).eval()
 
     # Read the file names
     fnames = pd.read_csv(GT_PATH)["fname"].to_list()
@@ -79,4 +100,7 @@ if __name__=="__main__":
     print(f"Average time/file: {total_time/len(audio_paths):.2f} sec.")
 
     #############
-    print("Done!\n")
+    print("Done!\n")   
+
+    
+
