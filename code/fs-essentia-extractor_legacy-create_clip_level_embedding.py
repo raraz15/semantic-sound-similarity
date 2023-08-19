@@ -77,7 +77,7 @@ if __name__=="__main__":
     parser.add_argument("-N",
                         type=int,
                         default=100, 
-                        help="Number of PCA components to keep.")
+                        help="Number of PCA components to keep. Pass -1 to skip PCA reduction.")
     parser.add_argument('--plot-scree', 
                         action='store_true', 
                         help="Plot variance contributions of PCA components.")
@@ -94,55 +94,42 @@ if __name__=="__main__":
     print(f"{len(embed_paths)} embeddings found.")
 
     # Create the initial embeddings from model outputs
-    print("Creating the initial embeddings...")
+    print("Selecting the features and concatenating...")
     start_time = time.time()
     fnames,embeddings = [],[]
     for i,embed_path in enumerate(embed_paths):
-        if (i+1)%1000==0:
-            print(f"Processed {i} embeddings...")
         # Get the fname from the path
         fnames += [get_fname(embed_path).split("-")[0]]
         # Load the features and select the subset
         feat_dict = load_yaml(embed_path)
-        embeddings += [select_subset(feat_dict)]
-    total_time = time.time()-start_time
-    print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
-
-    # List of all included features
-    SUBSET_KEYS = list(embeddings[0].keys())
-    print(f"{len(SUBSET_KEYS)} features selected.")
-
-    # Create and store a Scaler for each feature
-    print("Fitting scalers for each feature...")
-    start_time = time.time()
-    scalers = []
-    for feat in SUBSET_KEYS:
-        # Create the Data Matrix
-        data = np.array([embed[feat] for embed in embeddings])
-        scaler = MinMaxScaler()
-        scaler.fit(data)
-        scalers.append((feat,scaler))
+        # Hand-pick the features
+        embed = select_subset(feat_dict)
+        # Use the first item to decide the order of concatenation
+        if i==0:
+            SUBSET_KEYS = list(embed.keys()) # List of all included features
+            print(f"{len(SUBSET_KEYS)} features selected.")
+        embed = np.array([embed[k] for k in SUBSET_KEYS]).reshape(-1)
+        # Append the concatenated array
+        embeddings += [embed]
+        if (i+1)%1000==0 or i==0 or i+1==len(embed_paths):
+            print(f"Processed [{i+1}/{len(embed_paths)}] embeddings...")        
+    embeddings = np.array(embeddings)
+    print(f"Embedding shape: {embeddings.shape}")
     total_time = time.time()-start_time
     print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
     # Normalize each feature independently
-    print("Normalizing each feature independently...")
+    print("Normalizing the features...")
     start_time = time.time()
-    for i in range(len(embeddings)):
-        for key,scaler in scalers:
-            d = np.array(embeddings[i][key]).reshape(1,-1)
-            embeddings[i][key] = scaler.transform(d).reshape(-1)
+    scaler = MinMaxScaler()
+    embeddings = scaler.fit_transform(embeddings)
     total_time = time.time()-start_time
     print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
-    # Concat all normalized features, make sure same order is followed
-    print("Concatanating all the features....")
-    start_time = time.time()
-    for i in range(len(embeddings)):
-        embeddings[i] = np.array([embeddings[i][k] for k in SUBSET_KEYS]).reshape(-1)
-    embeddings = np.array(embeddings)
-    total_time = time.time()-start_time
-    print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
+    # Control the normalization
+    _min = embeddings.min(axis=0)
+    _max = embeddings.max(axis=0)
+    assert np.allclose(_min, 0) and np.allclose(_max, 1), f"Min-max scaling went wrong.\nmin={_min}, max={_max}"
 
     # Determine PCA components
     n_components = args.N if args.N!=-1 else embeddings.shape[1]
@@ -153,7 +140,7 @@ if __name__=="__main__":
     else:
         output_dir = os.path.join(args.output_dir, os.path.basename(args.embed_dir))
     os.makedirs(output_dir, exist_ok=True)
-    print(f"Exporting the embeddings to: {output_dir}")
+    print(f"Embeddings will be extracted to: {output_dir}")
 
     # Scree plot
     if args.plot_scree:

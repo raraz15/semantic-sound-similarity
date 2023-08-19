@@ -150,6 +150,11 @@ if __name__=="__main__":
         start_time = time.time()
         embeddings = np.array([normalize_embedding(embed) for embed in embeddings])
         print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
+        # Control the normalization
+        _min = embeddings.min(axis=0)
+        _max = embeddings.max(axis=0)
+        assert np.allclose(_min, 0) and np.allclose(_max, 1), \
+            f"Min-max scaling went wrong.\nmin={_min}, max={_max}"
 
     # Export the transformed embeddings
     print("Exporting the embeddings...")
