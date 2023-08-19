@@ -15,7 +15,6 @@ torch.set_grad_enabled(False)
 
 from essentia.standard import EasyLoader
 
-# MODEL_FILENAME = 'AudioCLIP-Full-Training.pt'
 SAMPLE_RATE = 44100
 TRIM_DUR = 30 # seconds
 
