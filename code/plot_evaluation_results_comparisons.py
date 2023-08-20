@@ -29,7 +29,9 @@ if __name__=="__main__":
 
     # Create the save directory if it does not exist
     if args.save_dir == "":
-        args.save_dir = os.path.join(FIGURES_DIR, args.model)
+        args.save_dir = os.path.join(FIGURES_DIR, 
+                                     "evaluation_results", 
+                                     args.model)
 
     # Plot the figures
     plot_map_at_15_comparisons(args.model,
