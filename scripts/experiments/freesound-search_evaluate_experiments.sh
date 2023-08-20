@@ -18,7 +18,7 @@ for file in "$EMBED_DIR/"*; do # for each embedding dir
         echo $f
         readarray -d - -t strarr <<< $f # Split from -
         SUFFIX="${strarr[3]}"     # 3rd is the PCA for essentia
-        essentia-search_evaluate.sh $SUFFIX "nn"
+        freesound-search_evaluate.sh $SUFFIX "nn"
     fi
 done
 

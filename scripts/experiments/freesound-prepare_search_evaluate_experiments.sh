@@ -11,7 +11,7 @@ variable=(80)
 #############################################################################
 
 for v in ${variable[@]}; do
-  essentia-prepare_search_evaluate.sh $v
+  freesound-prepare_search_evaluate.sh $v
 done
 
 # Compare the results of the experiments

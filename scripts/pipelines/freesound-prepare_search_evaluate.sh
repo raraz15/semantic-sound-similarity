@@ -54,7 +54,7 @@ echo $EVAL_DIR
 # Prepare the embeddings
 echo "======================================================================="
 echo "Preparation"
-python code/fs-essentia-extractor_legacy-create_clip_level_embedding.py $RAW_EMBED_DIR -N=$1
+python code/freesound-create_clip_level_embedding.py $RAW_EMBED_DIR -N=$1
 echo $EMBED_DIR
 echo
 
