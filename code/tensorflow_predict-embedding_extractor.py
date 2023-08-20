@@ -1,5 +1,6 @@
 """Takes a FSD50K csv file specifying audio file names and computes embeddings 
-using a TensorFlowPrecict model. All frame embeddings are exported without aggregation."""
+using a TensorFlowPrecict model. All frame embeddings are exported without 
+aggregation. Currently works with FSD-Sinet, VGGish, YamNet and OpenL3 models."""
 
 import os
 import time
@@ -11,25 +12,30 @@ import pandas as pd
 
 from essentia.standard import EasyLoader, TensorflowPredictFSDSINet, TensorflowPredictVGGish
 
+from lib.openl3 import EmbeddingsOpenL3
 from lib.directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
 
 TRIM_DUR = 30 # seconds
 
-def create_frame_level_embeddings(model, audio):
+def create_frame_level_embeddings(model, audio, model_name):
     """ Takes an embedding model and an audio array and returns the frame level embeddings.
     If the model produces a non-floatable embedding, returns None. This does not happen
     with models such as FSD-Sinet or VGGish, YamNet, OpenL3 on FSD50K eval."""
+
     try:
-        embeddings = model(audio) # Embedding vectors of each frame
+        # Embeddings of each time frame
+        if "openl3" in model_name:
+            embeddings = model.compute(audio) 
+        else:
+            embeddings = model(audio)
+        # Convert to list of lists, float for json serialization
         embeddings = [[float(value) for value in embedding] for embedding in embeddings]
         return embeddings
     except AttributeError:
         print("Model produced a non-floatable embedding.")
         return None
 
-# TODO: effect of zero padding short clips?
-# TODO: effect of normalization?
-def process_audio(model_embeddings, audio_path, output_dir, sample_rate):
+def process_audio(model, audio_path, output_dir, sample_rate, model_name):
     """ Reads the audio of given path, creates the embeddings and exports."""
     # Load the audio file
     loader = EasyLoader()
@@ -43,12 +49,13 @@ def process_audio(model_embeddings, audio_path, output_dir, sample_rate):
     if audio.shape[0] < sample_rate:
         audio = np.concatenate((audio, np.zeros((sample_rate-audio.shape[0]))))
     # Process
-    embeddings = create_frame_level_embeddings(model_embeddings, audio)
+    embeddings = create_frame_level_embeddings(model, audio, model_name)
     # Save results
     fname = os.path.splitext(os.path.basename(audio_path))[0]
     output_path = os.path.join(output_dir, f"{fname}.json")
     with open(output_path, 'w') as outfile:
-        json.dump({'audio_path': audio_path, 'embeddings': embeddings}, outfile, indent=4)
+        json.dump({'audio_path': audio_path, 
+                   'embeddings': embeddings}, outfile, indent=4)
 
 if __name__=="__main__":
 
@@ -74,16 +81,19 @@ if __name__=="__main__":
     # Configure the embedding model
     model_name = os.path.splitext(os.path.basename(args.config_path))[0]
     model_path = os.path.join(os.path.dirname(args.config_path), f"{model_name}.pb")
-    if "audioset-yamnet" in 'model_name':
-        model_embeddings = TensorflowPredictVGGish(graphFilename=model_path, 
-                                                input="melspectrogram", 
-                                                output="embeddings")
+    if "audioset-yamnet" in model_name:
+        model = TensorflowPredictVGGish(graphFilename=model_path, 
+                                        input="melspectrogram", 
+                                        output="embeddings")
     elif "audioset-vggish" in model_name:
-        model_embeddings = TensorflowPredictVGGish(graphFilename=model_path, 
-                                                output="model/vggish/embeddings")
+        model = TensorflowPredictVGGish(graphFilename=model_path, 
+                                        output="model/vggish/embeddings")
     elif "fsd-sinet" in model_name:
-        model_embeddings = TensorflowPredictFSDSINet(graphFilename=model_path,
-                                                    output="model/global_max_pooling1d/Max")
+        model = TensorflowPredictFSDSINet(graphFilename=model_path,
+                                        output="model/global_max_pooling1d/Max")
+    elif "openl3" in model_name:
+        model = EmbeddingsOpenL3(graph_path=model_path,
+                                input_shape=config['schema']['inputs'][0]['shape'])
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
@@ -105,9 +115,13 @@ if __name__=="__main__":
     # Process each audio
     start_time = time.time()
     for i,audio_path in enumerate(audio_paths):
-        if i%1000==0:
-            print(f"[{i:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")
-        process_audio(model_embeddings, audio_path, output_dir, config['inference']['sample_rate'])
+        process_audio(model, 
+                    audio_path, 
+                    output_dir, 
+                    config['inference']['sample_rate'], 
+                    model_name)
+        if i%1000==0 or i+1==len(audio_paths) or i==0:
+            print(f"[{i+1:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")
     total_time = time.time()-start_time
     print(f"\nTotal time: {time.strftime('%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(audio_paths):.2f} sec.")
