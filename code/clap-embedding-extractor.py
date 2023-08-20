@@ -1,7 +1,3 @@
-"""Takes a FSD50K csv file specifying audio file names and computes embeddings 
-using a CLAP https://github.com/LAION-AI/CLAP/tree/main .Commit ID: 6b1b4b5
-All frame embeddings are exported as it is."""
-
 import os
 import time
 import json
@@ -9,8 +5,9 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import pandas as pd
 
-from lib.laion_clap import CLAP_Module
 from lib.directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
+from lib.laion_clap import CLAP_Module
+
 
 def process_audio(model_embeddings, audio_path, output_dir):
     """ Reads the audio of given path, creates the embeddings and exports.
@@ -55,7 +52,11 @@ if __name__=="__main__":
 
     # Read the file names
     fnames = pd.read_csv(GT_PATH)["fname"].to_list()
-    audio_paths = [os.path.join(AUDIO_DIR, f"{fname}.wav") for fname in fnames]
+    audio_paths = []
+    for fname in fnames:
+        audio_path = os.path.join(AUDIO_DIR, f"{fname}.wav")
+        if os.path.exists(audio_path):
+            audio_paths.append(audio_path)
     print(f"There are {len(audio_paths)} audio files to process.")
 
     # Determine the output directory
@@ -68,12 +69,12 @@ if __name__=="__main__":
     os.makedirs(output_dir, exist_ok=True)
     print(f"Exporting the embeddings to: {output_dir}")
 
-    # Process each audio
+    # Process each audio clip
     start_time = time.time()
     for i,audio_path in enumerate(audio_paths):
-        if i%1000==0:
-            print(f"[{i:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")
         process_audio(model, audio_path, output_dir)
+        if (i+1)%1000==0 or i==0 or i+1==len(audio_paths):
+            print(f"[{i+1:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")        
     total_time = time.time()-start_time
     print(f"\nTotal time: {time.strftime('%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(audio_paths):.2f} sec.")
