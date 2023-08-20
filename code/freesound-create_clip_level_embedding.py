@@ -78,9 +78,6 @@ if __name__=="__main__":
                         type=int,
                         default=100, 
                         help="Number of PCA components to keep. Pass -1 to skip PCA reduction.")
-    parser.add_argument('--plot-scree', 
-                        action='store_true', 
-                        help="Plot variance contributions of PCA components.")
     parser.add_argument("--output-dir",
                         type=str,
                         default="",
@@ -133,37 +130,6 @@ if __name__=="__main__":
 
     # Determine PCA components
     n_components = args.N if args.N!=-1 else embeddings.shape[1]
-
-    # Create the output dir
-    if args.output_dir == "":
-        output_dir = f"{args.embed_dir}-PCA_{n_components}"
-    else:
-        output_dir = os.path.join(args.output_dir, os.path.basename(args.embed_dir))
-    os.makedirs(output_dir, exist_ok=True)
-    print(f"Embeddings will be extracted to: {output_dir}")
-
-    # Scree plot
-    if args.plot_scree:
-        print(f"Plotting the PCA Scree plot next to the embeddings...")
-        import matplotlib.pyplot as plt
-        model = os.path.basename(args.embed_dir)
-        data = os.path.basename(os.path.dirname(args.embed_dir))
-        title=f'FSD50K.{data} - {model} Embeddings PCA Scree Plot'
-        pca = PCA(n_components=None, copy=True)
-        pca.fit(embeddings)
-        PC_values = np.arange(pca.n_components_) + 1
-        cumsum_variance = 100*np.cumsum(pca.explained_variance_ratio_)
-        fig,ax = plt.subplots(figsize=(15,8), constrained_layout=True)
-        fig.suptitle(title, fontsize=20)
-        ax.plot(PC_values, cumsum_variance, 'ro-', linewidth=2)
-        ax.set_xlim([-5,len(PC_values)+5])
-        ax.set_yticks(np.arange(0,105,5)) # 5% increase
-        ax.set_xlabel('Number of Principal Components Selected', fontsize=15)
-        ax.set_ylabel('% Cumulative Variance Explained', fontsize=15)
-        ax.grid()
-        figure_path = os.path.join(output_dir, f'FSD50K.{data}-{model}-scree_plot.jpeg')
-        fig.savefig(figure_path)
-
     # Apply PCA if specified
     if args.N!=-1:
         print("Applying PCA to each embedding...")
@@ -172,6 +138,15 @@ if __name__=="__main__":
         embeddings = pca.fit_transform(embeddings)
         total_time = time.time()-start_time
         print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
+
+    # Create the output dir
+    if args.output_dir == "":
+        output_dir = f"{args.embed_dir}-PCA_{n_components}"
+    else:
+        output_dir = os.path.join(args.output_dir, 
+                                  f"{os.path.basename(args.embed_dir)}-PCA_{n_components}")
+    os.makedirs(output_dir, exist_ok=True)
+    print(f"Embeddings will be extracted to: {output_dir}")
 
     # Export the transformed embeddings
     print("Exporting the embeddings...")
