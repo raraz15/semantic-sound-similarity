@@ -43,7 +43,7 @@ def process_audio(model, audio_path, output_dir, sample_rate=SAMPLE_RATE):
 
     # Process
     ((embeddings, _, _), _), _ = model(audio=audio)
-    embeddings = embeddings.squeeze(0).tolist()
+    embeddings = embeddings.tolist()
     
     # Save results
     fname = os.path.splitext(os.path.basename(audio_path))[0]
