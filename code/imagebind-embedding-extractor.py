@@ -1,6 +1,5 @@
 """Takes a FSD50K csv file specifying audio file names and computes embeddings 
-using ImabgeBind https://github.com/facebookresearch/ImageBind/tree/main.
-Commit ID: 95d27c7. All frame embeddings are exported as it is.
+using ImabgeBind . All frame embeddings are exported as it is.
 """
 
 import os

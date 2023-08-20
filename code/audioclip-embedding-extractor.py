@@ -1,6 +1,5 @@
 """Takes a FSD50K csv file specifying audio file names and computes embeddings 
-using an AudioCLIP model https://github.com/AndreyGuzhov/AudioCLIP. 
-Commit ID: 45327aa """
+using an AudioCLIP model  """
 
 import os
 import time
