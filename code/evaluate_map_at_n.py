@@ -111,9 +111,10 @@ if __name__=="__main__":
         print(f"\nCalculating mAP@{args.N} for each label ...")
         label_maps, columns = metrics.calculate_map_at_n_for_labels(results_dict, df, n=args.N)
         print("-"*40)
-        print(f" mAP@{args.N} for Top 5 labels")
+        print(f"mAP@{args.N} for Top 5 labels")
         for label, val, _ in label_maps[:5]:
             print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
+        print(" "*15+"-"*10+" "*15)
         print(f" mAP@{args.N} for Bottom 5 labels")
         for label, val, _ in label_maps[-5:]:
             print(f"{label:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
