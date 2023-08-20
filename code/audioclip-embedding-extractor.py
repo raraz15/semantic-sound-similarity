@@ -36,10 +36,11 @@ def process_audio(model, audio_path, output_dir, sample_rate=SAMPLE_RATE):
     # Zero pad short clips (IN FSD50K 7% of the clips are shorter than 1 second)
     if audio.shape[0] < sample_rate:
         audio = np.concatenate((audio, np.zeros((sample_rate-audio.shape[0]))))
+
     # Bring to the right format
     audio = audio.astype(np.float32)
     audio_transforms = ToTensor1D()
-    audio = torch.stack([audio_transforms(audio.reshape(1,-1))]) #.unsqueeze(0)
+    audio = torch.stack([audio_transforms(audio.reshape(1,-1))])
 
     # Process
     ((embeddings, _, _), _), _ = model(audio=audio)
@@ -49,7 +50,8 @@ def process_audio(model, audio_path, output_dir, sample_rate=SAMPLE_RATE):
     fname = os.path.splitext(os.path.basename(audio_path))[0]
     output_path = os.path.join(output_dir, f"{fname}.json")
     with open(output_path, 'w') as outfile:
-        json.dump({'audio_path': audio_path, 'embeddings': embeddings}, outfile, indent=4)
+        json.dump({'audio_path': audio_path, 
+                   'embeddings': embeddings}, outfile, indent=4)
 
 if __name__=="__main__":
 
