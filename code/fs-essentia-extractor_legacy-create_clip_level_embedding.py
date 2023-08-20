@@ -118,7 +118,7 @@ if __name__=="__main__":
     total_time = time.time()-start_time
     print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
 
-    # Normalize each feature independently
+    # Normalize each feature independently. It's actually MinMax scaling
     print("Normalizing the features...")
     start_time = time.time()
     scaler = MinMaxScaler()
