@@ -5,6 +5,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+import os
 import logging
 import math
 
@@ -18,11 +19,13 @@ from pytorchvideo.data.encoded_video import EncodedVideo
 from torchvision import transforms
 from torchvision.transforms._transforms_video import NormalizeVideo
 
-from imagebind.models.multimodal_preprocessors import SimpleTokenizer
+from lib.imagebind.models.multimodal_preprocessors import SimpleTokenizer
+
+from lib.directories import MODELS_DIR
 
 DEFAULT_AUDIO_FRAME_SHIFT_MS = 10  # in milliseconds
 
-BPE_PATH = "bpe/bpe_simple_vocab_16e6.txt.gz"
+BPE_PATH = os.path.join(MODELS_DIR, "bpe/bpe_simple_vocab_16e6.txt.gz")
 
 
 def waveform2melspec(waveform, sample_rate, num_mel_bins, target_length):
