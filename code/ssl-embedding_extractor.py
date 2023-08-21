@@ -34,6 +34,7 @@ if __name__=="__main__":
     model_name = os.path.splitext(os.path.basename(args.model_path))[0]
     # Load the corresponding model
     if "clap" in model_name.lower():
+        print("Setting up CLAP model...")
         from lib.laion_clap import CLAP_Module
         # Decide type of CLAP model
         if model_name in ["clap-630k-audioset-fusion-best", "clap-630k-fusion-best"]:
@@ -51,6 +52,7 @@ if __name__=="__main__":
                                                                     use_tensor=False).tolist()
             return embeddings
     elif "imagebind" in model_name.lower():
+        print("Setting up ImageBind model...")
         from lib.imagebind import data
         from lib.imagebind.models import imagebind_model
         from lib.imagebind.models.imagebind_model import ModalityType        
@@ -70,24 +72,18 @@ if __name__=="__main__":
             embeddings = embeddings['audio'].cpu().numpy().tolist()
             return embeddings
     elif "audioclip" in model_name.lower():
+        print("Setting up AudioCLIP model...")        # TODO: create a function to load audio files, use it in tensofrlowpredict script as well
         from lib.audio_clip.model import AudioCLIP
         from lib.audio_clip.utils.transforms import ToTensor1D
-        from essentia.standard import EasyLoader
+        import librosa
+        # Load the model
         model = AudioCLIP(pretrained=args.model_path).eval()
         # Define embedding extractor function
-        # TODO: create a function to load audio files, use it in tensofrlowpredict script as well
         def extract_embeddings(model, audio_path):
             # Load the audio file
-            loader = EasyLoader()
-            loader.configure(filename=audio_path, 
-                            sampleRate=44100, 
-                            endTime=TRIM_DUR, # FSD50K are already below 30 seconds
-                            replayGain=0 # Do not normalize the audio
-                            )
-            audio = loader()
-            # Zero pad short clips (IN FSD50K 7% of the clips are shorter than 1 second)
-            if audio.shape[0] < 44100:
-                audio = np.concatenate((audio, np.zeros((44100-audio.shape[0]))))
+            audio = librosa.load(audio_path, sr=44100)[0]
+            # Trim the audio
+            audio = audio[:TRIM_DUR*44100]
             # Bring to the right format
             audio = audio.astype(np.float32)
             audio_transforms = ToTensor1D()
