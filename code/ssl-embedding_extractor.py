@@ -146,7 +146,7 @@ if __name__=="__main__":
         if (i+1)%1000==0 or i==0 or i+1==len(audio_paths):
             print(f"[{i+1:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")        
     total_time = time.time()-start_time
-    print(f"\nTotal time: {time.strftime('%M:%S', time.gmtime(total_time))}")
+    print(f"\nTotal time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(audio_paths):.2f} sec.")
 
     #############
