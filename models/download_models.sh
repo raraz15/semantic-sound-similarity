@@ -90,6 +90,13 @@ echo "Downloading AudioCLIP..."
 wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/bpe_simple_vocab_16e6.txt.gz -P ./models/
 wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/AudioCLIP-Full-Training.pt -P ./models/
 
+############################################################################################################
+
+echo "====================================================================================================="
+echo "Downloading Wav2CLIP..."
+
+wget https://github.com/descriptinc/lyrebird-wav2clip/releases/download/v0.1.0-alpha/Wav2CLIP.pt -P ./models/
+
 echo "Done!"
 
 # ############################################################################################################

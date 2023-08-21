@@ -92,6 +92,21 @@ if __name__=="__main__":
             ((embeddings, _, _), _), _ = model(audio=audio)
             embeddings = embeddings.tolist()
             return embeddings
+    elif "wav2clip" in model_name.lower():
+        print("Setting up wav2clip model...")
+        import lib.wav2clip_wrapper as wav2clip
+        import librosa
+        # Load the model
+        model = wav2clip.get_model(args.model_path)
+        # Define embedding extractor function
+        def extract_embeddings(model, audio_path):
+            # Load the audio file
+            audio = librosa.load(audio_path, sr=44100)[0]
+            # Trim the audio
+            audio = audio[:TRIM_DUR*44100]
+            # Create the embeddings
+            embeddings = wav2clip.embed_audio(audio, model).tolist()
+            return embeddings
     else:
         raise ValueError(f"Unknown model name: {model_name}.")
 

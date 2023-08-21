@@ -35,7 +35,15 @@ executing==1.2.0
 filelock==3.12.2
 Flask==2.3.2
 fonttools==4.38.0
-git+https://github.com/mtg/freesound-python.git
+freesound-python==1.1
+fsspec==2023.6.0
+ftfy==6.1.1
+fvcore==0.1.5.post20221221
+geos==0.2.3
+gitdb==4.0.10
+GitPython==3.1.31
+h5py==3.9.0
+huggingface-hub==0.16.4
 idna==3.4
 importlib-metadata==6.6.0
 iopath==0.1.10
@@ -147,6 +155,7 @@ visdom==0.1.8.9
 vtk==9.2.6
 wandb==0.15.7
 watchdog==3.0.0
+wav2clip==0.1.0
 wcwidth==0.2.6
 webdataset==0.2.48
 websocket-client==1.6.1
