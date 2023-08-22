@@ -22,7 +22,9 @@ from ..directories import EVAL_DIR, DATASET_NAME
 
 def plot_map_comparisons_multimodel(models, map_type, 
                                     eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                                    fig_name="", save_fig=False, save_dir=""):
+                                    use_fig_name=True, fig_name="",
+                                    legend=True,
+                                    save_fig=False, save_dir=""):
     """Takes a list of [(model,variation,search)] and plots all the mAP@15 in 
     the same figure. By setting map_type to "micro" or "macro" you can choose 
     between the two types of mAP.
@@ -58,7 +60,8 @@ def plot_map_comparisons_multimodel(models, map_type,
 
     # Plot the mAP for each model in a single figure
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(fig_name, fontsize=19, weight='bold')
+    if use_fig_name:
+        fig.suptitle(fig_name, fontsize=19, weight='bold')
     for j,(model,variation,search,map_at_15) in enumerate(maps):
         ax.bar(positions[j], 
                 map_at_15, 
@@ -84,15 +87,18 @@ def plot_map_comparisons_multimodel(models, map_type,
     ax.set_ylabel("mAP@15 (↑)", fontsize=15)
     ax.set_ylim([0,1])
     ax.grid(alpha=0.5)
-    ax.legend(loc="best", fontsize=11)
+    if legend:
+        ax.legend(loc="best", fontsize=11)
 
     # Save and show
     save_function(save_fig, save_dir, figure_save_name, fig)
     plt.show()
 
 def plot_family_map_comparisons_multimodel(models, 
-                                           eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                                           fig_name="", save_fig=False, save_dir=""):
+                                        eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
+                                        use_fig_name=True, fig_name="",
+                                        legend=True,
+                                        save_fig=False, save_dir=""):
     """Takes a list of [(model,variation,search)] and plots all the Family-based 
     mAP@15 in the same figure."""
 
@@ -114,7 +120,8 @@ def plot_family_map_comparisons_multimodel(models,
     model_maps = dict(sorted(model_maps.items(), key=lambda x: x[0]))
 
     fig,ax = plt.subplots(nrows=len(model_maps) ,figsize=(18,12), constrained_layout=True)
-    fig.suptitle(fig_name, fontsize=19, weight='bold')
+    if use_fig_name:
+        fig.suptitle(fig_name, fontsize=19, weight='bold')
     for i, (family, family_aps) in enumerate(model_maps.items()):
         for j,(model,variation,search,ap) in enumerate(family_aps):
             ax[i].bar(j, 
@@ -140,7 +147,7 @@ def plot_family_map_comparisons_multimodel(models,
         ax[i].set_ylabel("mAP@15 (↑)", fontsize=13)
         ax[i].set_ylim([0,1])
         ax[i].grid(alpha=0.5)
-        if i==0:
+        if legend and i==0:
             ax[i].legend(loc="upper center", fontsize=12, 
                          fancybox=True, ncol=len(models))
 
@@ -149,7 +156,9 @@ def plot_family_map_comparisons_multimodel(models,
 
 def plot_macro_map_pca_comparisons_multimodel(models,
                                         eval_dir=EVAL_DIR, dataset_name=DATASET_NAME,
-                                        fig_name="", save_fig=False, save_dir=""):
+                                        use_fig_name=True, fig_name="",
+                                        legend=True,                                        
+                                        save_fig=False, save_dir=""):
 
     default_fig_name = "Effect of the Number of PCA Components on Sound " \
                         "Similarity Performace by Label-Averaged mAP@15"
