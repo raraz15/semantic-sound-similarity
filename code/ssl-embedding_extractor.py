@@ -12,7 +12,7 @@ import pandas as pd
 
 import torch
 
-from lib.directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
+from lib.directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR, DATASET_NAME
 
 TRIM_DUR = 30 # seconds
 
@@ -27,7 +27,8 @@ if __name__=="__main__":
                         '--output_dir', 
                         type=str, 
                         default="",
-                        help="Path to output directory.")
+                        help="Path to output directory. Default: "
+                        f"<{EMBEDDINGS_DIR}>/<{DATASET_NAME}>/<model_name>")
     args=parser.parse_args()
 
     # Get the model anem from models/model_name.pt
@@ -72,26 +73,58 @@ if __name__=="__main__":
             embeddings = embeddings['audio'].cpu().numpy().tolist()
             return embeddings
     elif "audioclip" in model_name.lower():
-        print("Setting up AudioCLIP model...")        # TODO: create a function to load audio files, use it in tensofrlowpredict script as well
-        from lib.audio_clip.model import AudioCLIP
+        print("Setting up AudioCLIP model...")
         from lib.audio_clip.utils.transforms import ToTensor1D
         import librosa
         # Load the model
-        model = AudioCLIP(pretrained=args.model_path).eval()
-        # Define embedding extractor function
-        def extract_embeddings(model, audio_path):
-            # Load the audio file
-            audio = librosa.load(audio_path, sr=44100)[0]
-            # Trim the audio
-            audio = audio[:TRIM_DUR*44100]
-            # Bring to the right format
-            audio = audio.astype(np.float32)
-            audio_transforms = ToTensor1D()
-            audio = torch.stack([audio_transforms(audio.reshape(1,-1))])
-            # Process
-            ((embeddings, _, _), _), _ = model(audio=audio)
-            embeddings = embeddings.tolist()
-            return embeddings
+        if "ESRNXFBSP".lower() not in model_name.lower():
+            from lib.audio_clip.model import AudioCLIP
+            model = AudioCLIP(pretrained=args.model_path).eval()
+                # Define embedding extractor function
+            def extract_embeddings(model, audio_path):
+                # Load the audio file
+                audio = librosa.load(audio_path, sr=44100)[0]
+                # Trim the audio
+                audio = audio[:TRIM_DUR*44100]
+                # Bring to the right format
+                audio = audio.astype(np.float32)
+                audio_transforms = ToTensor1D()
+                audio = torch.stack([audio_transforms(audio.reshape(1,-1))])
+                # Process
+                ((embeddings, _, _), _), _ = model(audio=audio)
+                embeddings = embeddings.tolist()
+                return embeddings
+        else:
+            from lib.audio_clip.model.esresnet import ESResNeXtFBSP
+            model = ESResNeXtFBSP(n_fft=2048,
+                                hop_length=561,
+                                win_length=1654,
+                                window='blackmanharris',
+                                normalized=True,
+                                onesided=True,
+                                spec_height=-1,
+                                spec_width=-1,
+                                num_classes=527,
+                                apply_attention=True,
+                                pretrained=args.model_path).eval()
+            def extract_embeddings(model, audio_path):
+                # Load the audio file
+                audio = librosa.load(audio_path, sr=44100)[0]
+                # Trim the audio
+                audio = audio[:TRIM_DUR*44100]
+                # Bring to the right format
+                audio = audio.astype(np.float32)
+                audio_transforms = ToTensor1D()
+                audio = torch.stack([audio_transforms(audio.reshape(1,-1))])
+                # Process
+                #embeddings = model(audio)
+                x = model._forward_pre_processing(audio)
+                x = model._forward_features(x)
+                embeddings = model._forward_reduction(x)
+                embeddings = embeddings / embeddings.norm(dim=-1, keepdim=True)
+                #((embeddings, _, _), _), _ = model(audio=audio)
+                embeddings = embeddings.tolist()
+                return embeddings
     elif "wav2clip" in model_name.lower():
         print("Setting up wav2clip model...")
         import lib.wav2clip_wrapper as wav2clip
