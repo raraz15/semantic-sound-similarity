@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Do not forget to append CLAP 
+
 ############################################################################################################
 
 echo "====================================================================================================="
@@ -89,6 +91,8 @@ echo "Downloading AudioCLIP..."
 # AudioCLIP trained on AudioSet (text-, image- and audio-head simultaneously)
 wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/bpe_simple_vocab_16e6.txt.gz -P ./models/
 wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/AudioCLIP-Full-Training.pt -P ./models/
+wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/AudioCLIP-Partial-Training.pt -P ./models/
+wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/ESRNXFBSP.pt -P ./models/ -O AudioCLIP-ESRNXFBSP.pt
 
 ############################################################################################################
 
@@ -100,3 +104,8 @@ wget https://github.com/descriptinc/lyrebird-wav2clip/releases/download/v0.1.0-a
 echo "Done!"
 
 # ############################################################################################################
+
+# echo "====================================================================================================="
+# echo "Downloading CAV-MAE..."
+
+# wget "https://www.dropbox.com/s/wxrjgr86gdhc5k8/cav-mae-base.pth?dl=1" -P ./models/
