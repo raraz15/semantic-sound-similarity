@@ -14,10 +14,11 @@ from ..directories import EVAL_DIR, DATASET_NAME
 
 def plot_map_at_15_comparisons(model, map_type,
                                 eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                                fig_name="", save_fig=False, save_dir="",
+                                use_fig_name=True, fig_name="", 
+                                save_fig=False, save_dir="",
                                 presentation_mode=False):
     """Takes a model name and for each variation inside eval_dir,
-    plots all the the micro-averaged AP@15 values in a single plot ."""
+    plots all the the AP@15 values in a single plot ."""
 
     # Determine the file name and figure name
     # TODO: Instead of Label Class?
@@ -43,6 +44,7 @@ def plot_map_at_15_comparisons(model, map_type,
         _variation_paths = []
         for var_path in variation_paths:
             n_pca = int(var_path.split("/")[-1].split("-PCA_")[1].split("-Norm")[0])
+            # Only plıt certain variations
             if n_pca>=100:
                 _variation_paths.append(var_path)
             elif n_pca==64 and "vggish" in model:
@@ -59,7 +61,9 @@ def plot_map_at_15_comparisons(model, map_type,
             with open(map_path, "r") as in_f:
                 micro_map_at_15 = float(in_f.read())
             full_model_name = model_dir.split("/")[-1]
-            variation = "-".join(full_model_name.split("-")[-3:])
+            variation_parts = full_model_name.split("-")[-3:]
+            variation_parts = [v for v in variation_parts if v!="none"]
+            variation = "-".join(variation_parts)
             map_dict[search].append((variation, micro_map_at_15))
 
     # Determine some plot parameters
@@ -73,7 +77,8 @@ def plot_map_at_15_comparisons(model, map_type,
 
     # Plot the maps
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(fig_name, fontsize=19, weight='bold')
+    if use_fig_name:
+        fig.suptitle(fig_name, fontsize=19, weight='bold')
     xticks = []
     for j,search in enumerate(map_dict.keys()):
         for z,(variation,map) in enumerate(map_dict[search]):

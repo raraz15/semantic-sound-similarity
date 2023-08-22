@@ -13,9 +13,10 @@ from .utils import save_function
 from ..directories import EVAL_DIR, DATASET_NAME
 
 # TODO: find a way to wrap the text better
-def plot_label_based_map_at_15(model_variation_search, 
-                               eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                               fig_name="", save_fig=False, save_dir=""):
+def plot_map_at_15_for_all_labels(model_variation_search, 
+                               eval_dir=EVAL_DIR, dataset_name=DATASET_NAME,
+                               use_fig_name=True, fig_name="",
+                               save_fig=False, save_dir=""):
     """Takes a model name, aggregation variation and search name and plots 
     the label-based mAP@15 for it. That is, the mAP@15 is plotted for each 
     individual label."""
@@ -48,7 +49,8 @@ def plot_label_based_map_at_15(model_variation_search,
 
     # Plot the label-based mAP@15
     fig, ax = plt.subplots(figsize=(18, 24), nrows=N, constrained_layout=True)
-    fig.suptitle(fig_name, fontsize=16)
+    if use_fig_name:
+        fig.suptitle(fig_name, fontsize=16)
     for i in range(N):
         ax[i].bar([label.replace("_","\n") for label,_ in label_aps[i*delta:(i+1)*delta]], 
                   [prec for _,prec in label_aps[i*delta:(i+1)*delta]])
@@ -61,9 +63,10 @@ def plot_label_based_map_at_15(model_variation_search,
     save_function(save_fig, save_dir, "label_based_mAP@15.png", fig)
     plt.show()
 
-def plot_family_based_map_at_15(model_variation_search, 
+def plot_map_at_15_for_families(model_variation_search, 
                                 eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                                fig_name="", save_fig=False, save_dir=""):
+                                use_fig_name=True, fig_name="", 
+                                save_fig=False, save_dir=""):
     """Takes a model name, aggregation variation and search name and plots the label_family-based mAP@15 for it.
     That is, the mAP@15 is plotted for each individual label family."""
 
@@ -92,7 +95,8 @@ def plot_family_based_map_at_15(model_variation_search,
 
     # Plot the family-based mAP@15
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(fig_name, fontsize=19, weight='bold')
+    if use_fig_name:
+        fig.suptitle(fig_name, fontsize=19, weight='bold')
     # ax.set_title("Page 1 Results", fontsize=15)
     ax.bar([f.replace("_", " ").title() for f,_ in family_aps], 
            [m for _,m in family_aps], 
@@ -110,7 +114,8 @@ def plot_family_based_map_at_15(model_variation_search,
     # Set the plot parameters
     ax.set_yticks(np.arange(0,1.05,0.10))
     ax.tick_params(axis='y', which='major', labelsize=11)
-    ax.set_xlabel("Label Families", fontsize=15)
+    ax.tick_params(axis='x', which='major', labelsize=13)
+    ax.set_xlabel("Sound Families", fontsize=15)
     ax.set_ylabel("mAP@15 (↑)", fontsize=15)
     ax.set_ylim([0,1])
     ax.grid()

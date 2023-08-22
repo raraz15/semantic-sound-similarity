@@ -35,12 +35,12 @@ def plot_map_comparisons_multimodel(models, map_type,
         file_name = "micro_mAP@15.txt"
         default_fig_name = "Sound Similarity Performances of Embeddings by "\
                         "Instance-Based mAP@15" #(Micro-Averaged)
-        figure_save_name = "best_embeddings-micro_mAP@15-comparison.png"
+        figure_save_name = "micro_mAP@15-comparison.png"
     elif map_type=="macro":
         file_name = "balanced_mAP@15.txt"
         default_fig_name = "Sound Similarity Performances of Embeddings by "\
                         "Label-Based mAP@15" # (Macro-Averaged)
-        figure_save_name = "best_embeddings-macro_mAP@15-comparison.png"
+        figure_save_name = "macro_mAP@15-comparison.png"
     else:
         raise("map_type must be one of 'micro', 'macro'")
     fig_name = fig_name if fig_name else default_fig_name
@@ -156,8 +156,7 @@ def plot_family_map_comparisons_multimodel(models,
 
 def plot_macro_map_pca_comparisons_multimodel(models,
                                         eval_dir=EVAL_DIR, dataset_name=DATASET_NAME,
-                                        use_fig_name=True, fig_name="",
-                                        legend=True,                                        
+                                        use_fig_name=True, fig_name="",                                     
                                         save_fig=False, save_dir=""):
 
     default_fig_name = "Effect of the Number of PCA Components on Sound " \
@@ -165,7 +164,8 @@ def plot_macro_map_pca_comparisons_multimodel(models,
     fig_name = fig_name if fig_name else default_fig_name
 
     fig, ax = plt.subplots(nrows=len(models), figsize=(18,12), constrained_layout=True)
-    fig.suptitle(default_fig_name, fontsize=20, weight='bold')
+    if use_fig_name:
+        fig.suptitle(default_fig_name, fontsize=20, weight='bold')
     
     for i,model_search in enumerate(models):
 
@@ -240,7 +240,9 @@ def plot_macro_map_pca_comparisons_multimodel(models,
 
 def plot_mr1_comparisons_multimodel(models, mr1_type,
                                     eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                                    fig_name="", save_fig=False, save_dir=""):
+                                    use_fig_name=True, fig_name="",
+                                    legend=True,          
+                                    save_fig=False, save_dir=""):
     """ Takes a list of [(model,variation,search)] and plots all the MR1s in the same figure.
     mr1_type must be one of 'micro', 'macro'."""
 
@@ -249,12 +251,12 @@ def plot_mr1_comparisons_multimodel(models, mr1_type,
         file_name = "micro_MR1.txt"
         default_fig_name = "Sound Similarity Performances of Embeddings by "\
                         "Instance-Based MR1" #(Micro-Averaged)
-        figure_save_name = "best_embeddings-micro_MR1-comparison.png"
+        figure_save_name = "micro_MR1-comparison.png"
     elif mr1_type=="macro":
         file_name = "balanced_MR1.txt"
         default_fig_name = "Sound Similarity Performances of Embeddings by "\
                         "Label-Based MR1" # (Macro-Averaged)
-        figure_save_name = "best_embeddings-macro_MR1-comparison.png"
+        figure_save_name = "macro_MR1-comparison.png"
     else:
         raise("mr1_type must be one of 'micro', 'macro'")
     fig_name = fig_name if fig_name else default_fig_name
@@ -277,7 +279,8 @@ def plot_mr1_comparisons_multimodel(models, mr1_type,
 
     # Plot all the MR1s in the same figure
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(fig_name, fontsize=19, weight='bold')
+    if use_fig_name:
+        fig.suptitle(fig_name, fontsize=19, weight='bold')
     for i,(model,variation,search,mr1) in enumerate(mr1s):
             ax.bar(i, 
                 mr1, 
@@ -301,14 +304,17 @@ def plot_mr1_comparisons_multimodel(models, mr1_type,
     ax.set_xlabel("Embeddings", fontsize=15)
     ax.set_ylabel("MR1 (↓)", fontsize=15)
     ax.grid(alpha=0.5)
-    ax.legend(loc=4, fontsize=11)
+    if legend:
+        ax.legend(loc=4, fontsize=11)
 
     save_function(save_fig, save_dir, figure_save_name, fig)
     plt.show()
 
 def plot_family_mr1_comparisons_multimodel(models, 
                                            eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                                           fig_name="", save_fig=False, save_dir=""):
+                                           use_fig_name=True, fig_name="",
+                                           legend=True,
+                                           save_fig=False, save_dir=""):
     """Takes a list of [(model,variation,search)] and plots all the Family-based 
     MR1 in the same figure."""
 
@@ -333,7 +339,8 @@ def plot_family_mr1_comparisons_multimodel(models,
     model_mr1s = dict(sorted(model_mr1s.items(), key=lambda x: x[0]))
 
     fig,ax = plt.subplots(nrows=len(model_mr1s) ,figsize=(18,12), constrained_layout=True)
-    fig.suptitle(fig_name, fontsize=19, weight='bold')
+    if use_fig_name:
+        fig.suptitle(fig_name, fontsize=19, weight='bold')
     for i, (family, family_mr1s) in enumerate(model_mr1s.items()):
         for j,(model,variation,search,mr1) in enumerate(family_mr1s):
             ax[i].bar(j, 
@@ -359,7 +366,7 @@ def plot_family_mr1_comparisons_multimodel(models,
         ax[i].set_ylabel("MR1 (↓)", fontsize=13)
         ax[i].set_ylim([0, max_mr1+10])
         ax[i].grid(alpha=0.5)
-        if i==1:
+        if legend and i==1:
             ax[i].legend(loc="upper center", fontsize=11, 
                          fancybox=True, ncol=len(models))
 

@@ -47,7 +47,7 @@ def instance_based_MR1(embeddings, df):
         r1s.append(R1(query_fname, ranked_fnames, df))
         # Print the progress
         if (i+1)%1000==0 or (i+1)==len(embeddings) or i==0:
-            print(f"[{i+1}/{len(embeddings)}]")        
+            print(f"[{i+1:>{len(str(len(embeddings)))}}/{len(embeddings)}]")        
     # Calculate the mean of the R1s
     mr1 = sum(r1s)/len(r1s)
     return mr1

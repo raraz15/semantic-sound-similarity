@@ -70,6 +70,8 @@ if __name__=="__main__":
     print(f"{len(embed_paths)} embedding paths were found in the directory.")
     # Filter the embeddings to only include the ones in the ground truth
     embed_paths = [embed_path for embed_path in embed_paths if int(get_fname(embed_path)) in fnames]
+    assert len(embed_paths)==len(fnames), \
+        f"Number of embeddings ({len(embed_paths)}) and number of queries ({len(fnames)}) do not match."
     print(f"{len(embed_paths)} embeddings are in the ground truth.")
 
     # Load the embeddings, convert to numpy and store with the audio path
