@@ -2,6 +2,8 @@ ps/*
 
 models/*
 
+cav-mae/*
+
 
 __pycache__/*
 *.pyc

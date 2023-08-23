@@ -20,71 +20,150 @@ from ..directories import EVAL_DIR, DATASET_NAME
 ###################################################################################
 # mAP
 
-def plot_map_comparisons_multimodel(models, map_type, 
+def plot_map_comparisons_multimodel(models, map_type, N=15,
                                     eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
                                     use_fig_name=True, fig_name="",
                                     legend=True,
                                     save_fig=False, save_dir=""):
-    """Takes a list of [(model,variation,search)] and plots all the mAP@15 in 
+    """Takes a list of [(model,variation,search)] and plots all the mAP@N in 
     the same figure. By setting map_type to "micro" or "macro" you can choose 
     between the two types of mAP.
     """
 
     # Determine the file name and figure name
     if map_type=="micro":
-        file_name = "micro_mAP@15.txt"
+        file_name = f"micro_mAP@{N}.txt"
         default_fig_name = "Sound Similarity Performances of Embeddings by "\
-                        "Instance-Based mAP@15" #(Micro-Averaged)
-        figure_save_name = "micro_mAP@15-comparison.png"
+                        f"Instance-Based mAP@{N}" #(Micro-Averaged)
+        figure_save_name = f"micro_mAP@{N}-comparison.png"
     elif map_type=="macro":
-        file_name = "balanced_mAP@15.txt"
+        file_name = f"balanced_mAP@{N}.txt"
         default_fig_name = "Sound Similarity Performances of Embeddings by "\
-                        "Label-Based mAP@15" # (Macro-Averaged)
-        figure_save_name = "macro_mAP@15-comparison.png"
+                        f"Label-Based mAP@{N}" # (Macro-Averaged)
+        figure_save_name = f"macro_mAP@{N}-comparison.png"
     else:
         raise("map_type must be one of 'micro', 'macro'")
     fig_name = fig_name if fig_name else default_fig_name
 
-    # Determine Some Parameters
-    positions = np.linspace(-0.4, 0.4, len(models))
-    delta = positions[1]-positions[0]
-
-    # Read the mAP for each model
+    # Read the mAP@N for each model
     maps = []
     for model, variation, search in models:
         embedding_eval_dir = os.path.join(eval_dir, dataset_name, model+"-"+variation)
         map_path = os.path.join(embedding_eval_dir, search, file_name)
         with open(map_path, "r") as in_f:
-            map_at_15 = float(in_f.read())
-        maps.append((model, variation, search, map_at_15))
+            map_at_N = float(in_f.read())
+        maps.append((model, variation, search, map_at_N))
+
+    # Determine Some Parameters
+    positions = np.linspace(-0.4, 0.4, len(models))
+    delta = positions[1]-positions[0]        
 
     # Plot the mAP for each model in a single figure
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
     if use_fig_name:
         fig.suptitle(fig_name, fontsize=19, weight='bold')
-    for j,(model,variation,search,map_at_15) in enumerate(maps):
+    for j,(model,variation,search,map_at_N) in enumerate(maps):
         ax.bar(positions[j], 
-                map_at_15, 
+                map_at_N, 
                 label=model,
                 width=delta*0.80, 
                 color=COLORS[j], 
                 edgecolor='k',
                 linewidth=1.6)
         ax.text(positions[j], 
-                map_at_15+0.01, 
-                f"{map_at_15:.3f}", 
+                map_at_N+0.01, 
+                f"{map_at_N:.3f}", 
                 ha='center', 
                 va='bottom', 
                 fontsize=12, 
                 weight='bold')
 
     # Set the plot parameters
-    # ax.set_title("Page 1 Results", fontsize=15)
     ax.set_yticks(np.arange(0,1.05,0.05))
     ax.tick_params(axis='x', which='major', labelsize=0)
     ax.tick_params(axis='y', which='major', labelsize=11)
     ax.set_xlabel("Embeddings", fontsize=15)
-    ax.set_ylabel("mAP@15 (↑)", fontsize=15)
+    ax.set_ylabel(f"mAP@{N} (↑)", fontsize=15)
+    ax.set_ylim([0,1])
+    ax.grid(alpha=0.5)
+    if legend:
+        ax.legend(loc="best", fontsize=11)
+
+    # Save and show
+    save_function(save_fig, save_dir, figure_save_name, fig)
+    plt.show()
+
+def plot_map_15_and_150_comparisons_multimodel(models, map_type, 
+                                    eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
+                                    use_fig_name=True, fig_name="",
+                                    legend=True,
+                                    save_fig=False, save_dir=""):
+    """Takes a list of [(model,variation,search)] and plots all the mAP@N in 
+    the same figure. By setting map_type to "micro" or "macro" you can choose 
+    between the two types of mAP.
+    """
+
+    # Determine the file name and figure name
+    if map_type=="micro":
+        file_name_15 = "micro_mAP@15.txt"
+        file_name_150 = "micro_mAP@150.txt"
+        default_fig_name = "Sound Similarity Performances of Embeddings by "\
+                        "Instance-Based mAP@15 and mAP@150" #(Micro-Averaged)
+        figure_save_name = "micro_mAP@15_mAP@150-comparison.png"
+    elif map_type=="macro":
+        file_name_15 = "balanced_mAP@15.txt"
+        file_name_150 = "balanced_mAP@150.txt"
+        default_fig_name = "Sound Similarity Performances of Embeddings by "\
+                        "Label-Based mAP@15 and mAP@150" # (Macro-Averaged)
+        figure_save_name = "macro_mAP@15_mAP@150-comparison.png"
+    else:
+        raise("map_type must be one of 'micro', 'macro'")
+    fig_name = fig_name if fig_name else default_fig_name
+
+    # Read the mAP@N for each model
+    maps = {}
+    for N, file_name in zip([15, 150], [file_name_15, file_name_150]):
+        maps[N] = []
+        for model, variation, search in models:
+            embedding_eval_dir = os.path.join(eval_dir, dataset_name, model+"-"+variation)
+            map_path = os.path.join(embedding_eval_dir, search, file_name)
+            with open(map_path, "r") as in_f:
+                map_at_N = float(in_f.read())
+            maps[N].append((model, variation, search, map_at_N))
+
+    # Determine Some Parameters
+    positions = np.linspace(-0.4, 0.4, len(models))
+    delta = positions[1]-positions[0]        
+
+    # Plot the mAP for each model in a single figure
+    fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
+    if use_fig_name:
+        fig.suptitle(fig_name, fontsize=19, weight='bold')
+    for i,(N,maps_at_N) in enumerate(maps.items()):
+        for j,(model,variation,search,map_at_N) in enumerate(maps_at_N):
+            pos = positions[j]+((-1)**(i+1))*(delta/5)
+            ax.bar(pos,
+                    map_at_N, 
+                    hatch="//" if N==150 else None,
+                    label=f"{model} - mAP@{N}",
+                    width=delta*0.3, 
+                    color=COLORS[j], 
+                    edgecolor='k',
+                    linewidth=1.6)
+            ax.text(pos, 
+                    map_at_N+0.01, 
+                    f"{map_at_N:.3f}", 
+                    ha='center', 
+                    va='bottom', 
+                    fontsize=12, 
+                    weight='bold')
+
+    # Set the plot parameters
+    ax.set_yticks(np.arange(0,1.05,0.05))
+    ax.tick_params(axis='x', which='major', labelsize=0)
+    ax.tick_params(axis='y', which='major', labelsize=11)
+    ax.set_xlabel("Embeddings", fontsize=15)
+    ax.set_ylabel("mAP@N (↑)", fontsize=15)
     ax.set_ylim([0,1])
     ax.grid(alpha=0.5)
     if legend:
