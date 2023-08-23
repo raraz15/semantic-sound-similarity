@@ -62,7 +62,8 @@ def plot_map_at_15_comparisons(model, map_type,
                 micro_map_at_15 = float(in_f.read())
             full_model_name = model_dir.split("/")[-1]
             variation_parts = full_model_name.split("-")[-3:]
-            variation_parts = [v for v in variation_parts if v!="none"]
+            # Do not display Agg_none
+            variation_parts = [v for v in variation_parts if v!="Agg_none"]
             variation = "-".join(variation_parts)
             map_dict[search].append((variation, micro_map_at_15))
 
@@ -126,7 +127,8 @@ def plot_map_at_15_comparisons(model, map_type,
 
 def plot_macro_map_at_15_PCA_comparisons(model_search, 
                                          eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                                         fig_name="", save_fig=False, save_dir=""):
+                                         use_fig_name=True, fig_name="", 
+                                         save_fig=False, save_dir=""):
     """ Takes a model name, a fixed aggregation, normalization, and fixed search type 
     and plots the map@15 of each model variation inside eval_dir following these parameters 
     in the same plot. """
@@ -162,7 +164,8 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
 
     # Plot the maps
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(default_fig_name, fontsize=19, weight='bold')
+    if use_fig_name:
+        fig.suptitle(default_fig_name, fontsize=19, weight='bold')
 
     xticks = []
     for i,(variation,balanced_mAP) in enumerate(zip(variations, maps)):
@@ -189,8 +192,10 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
     ax.set_xlabel("Number of PCA Components", fontsize=15)
     ax.set_ylim([0,1])
 
-    save_function(save_fig, save_dir, 
-                  f"{'-'.join(model_search)}-macro_map@15-PCA_comparisons.png", fig)
+    save_function(save_fig, 
+                  save_dir, 
+                  "macro_map@15-PCA_comparisons.png", 
+                  fig)
     plt.show()
 
 # TODO: since we dont compute MR1 for all models, this function is not useful anymore
