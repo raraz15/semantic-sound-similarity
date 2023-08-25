@@ -48,7 +48,7 @@ def plot_map_at_15_for_all_labels(model_variation_search,
     delta = len(maps) // N
 
     # Plot the label-based mAP@15
-    fig, ax = plt.subplots(figsize=(18, 24), nrows=N, constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(18, 26), nrows=N, constrained_layout=True)
     if use_fig_name:
         fig.suptitle(fig_name, fontsize=16)
     for i in range(N):
