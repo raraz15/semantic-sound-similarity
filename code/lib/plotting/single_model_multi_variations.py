@@ -59,14 +59,18 @@ def plot_map_at_15_comparisons(model, map_type,
         for model_dir in variation_paths:
             map_path = os.path.join(model_dir, search, file_name)
             with open(map_path, "r") as in_f:
-                micro_map_at_15 = float(in_f.read())
+                map_at_15 = float(in_f.read())
             full_model_name = model_dir.split("/")[-1]
             variation_parts = full_model_name.split("-")[-3:]
             # Do not display Agg_none
             variation_parts = [v for v in variation_parts if v!="Agg_none"]
-            variation = "-".join(variation_parts)
-            map_dict[search].append((variation, micro_map_at_15))
-
+            if variation_parts[-1]=="Norm_True": # and search=="dot"
+                variation = "-".join(variation_parts[:-1])
+                map_dict["cos"].append((variation, map_at_15))
+            else:
+                variation = "-".join(variation_parts)
+                map_dict[search].append((variation, map_at_15))
+            
     # Determine some plot parameters
     if len(searches)>1:
         positions = np.linspace(-0.2, 0.2, len(searches))
@@ -90,9 +94,11 @@ def plot_map_at_15_comparisons(model, map_type,
                     xticks.append(variation.replace("essentia-extractor_legacy-", ""))
             if z==0:
                 if search=="dot":
-                    label = "Dot Product"
+                    label = "MIPS"
                 elif search=="nn":
-                    label = "Nearest Neighbors"
+                    label = "NNS"
+                elif search=="cos":
+                    label = "MCSS"
             else:
                 label = ""
             ax.bar(z+positions[j], 
