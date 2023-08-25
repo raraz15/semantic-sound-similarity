@@ -129,6 +129,25 @@ def plot_map_15_and_150_comparisons_multimodel(models, map_type,
             map_path = os.path.join(embedding_eval_dir, search, file_name)
             with open(map_path, "r") as in_f:
                 map_at_N = float(in_f.read())
+            # Clean model names for nice display
+            if model == "fs-essentia-extractor_legacy":
+                model = "Freesound"
+            elif model == "audioset-yamnet-1":
+                model = "YAMNet"
+            elif model == "audioset-vggish-3":
+                model = "VGGish"
+            elif model == "fsd-sinet-vgg42-tlpf-1":
+                model = "FSD-Sinet"
+            elif model == "openl3-env-mel256-emb512-3":
+                model = "OpenL3"
+            elif model == "clap-630k-fusion-best":
+                model = "CLAP"
+            elif model == "imagebind_huge":
+                model = "ImageBind"
+            elif model == "AudioCLIP-Full-Training":
+                model = "AudioCLIP"
+            elif model == "Wav2CLIP":
+                model = "Wav2CLIP"
             maps[N].append((model, variation, search, map_at_N))
 
     # Determine Some Parameters
@@ -144,7 +163,7 @@ def plot_map_15_and_150_comparisons_multimodel(models, map_type,
             pos = positions[j]+((-1)**(i+1))*(delta/5)
             ax.bar(pos,
                     map_at_N, 
-                    hatch="//" if N==150 else None,
+                    hatch="///" if N==150 else None,
                     label=f"{model} - mAP@{N}",
                     width=delta*0.3, 
                     color=COLORS[j], 
@@ -162,12 +181,12 @@ def plot_map_15_and_150_comparisons_multimodel(models, map_type,
     ax.set_yticks(np.arange(0,1.05,0.05))
     ax.tick_params(axis='x', which='major', labelsize=0)
     ax.tick_params(axis='y', which='major', labelsize=11)
-    ax.set_xlabel("Embeddings", fontsize=15)
+    ax.set_xlabel("QbE Systems", fontsize=15)
     ax.set_ylabel("mAP@N (↑)", fontsize=15)
     ax.set_ylim([0,1])
     ax.grid(alpha=0.5)
     if legend:
-        ax.legend(loc="best", fontsize=11)
+        ax.legend(loc="upper right", ncols=2, fontsize=12)
 
     # Save and show
     save_function(save_fig, save_dir, figure_save_name, fig)
