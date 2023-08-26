@@ -46,3 +46,26 @@ def save_function(save_fig, save_dir, default_name, fig):
         fig_path = os.path.join(save_dir, default_name)
         print(f"Saving figure to {fig_path}")
         fig.savefig(fig_path)
+
+def clean_model_name(model):
+    """Clean the model name for plotting."""
+
+    if model == "fs-essentia-extractor_legacy":
+        model = "Freesound"
+    elif model == "audioset-yamnet-1":
+        model = "YAMNet"
+    elif model == "audioset-vggish-3":
+        model = "VGGish"
+    elif model == "fsd-sinet-vgg42-tlpf-1":
+        model = "FSD-SINet"
+    elif model == "openl3-env-mel256-emb512-3":
+        model = "OpenL3"
+    elif model == "clap-630k-fusion-best":
+        model = "CLAP"
+    elif model == "imagebind_huge":
+        model = "ImageBind"
+    elif model == "AudioCLIP-Full-Training":
+        model = "AudioCLIP"
+    elif model == "Wav2CLIP":
+        model = "Wav2CLIP"
+    return model

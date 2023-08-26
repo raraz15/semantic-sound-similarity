@@ -14,13 +14,13 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 COLORS = list(TABLEAU_COLORS.values())
 
-from .utils import save_function, sort_variation_paths, get_pca
+from .utils import save_function, sort_variation_paths, get_pca, clean_model_name
 from ..directories import EVAL_DIR, DATASET_NAME
 
 ###################################################################################
 # mAP
 
-def plot_map_comparisons_multimodel(models, map_type, N=15,
+def plot_map_N_comparisons_multimodel(models, map_type, N=15,
                                     eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
                                     use_fig_name=True, fig_name="",
                                     legend=True,
@@ -129,25 +129,7 @@ def plot_map_15_and_150_comparisons_multimodel(models, map_type,
             map_path = os.path.join(embedding_eval_dir, search, file_name)
             with open(map_path, "r") as in_f:
                 map_at_N = float(in_f.read())
-            # Clean model names for nice display
-            if model == "fs-essentia-extractor_legacy":
-                model = "Freesound"
-            elif model == "audioset-yamnet-1":
-                model = "YAMNet"
-            elif model == "audioset-vggish-3":
-                model = "VGGish"
-            elif model == "fsd-sinet-vgg42-tlpf-1":
-                model = "FSD-Sinet"
-            elif model == "openl3-env-mel256-emb512-3":
-                model = "OpenL3"
-            elif model == "clap-630k-fusion-best":
-                model = "CLAP"
-            elif model == "imagebind_huge":
-                model = "ImageBind"
-            elif model == "AudioCLIP-Full-Training":
-                model = "AudioCLIP"
-            elif model == "Wav2CLIP":
-                model = "Wav2CLIP"
+            model = clean_model_name(model)
             maps[N].append((model, variation, search, map_at_N))
 
     # Determine Some Parameters
@@ -155,21 +137,19 @@ def plot_map_15_and_150_comparisons_multimodel(models, map_type,
     delta = positions[1]-positions[0]        
 
     # Plot the mAP for each model in a single figure
-    fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
+    fig,ax = plt.subplots(ncols=2, figsize=(18,6), sharey=True, constrained_layout=True)
     if use_fig_name:
         fig.suptitle(fig_name, fontsize=19, weight='bold')
     for i,(N,maps_at_N) in enumerate(maps.items()):
         for j,(model,variation,search,map_at_N) in enumerate(maps_at_N):
-            pos = positions[j]+((-1)**(i+1))*(delta/5)
-            ax.bar(pos,
+            ax[i].bar(positions[j],
                     map_at_N, 
-                    hatch="///" if N==150 else None,
-                    label=f"{model} - mAP@{N}",
-                    width=delta*0.3, 
+                    label=model if i==1 else None,
+                    width=delta*0.5, 
                     color=COLORS[j], 
                     edgecolor='k',
                     linewidth=1.6)
-            ax.text(pos, 
+            ax[i].text(positions[j], 
                     map_at_N+0.01, 
                     f"{map_at_N:.3f}", 
                     ha='center', 
@@ -177,16 +157,18 @@ def plot_map_15_and_150_comparisons_multimodel(models, map_type,
                     fontsize=12, 
                     weight='bold')
 
-    # Set the plot parameters
-    ax.set_yticks(np.arange(0,1.05,0.05))
-    ax.tick_params(axis='x', which='major', labelsize=0)
-    ax.tick_params(axis='y', which='major', labelsize=11)
-    ax.set_xlabel("QbE Systems", fontsize=15)
-    ax.set_ylabel("mAP@N (↑)", fontsize=15)
-    ax.set_ylim([0,1])
-    ax.grid(alpha=0.5)
-    if legend:
-        ax.legend(loc="upper right", ncols=2, fontsize=12)
+        # Set the plot parameters
+        ax[i].set_yticks(np.arange(0,1.05,0.05))
+        ax[i].tick_params(axis='x', which='major', labelsize=0)
+        ax[i].tick_params(axis='y', which='major', labelsize=11)
+        ax[i].set_title(f"N={N} (Page {N//15})", fontsize=17, weight='bold')
+        if i==0:
+            ax[i].set_ylabel(f"mAP@N (↑)", fontsize=15)
+        ax[i].set_ylim([0,1])
+        ax[i].grid(alpha=0.5)
+        if legend and i==1:
+            ax[i].legend(loc="upper right", title="QbE Systems", 
+                         title_fontsize=15, ncols=3, fontsize=12)
 
     # Save and show
     save_function(save_fig, save_dir, figure_save_name, fig)
@@ -366,6 +348,7 @@ def plot_mr1_comparisons_multimodel(models, mr1_type,
         mr1_path = os.path.join(embedding_eval_dir, search, file_name)
         with open(mr1_path,"r") as infile:
             mr1 = float(infile.read())
+        model = clean_model_name(model)
         mr1s.append((model, variation, search, mr1))
 
     # Determine the ytick params
@@ -396,14 +379,15 @@ def plot_mr1_comparisons_multimodel(models, mr1_type,
                 weight='bold')
 
     # Set the plot parameters
-    ax.tick_params(axis='x', which='major', labelsize=0)
+    ax.tick_params(axis='x', which='both', labelsize=0)
     ax.tick_params(axis='y', which='major', labelsize=11)
     ax.set_yticks(np.arange(0, max_mr1+delta_yticks, delta_yticks))
-    ax.set_xlabel("Embeddings", fontsize=15)
+    # ax.set_xlabel("Embeddings", fontsize=15)
     ax.set_ylabel("MR1 (↓)", fontsize=15)
     ax.grid(alpha=0.5)
     if legend:
-        ax.legend(loc=4, fontsize=11)
+        ax.legend(loc="upper center", ncols=3, title="QbE Systems",
+                  title_fontsize=15, fontsize=12)
 
     save_function(save_fig, save_dir, figure_save_name, fig)
     plt.show()
