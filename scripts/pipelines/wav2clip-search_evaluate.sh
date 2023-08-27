@@ -16,7 +16,7 @@ fi
 
 #############################################################################
 
-MODEL_NAME="AudioCLIP-Full-Training"
+MODEL_NAME="Wav2CLIP"
 DATASET_NAME="FSD50K.eval_audio"
 EMBED_NAME="$MODEL_NAME-$1"
 
