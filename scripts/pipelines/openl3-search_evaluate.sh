@@ -36,24 +36,22 @@ echo
 echo "Output Directories:"
 echo $SIMILARITY_DIR
 echo $EVAL_DIR
-echo
+echo "======================================================================="
 
 #############################################################################
-
 # Perform similarity search
-echo "======================================================================="
+
 echo "Similarity Search"
 python code/similarity_search.py $PREP_EMBED_DIR -s=$3
 SIMILARITY_PATH="$SIMILARITY_DIR/similarity_results.json"
-echo
+echo "======================================================================="
 
 #############################################################################
-
 # Evaluate
-echo "======================================================================="
+
 echo "Evaluation"
-python code/evaluate_map_at_15.py $SIMILARITY_PATH
-echo
+python code/evaluate_map_at_n.py $SIMILARITY_PATH
 echo "======================================================================="
+echo 
 
 #############################################################################

@@ -30,7 +30,7 @@ if __name__=="__main__":
                         help="Type of similarity search algorithm.")
     parser.add_argument('-N', 
                         type=int, 
-                        default=30, 
+                        default=15, 
                         help="Number of queries to return.")
     parser.add_argument("--ground-truth",
                         type=str,
@@ -88,11 +88,11 @@ if __name__=="__main__":
             # Export the results to JSONL file
             outfile.write(json.dumps(results)+"\n")
             # Display progress
-            if (i+1)%1000==0 or (i+1)==len(embeddings):
+            if (i+1)%1000==0 or (i+1)==len(embeddings) or i==0:
                 print(f"[{i+1:>{len(str(len(embeddings)))}}/{len(embeddings)}]")
     total_time = time.monotonic()-start_time
     print(f"Total computation time: {time.strftime('%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(embeddings):.3f} sec.")
 
     ##############
-    print("Done!")
+    print("Done!\n")

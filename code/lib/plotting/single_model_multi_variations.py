@@ -13,23 +13,25 @@ from .utils import save_function, sort_variation_paths, get_pca
 from ..directories import EVAL_DIR, DATASET_NAME
 
 def plot_map_at_15_comparisons(model, map_type,
+                               map_precision=3,
                                 eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                                fig_name="", save_fig=False, save_dir="",
+                                use_fig_name=True, fig_name="", 
+                                save_fig=False, save_dir="",
                                 presentation_mode=False):
     """Takes a model name and for each variation inside eval_dir,
-    plots all the the micro-averaged AP@15 values in a single plot ."""
+    plots all the the AP@15 values in a single plot ."""
 
     # Determine the file name and figure name
     # TODO: Instead of Label Class?
     if map_type=="micro":
         file_name = "micro_mAP@15.txt"
-        default_fig_name = f"Sound Similarity Performances of AIR Systems using " \
-                            f"Instance-Based mAP@15\n{model} Evaluated on {dataset_name}"
+        default_fig_name = f"Sound Similarity Performances of AIR Systems by " \
+                            f"Instance-Based mAP@15\n{model}"
         figure_save_name = "micro_mAP@15-comparisons.png"
     elif map_type=="macro":
         file_name = "balanced_mAP@15.txt"
-        default_fig_name = f"Sound Similarity Performances of AIR Systems using " \
-                            f"Label-Based mAP@15\n{model} Evaluated on {dataset_name}"
+        default_fig_name = f"Sound Similarity Performances of AIR Systems by " \
+                            f"Label-Based mAP@15\n{model}"
         figure_save_name = "macro_map@15-comparisons.png"
     else:
         raise("map_type must be one of 'micro', 'macro'")
@@ -43,6 +45,7 @@ def plot_map_at_15_comparisons(model, map_type,
         _variation_paths = []
         for var_path in variation_paths:
             n_pca = int(var_path.split("/")[-1].split("-PCA_")[1].split("-Norm")[0])
+            # Only plıt certain variations
             if n_pca>=100:
                 _variation_paths.append(var_path)
             elif n_pca==64 and "vggish" in model:
@@ -52,16 +55,49 @@ def plot_map_at_15_comparisons(model, map_type,
     searches = os.listdir(variation_paths[0])
 
     # Read all the maps
-    map_dict = {search: [] for search in searches}
+    map_dict = {search: [] for search in searches+["cos"]}
     for search in searches:
         for model_dir in variation_paths:
             map_path = os.path.join(model_dir, search, file_name)
             with open(map_path, "r") as in_f:
-                micro_map_at_15 = float(in_f.read())
+                map_at_15 = float(in_f.read())
             full_model_name = model_dir.split("/")[-1]
-            variation = "-".join(full_model_name.split("-")[-3:])
-            map_dict[search].append((variation, micro_map_at_15))
+            full_model_name = full_model_name.replace("fs-essentia-extractor_legacy-", "")
+            variation_parts = full_model_name.split("-")[-3:]
 
+            # Format the variation name for pprint
+            if variation_parts[0] == "Agg_mean":
+                variation_parts[0] = "Mean Agg."
+            elif variation_parts[0] == "Agg_max":
+                variation_parts[0] = "Max Agg."
+            elif variation_parts[0] == "Agg_median":
+                variation_parts[0] = "Median Agg."
+
+            # Freesound has 1 part only, e.g. PCA_100
+            if len(variation_parts)>1:
+                variation_parts[1] = variation_parts[1].replace("PCA_", "PCA: ")
+            else:
+                variation_parts[0] = variation_parts[0].replace("PCA_", "PCA: ")
+
+            # Do not display Agg_none
+            if variation_parts[0] == "Agg_none":
+                variation_parts.pop(0)
+
+            if len(variation_parts)>1:
+                variation = "\n".join(variation_parts[:-1])
+            else:
+                variation = variation_parts[0]
+
+            if variation_parts[-1]=="Norm_True" and search=="dot":
+                map_dict["cos"].append((variation, map_at_15))
+            elif variation_parts[-1]=="Norm_False":
+                map_dict[search].append((variation, map_at_15))
+            elif "PCA" in variation_parts[-1]: # Freesound
+                map_dict[search].append((variation, map_at_15))
+    # Remove cos for freesound
+    map_dict = {k:v for k,v in map_dict.items() if len(v)>0}
+    searches = list(map_dict.keys())
+       
     # Determine some plot parameters
     if len(searches)>1:
         positions = np.linspace(-0.2, 0.2, len(searches))
@@ -73,20 +109,20 @@ def plot_map_at_15_comparisons(model, map_type,
 
     # Plot the maps
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(fig_name, fontsize=19, weight='bold')
+    if use_fig_name:
+        fig.suptitle(fig_name, fontsize=19, weight='bold')
     xticks = []
     for j,search in enumerate(map_dict.keys()):
         for z,(variation,map) in enumerate(map_dict[search]):
             if j==0:
-                if "essentia" not in variation:
-                    xticks.append(variation.replace("-","\n").replace("Agg_", ""))
-                else:
-                    xticks.append(variation.replace("essentia-extractor_legacy-", ""))
+                xticks.append(variation)
             if z==0:
                 if search=="dot":
-                    label = "Dot Product"
+                    label = "MIPS"
                 elif search=="nn":
-                    label = "Nearest Neighbors"
+                    label = "NNS"
+                elif search=="cos":
+                    label = "MCSS"
             else:
                 label = ""
             ax.bar(z+positions[j], 
@@ -96,16 +132,29 @@ def plot_map_at_15_comparisons(model, map_type,
                     color=COLORS[j], 
                     edgecolor='k',
                     linewidth=1.2)
-            ax.text(z+positions[j]+0.05*(-1)**(j+1) , 
+            if len(searches)>1:
+                if len(map_dict[search])<=3:
+                    text_delta = 0
+                else:                        
+                    if j==0:
+                        text_delta = -0.07
+                    elif j==1:
+                        text_delta = 0
+                    else:
+                        text_delta = 0.07
+            else:
+                text_delta = 0
+            ax.text(z+positions[j]+text_delta,
                     map+0.01, 
-                    f"{map:.3f}", 
+                    f"{map:.{map_precision}f}", 
                     ha='center', 
                     va='bottom', 
-                    fontsize=10)
+                    fontsize=11,
+                    weight='bold'
+                    )
 
-    #ax.set_title(f"Page 1 Results", fontsize=17)
     ax.tick_params(axis='y', which='major', labelsize=11)
-    ax.tick_params(axis='x', which='major', labelsize=10)
+    ax.tick_params(axis='x', which='major', labelsize=12)
     ax.set_xticks(np.arange(len(xticks)), xticks)
     ax.set_yticks(np.arange(0,1.05,0.05))
     ax.set_ylim([0,1])
@@ -113,15 +162,16 @@ def plot_map_at_15_comparisons(model, map_type,
     ax.set_ylabel("mAP@15 (↑)", fontsize=15)
     ax.set_xlabel("Embedding Processing Parameters", fontsize=15)
     ax.grid(alpha=0.5)
-    ax.legend(fontsize=10, loc=1, title="Search Algorithms", 
-            title_fontsize=10, fancybox=True)
+    ax.legend(fontsize=12, loc=1, title="Search Algorithms", 
+            title_fontsize=14, fancybox=True)
 
     save_function(save_fig, save_dir, figure_save_name, fig)
     plt.show()
 
 def plot_macro_map_at_15_PCA_comparisons(model_search, 
                                          eval_dir=EVAL_DIR, dataset_name=DATASET_NAME, 
-                                         fig_name="", save_fig=False, save_dir=""):
+                                         use_fig_name=True, fig_name="", 
+                                         save_fig=False, save_dir=""):
     """ Takes a model name, a fixed aggregation, normalization, and fixed search type 
     and plots the map@15 of each model variation inside eval_dir following these parameters 
     in the same plot. """
@@ -129,7 +179,7 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
     model, agg, norm, search = model_search
 
     default_fig_name = f"Effect of the Number of PCA Components on Sound Similarity Performace by "+\
-                f"Label-Averaged mAP@15\n{model} Evaluated on {dataset_name}"
+                f"Label-Averaged mAP@15\n{model}"
     fig_name = fig_name if fig_name else default_fig_name
 
     # Find all the variation_paths of the model
@@ -157,7 +207,8 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
 
     # Plot the maps
     fig, ax = plt.subplots(figsize=(18,6), constrained_layout=True)
-    fig.suptitle(default_fig_name, fontsize=19, weight='bold')
+    if use_fig_name:
+        fig.suptitle(default_fig_name, fontsize=19, weight='bold')
 
     xticks = []
     for i,(variation,balanced_mAP) in enumerate(zip(variations, maps)):
@@ -169,10 +220,11 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
                 linewidth=1.2)
         ax.text(i, 
                 balanced_mAP+0.01, 
-                f"{balanced_mAP:.3f}", 
+                f"{balanced_mAP:.4f}", 
                 ha='center', 
                 va='bottom', 
-                fontsize=12)
+                fontsize=12,
+                weight='bold')
         xticks.append(get_pca(variation))
 
     ax.tick_params(axis='y', which='major', labelsize=11)
@@ -184,8 +236,10 @@ def plot_macro_map_at_15_PCA_comparisons(model_search,
     ax.set_xlabel("Number of PCA Components", fontsize=15)
     ax.set_ylim([0,1])
 
-    save_function(save_fig, save_dir, 
-                  f"{'-'.join(model_search)}-macro_map@15-PCA_comparisons.png", fig)
+    save_function(save_fig, 
+                  save_dir, 
+                  "macro_map@15-PCA_comparisons.png", 
+                  fig)
     plt.show()
 
 # TODO: since we dont compute MR1 for all models, this function is not useful anymore
@@ -195,7 +249,7 @@ def plot_mr1(model,
     """Takes a model name and plots the MR1 for all the variations of the model."""
 
     default_fig_name = "Embedding Processing and Search Algorithm " +\
-                f"Performances by MR1 Values\n{model} Evaluated on {dataset_name}"
+                f"Performances by MR1 Values\n{model}"
 
     # Find all the variation_paths of the model
     variation_paths = sorted(glob.glob(os.path.join(eval_dir, dataset_name, f"{model}-*")))

@@ -5,10 +5,10 @@ source ps/bin/activate
 #############################################################################
 
 if [ $# == 0 ]; then
-    echo "Description: Takes extracted yamnet embeddings and prepares them, 
+    echo "Description: Takes extracted OpenL3 embeddings and prepares them, 
     searches for similarity, and performs the evaluation pipeline."
     echo "Usage: $0 param1 param2 param3 param4 param5"
-    echo "param1: openl3 name"
+    echo "param1: openl3 model name"
     echo "param2: aggregation"
     echo "param3: N_PCA"
     echo "param4: normalization"
@@ -93,7 +93,7 @@ echo
 # Evaluate
 echo "======================================================================="
 echo "Evaluation"
-python code/evaluate_map_at_15.py $SIMILARITY_PATH
+python code/evaluate_map_at_n.py $SIMILARITY_PATH
 echo
 echo "======================================================================="
 

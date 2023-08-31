@@ -11,4 +11,6 @@ contact: <oguza97@gmail.com>
 
 ## Installation
 
+We use Python 3.10
+
 Coming Soon...

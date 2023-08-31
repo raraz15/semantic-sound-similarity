@@ -18,5 +18,7 @@ ANALYSIS_DIR = os.path.join(DATA_DIR, "similarity_results")
 EVAL_DIR = os.path.join(DATA_DIR, "evaluation_results")
 FIGURES_DIR = os.path.join(DATA_DIR, "figures")
 
+MODELS_DIR = os.path.join(PROJECT_DIR, "models")
+
 # Some useful files
 TAXONOMY_FAMILY_JSON = os.path.join(DATA_DIR, "taxonomy", "FSD50K_taxonomy-families.json")

@@ -16,6 +16,11 @@ fi
 
 #############################################################################
 
+# Define here the variables of the experiment
+variable1=(dot nn)
+
+#############################################################################
+
 DATASET_NAME="FSD50K.eval_audio"
 EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME"
 
@@ -27,12 +32,13 @@ for file in "$EMBED_DIR/"*; do # for each embedding dir
         echo "======================================================================="
         echo $f
         SUFFIX="${f/$1-/""}" # Strip model name to get the suffix
-        sinet-search_evaluate.sh $SUFFIX
+        for v1 in ${variable1[@]}; do
+            sinet-search_evaluate.sh $1 $SUFFIX $v1
+        done
     fi
 done
 
 # Compare the results of the experiments
 python code/plot_evaluation_results_comparisons.py =$1
-
 
 #############################################################################
