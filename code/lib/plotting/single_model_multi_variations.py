@@ -73,27 +73,39 @@ def plot_map_at_15_comparisons(model, map_type,
             elif variation_parts[0] == "Agg_median":
                 variation_parts[0] = "Median Agg."
 
+            # Uggly fix but quick. For display
             # Freesound has 1 part only, e.g. PCA_100
             if len(variation_parts)>1:
-                variation_parts[1] = variation_parts[1].replace("PCA_", "PCA: ")
+                N_PCA = int(variation_parts[1].split("_")[1])
+                if N_PCA>200:
+                    variation_parts[1] = "No PCA"
+                else:
+                    variation_parts[1] = variation_parts[1].replace("PCA_", "PCA: ")
             else:
-                variation_parts[0] = variation_parts[0].replace("PCA_", "PCA: ")
+                N_PCA = int(variation_parts[0].split("_")[1])
+                if N_PCA>200:
+                    variation_parts[0] = "No PCA"
+                else:
+                    variation_parts[0] = variation_parts[0].replace("PCA_", "PCA: ")
 
             # Do not display Agg_none
             if variation_parts[0] == "Agg_none":
                 variation_parts.pop(0)
 
+            # Create a single string
             if len(variation_parts)>1:
                 variation = "\n".join(variation_parts[:-1])
             else:
                 variation = variation_parts[0]
 
+            # Remove redundant computations. (When norm_true all 3 are equal)
             if variation_parts[-1]=="Norm_True" and search=="dot":
                 map_dict["cos"].append((variation, map_at_15))
             elif variation_parts[-1]=="Norm_False":
                 map_dict[search].append((variation, map_at_15))
             elif "PCA" in variation_parts[-1]: # Freesound
                 map_dict[search].append((variation, map_at_15))
+
     # Remove cos for freesound
     map_dict = {k:v for k,v in map_dict.items() if len(v)>0}
     searches = list(map_dict.keys())
