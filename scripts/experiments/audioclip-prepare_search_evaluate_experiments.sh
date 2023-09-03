@@ -27,6 +27,12 @@ variable3=("dot" "nn")
 for v1 in ${variable1[@]}; do
     for v2 in ${variable2[@]}; do
         for v3 in ${variable3[@]}; do
+
+            # if [[ $v1 == "-1" ]] && [[ $v2 == "--normalization" ]]; then
+            #     :
+            # else
+            #     echo "v1=$v1, v2=$v2, v3=$v3"
+            # fi
             echo "======================================================================="
             echo "Experiment Variables:"
             echo "v1=$v1, v2=$v2, v3=$v3"

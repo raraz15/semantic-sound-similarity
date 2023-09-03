@@ -1,0 +1,733 @@
+{
+    "name": "root",
+    "children": [
+        {
+            "name": "Music_[1972]",
+            "children": [
+                {
+                    "name": "Musical_instrument_[1940]",
+                    "children": [
+                        {
+                            "name": "Percussion_[825]",
+                            "children": [
+                                {
+                                    "name": "Drum_[310]",
+                                    "children": [
+                                        {
+                                            "name": "Snare_drum_[145]"
+                                        },
+                                        {
+                                            "name": "Bass_drum_[119]"
+                                        },
+                                        {
+                                            "name": "Tabla_[45]"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Cymbal_[234]",
+                                    "children": [
+                                        {
+                                            "name": "Hi-hat_[146]"
+                                        },
+                                        {
+                                            "name": "Crash_cymbal_[71]"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Mallet_percussion_[140]",
+                                    "children": [
+                                        {
+                                            "name": "Glockenspiel_[87]"
+                                        },
+                                        {
+                                            "name": "Marimba_and_xylophone_[39]"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Gong_[72]"
+                                },
+                                {
+                                    "name": "Tambourine_[71]"
+                                },
+                                {
+                                    "name": "Rattle_(instrument)_[64]"
+                                },
+                                {
+                                    "name": "Drum_kit_[60]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Plucked_string_instrument_[434]",
+                            "children": [
+                                {
+                                    "name": "Guitar_[411]",
+                                    "children": [
+                                        {
+                                            "name": "Electric_guitar_[181]"
+                                        },
+                                        {
+                                            "name": "Acoustic_guitar_[134]"
+                                        },
+                                        {
+                                            "name": "Bass_guitar_[78]"
+                                        },
+                                        {
+                                            "name": "Strum_[57]"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Keyboard_(musical)_[376]",
+                            "children": [
+                                {
+                                    "name": "Piano_[76]"
+                                },
+                                {
+                                    "name": "Organ_[35]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Bowed_string_instrument_[140]"
+                        },
+                        {
+                            "name": "Wind_instrument_and_woodwind_instrument_[105]"
+                        },
+                        {
+                            "name": "Brass_instrument_[86]",
+                            "children": [
+                                {
+                                    "name": "Trumpet_[56]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Scratching_(performance_technique)_[81]"
+                        },
+                        {
+                            "name": "Harmonica_[58]"
+                        },
+                        {
+                            "name": "Harp_[57]"
+                        },
+                        {
+                            "name": "Accordion_[50]"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Sounds_of_things_[0]",
+            "children": [
+                {
+                    "name": "Domestic_sounds_and_home_sounds_[1947]",
+                    "children": [
+                        {
+                            "name": "Door_[466]",
+                            "children": [
+                                {
+                                    "name": "Slam_[201]"
+                                },
+                                {
+                                    "name": "Sliding_door_[99]"
+                                },
+                                {
+                                    "name": "Doorbell_[37]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Water_tap_and_faucet_[178]"
+                        },
+                        {
+                            "name": "Dishes_and_pots_and_pans_[149]"
+                        },
+                        {
+                            "name": "Typing_[146]",
+                            "children": [
+                                {
+                                    "name": "Computer_keyboard_[93]"
+                                },
+                                {
+                                    "name": "Typewriter_[51]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Cutlery_and_silverware_[126]"
+                        },
+                        {
+                            "name": "Sink_(filling_or_washing)_[115]"
+                        },
+                        {
+                            "name": "Zipper_(clothing)_[104]"
+                        },
+                        {
+                            "name": "Coin_(dropping)_[92]"
+                        },
+                        {
+                            "name": "Writing_[88]"
+                        },
+                        {
+                            "name": "Keys_jangling_[82]"
+                        },
+                        {
+                            "name": "Toilet_flush_[73]"
+                        },
+                        {
+                            "name": "Drawer_open_or_close_[69]"
+                        },
+                        {
+                            "name": "Microwave_oven_[66]"
+                        },
+                        {
+                            "name": "Packing_tape_and_duct_tape_[60]"
+                        },
+                        {
+                            "name": "Scissors_[59]"
+                        },
+                        {
+                            "name": "Frying_(food)_[57]"
+                        },
+                        {
+                            "name": "Bathtub_(filling_or_washing)_[55]"
+                        },
+                        {
+                            "name": "Cupboard_open_or_close_[55]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Vehicle_[1030]",
+                    "children": [
+                        {
+                            "name": "Motor_vehicle_(road)_[587]",
+                            "children": [
+                                {
+                                    "name": "Car_[326]",
+                                    "children": [
+                                        {
+                                            "name": "Car_passing_by_[106]"
+                                        },
+                                        {
+                                            "name": "Vehicle_horn_and_car_horn_and_honking_[68]"
+                                        },
+                                        {
+                                            "name": "Race_car_and_auto_racing_[51]"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Traffic_noise_and_roadway_noise_[127]"
+                                },
+                                {
+                                    "name": "Motorcycle_[80]"
+                                },
+                                {
+                                    "name": "Bus_[62]"
+                                },
+                                {
+                                    "name": "Truck_[44]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Rail_transport_[199]",
+                            "children": [
+                                {
+                                    "name": "Train_[111]"
+                                },
+                                {
+                                    "name": "Subway_and_metro_and_underground_[82]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Bicycle_[100]",
+                            "children": [
+                                {
+                                    "name": "Bicycle_bell_[56]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Aircraft_[88]",
+                            "children": [
+                                {
+                                    "name": "Fixed-wing_aircraft_and_airplane_[45]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Skateboard_[52]"
+                        },
+                        {
+                            "name": "Boat_and_Water_vehicle_[33]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Alarm_[584]",
+                    "children": [
+                        {
+                            "name": "Telephone_[165]",
+                            "children": [
+                                {
+                                    "name": "Ringtone_[72]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Siren_[55]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Engine_[554]",
+                    "children": [
+                        {
+                            "name": "Accelerating_and_revving_and_vroom_[114]"
+                        },
+                        {
+                            "name": "Idling_[106]"
+                        },
+                        {
+                            "name": "Engine_starting_[76]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Liquid_[476]",
+                    "children": [
+                        {
+                            "name": "Pour_[169]",
+                            "children": [
+                                {
+                                    "name": "Trickle_and_dribble_[154]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Splash_and_splatter_[144]"
+                        },
+                        {
+                            "name": "Drip_[99]"
+                        },
+                        {
+                            "name": "Fill_(with_liquid)_[58]"
+                        },
+                        {
+                            "name": "Boiling_[37]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mechanisms_[461]",
+                    "children": [
+                        {
+                            "name": "Clock_[97]",
+                            "children": [
+                                {
+                                    "name": "Tick-tock_[74]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Camera_[76]"
+                        },
+                        {
+                            "name": "Printer_[63]"
+                        },
+                        {
+                            "name": "Mechanical_fan_[55]"
+                        },
+                        {
+                            "name": "Ratchet_and_pawl_[54]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Bell_[386]",
+                    "children": [
+                        {
+                            "name": "Chime_[102]",
+                            "children": [
+                                {
+                                    "name": "Wind_chime_[53]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Church_bell_[60]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Glass_[267]",
+                    "children": [
+                        {
+                            "name": "Chink_and_clink_[168]"
+                        },
+                        {
+                            "name": "Shatter_[96]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Explosion_[266]",
+                    "children": [
+                        {
+                            "name": "Gunshot_and_gunfire_[134]"
+                        },
+                        {
+                            "name": "Fireworks_[67]"
+                        },
+                        {
+                            "name": "Boom_[37]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Tools_[216]",
+                    "children": [
+                        {
+                            "name": "Hammer_[69]"
+                        },
+                        {
+                            "name": "Sawing_[55]"
+                        },
+                        {
+                            "name": "Power_tool_[43]",
+                            "children": [
+                                {
+                                    "name": "Drill_[42]"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Wood_[147]"
+                }
+            ]
+        },
+        {
+            "name": "Human_sounds_[0]",
+            "children": [
+                {
+                    "name": "Human_voice_[1633]",
+                    "children": [
+                        {
+                            "name": "Speech_[785]",
+                            "children": [
+                                {
+                                    "name": "Male_speech_and_man_speaking_[467]"
+                                },
+                                {
+                                    "name": "Female_speech_and_woman_speaking_[247]"
+                                },
+                                {
+                                    "name": "Child_speech_and_kid_speaking_[97]"
+                                },
+                                {
+                                    "name": "Conversation_[61]"
+                                },
+                                {
+                                    "name": "Speech_synthesizer_[61]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Laughter_[253]",
+                            "children": [
+                                {
+                                    "name": "Giggle_[84]"
+                                },
+                                {
+                                    "name": "Chuckle_and_chortle_[52]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Singing_[194]",
+                            "children": [
+                                {
+                                    "name": "Male_singing_[70]"
+                                },
+                                {
+                                    "name": "Female_singing_[70]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Shout_[177]",
+                            "children": [
+                                {
+                                    "name": "Yell_[60]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Screaming_[123]"
+                        },
+                        {
+                            "name": "Whispering_[75]"
+                        },
+                        {
+                            "name": "Sigh_[61]"
+                        },
+                        {
+                            "name": "Crying_and_sobbing_[42]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Human_group_actions_[631]",
+                    "children": [
+                        {
+                            "name": "Chatter_[387]"
+                        },
+                        {
+                            "name": "Crowd_[153]"
+                        },
+                        {
+                            "name": "Applause_[150]"
+                        },
+                        {
+                            "name": "Cheering_[109]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Respiratory_sounds_[380]",
+                    "children": [
+                        {
+                            "name": "Breathing_[227]",
+                            "children": [
+                                {
+                                    "name": "Gasp_[52]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Cough_[106]"
+                        },
+                        {
+                            "name": "Sneeze_[61]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Hands_[297]",
+                    "children": [
+                        {
+                            "name": "Clapping_[188]"
+                        },
+                        {
+                            "name": "Finger_snapping_[67]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Walk_and_footsteps_[203]"
+                },
+                {
+                    "name": "Fart_[97]"
+                },
+                {
+                    "name": "Burping_and_eructation_[92]"
+                },
+                {
+                    "name": "Run_[91]"
+                },
+                {
+                    "name": "Chewing_and_mastication_[75]"
+                }
+            ]
+        },
+        {
+            "name": "Animal_[1082]",
+            "children": [
+                {
+                    "name": "Wild_animals_[751]",
+                    "children": [
+                        {
+                            "name": "Bird_[540]",
+                            "children": [
+                                {
+                                    "name": "Bird_vocalization_and_bird_call_and_bird_song_[459]"
+                                },
+                                {
+                                    "name": "Crow_[36]"
+                                },
+                                {
+                                    "name": "Gull_and_seagull_[32]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Insect_[215]",
+                            "children": [
+                                {
+                                    "name": "Cricket_[100]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Frog_[38]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Domestic_animals_and_pets_[311]",
+                    "children": [
+                        {
+                            "name": "Dog_[178]",
+                            "children": [
+                                {
+                                    "name": "Bark_[122]"
+                                },
+                                {
+                                    "name": "Growling_[51]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Cat_[132]",
+                            "children": [
+                                {
+                                    "name": "Meow_[78]"
+                                },
+                                {
+                                    "name": "Purr_[60]"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Livestock_and_farm_animals_and_working_animals_[120]",
+                    "children": [
+                        {
+                            "name": "Cowbell_[63]"
+                        },
+                        {
+                            "name": "Fowl_[57]",
+                            "children": [
+                                {
+                                    "name": "Chicken_and_rooster_[35]"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Natural_sounds_[0]",
+            "children": [
+                {
+                    "name": "Water_[565]",
+                    "children": [
+                        {
+                            "name": "Rain_[208]",
+                            "children": [
+                                {
+                                    "name": "Raindrop_[75]"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Stream_[103]"
+                        },
+                        {
+                            "name": "Gurgling_[101]"
+                        },
+                        {
+                            "name": "Ocean_[93]",
+                            "children": [
+                                {
+                                    "name": "Waves_and_surf_[78]"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Wind_[134]"
+                },
+                {
+                    "name": "Thunderstorm_[132]",
+                    "children": [
+                        {
+                            "name": "Thunder_[128]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Fire_[124]"
+                }
+            ]
+        },
+        {
+            "name": "Source-ambiguous_sounds_[0]",
+            "children": [
+                {
+                    "name": "Chirp_and_tweet_[354]"
+                },
+                {
+                    "name": "Squeak_[217]"
+                },
+                {
+                    "name": "Thump_and_thud_[171]"
+                },
+                {
+                    "name": "Tap_[136]"
+                },
+                {
+                    "name": "Rattle_[127]"
+                },
+                {
+                    "name": "Hiss_[125]"
+                },
+                {
+                    "name": "Tearing_[110]"
+                },
+                {
+                    "name": "Crackle_[107]"
+                },
+                {
+                    "name": "Knock_[103]"
+                },
+                {
+                    "name": "Whoosh_and_swoosh_and_swish_[100]"
+                },
+                {
+                    "name": "Crumpling_and_crinkling_[90]"
+                },
+                {
+                    "name": "Crushing_[86]"
+                },
+                {
+                    "name": "Buzz_[76]"
+                },
+                {
+                    "name": "Crack_[69]"
+                },
+                {
+                    "name": "Screech_[68]"
+                },
+                {
+                    "name": "Tick_[57]"
+                }
+            ]
+        }
+    ]
+}

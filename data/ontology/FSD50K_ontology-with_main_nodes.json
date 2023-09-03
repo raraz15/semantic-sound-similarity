@@ -1,0 +1,733 @@
+{
+    "name": "root",
+    "children": [
+        {
+            "name": "Music",
+            "children": [
+                {
+                    "name": "Musical_instrument",
+                    "children": [
+                        {
+                            "name": "Percussion",
+                            "children": [
+                                {
+                                    "name": "Drum",
+                                    "children": [
+                                        {
+                                            "name": "Snare_drum"
+                                        },
+                                        {
+                                            "name": "Bass_drum"
+                                        },
+                                        {
+                                            "name": "Tabla"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Cymbal",
+                                    "children": [
+                                        {
+                                            "name": "Hi-hat"
+                                        },
+                                        {
+                                            "name": "Crash_cymbal"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Mallet_percussion",
+                                    "children": [
+                                        {
+                                            "name": "Glockenspiel"
+                                        },
+                                        {
+                                            "name": "Marimba_and_xylophone"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Gong"
+                                },
+                                {
+                                    "name": "Tambourine"
+                                },
+                                {
+                                    "name": "Rattle_(instrument)"
+                                },
+                                {
+                                    "name": "Drum_kit"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Plucked_string_instrument",
+                            "children": [
+                                {
+                                    "name": "Guitar",
+                                    "children": [
+                                        {
+                                            "name": "Electric_guitar"
+                                        },
+                                        {
+                                            "name": "Acoustic_guitar"
+                                        },
+                                        {
+                                            "name": "Bass_guitar"
+                                        },
+                                        {
+                                            "name": "Strum"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Keyboard_(musical)",
+                            "children": [
+                                {
+                                    "name": "Piano"
+                                },
+                                {
+                                    "name": "Organ"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Bowed_string_instrument"
+                        },
+                        {
+                            "name": "Wind_instrument_and_woodwind_instrument"
+                        },
+                        {
+                            "name": "Brass_instrument",
+                            "children": [
+                                {
+                                    "name": "Trumpet"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Scratching_(performance_technique)"
+                        },
+                        {
+                            "name": "Harmonica"
+                        },
+                        {
+                            "name": "Harp"
+                        },
+                        {
+                            "name": "Accordion"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Sounds_of_things",
+            "children": [
+                {
+                    "name": "Domestic_sounds_and_home_sounds",
+                    "children": [
+                        {
+                            "name": "Door",
+                            "children": [
+                                {
+                                    "name": "Slam"
+                                },
+                                {
+                                    "name": "Sliding_door"
+                                },
+                                {
+                                    "name": "Doorbell"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Water_tap_and_faucet"
+                        },
+                        {
+                            "name": "Dishes_and_pots_and_pans"
+                        },
+                        {
+                            "name": "Typing",
+                            "children": [
+                                {
+                                    "name": "Computer_keyboard"
+                                },
+                                {
+                                    "name": "Typewriter"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Cutlery_and_silverware"
+                        },
+                        {
+                            "name": "Sink_(filling_or_washing)"
+                        },
+                        {
+                            "name": "Zipper_(clothing)"
+                        },
+                        {
+                            "name": "Coin_(dropping)"
+                        },
+                        {
+                            "name": "Writing"
+                        },
+                        {
+                            "name": "Keys_jangling"
+                        },
+                        {
+                            "name": "Toilet_flush"
+                        },
+                        {
+                            "name": "Drawer_open_or_close"
+                        },
+                        {
+                            "name": "Microwave_oven"
+                        },
+                        {
+                            "name": "Packing_tape_and_duct_tape"
+                        },
+                        {
+                            "name": "Scissors"
+                        },
+                        {
+                            "name": "Frying_(food)"
+                        },
+                        {
+                            "name": "Bathtub_(filling_or_washing)"
+                        },
+                        {
+                            "name": "Cupboard_open_or_close"
+                        }
+                    ]
+                },
+                {
+                    "name": "Vehicle",
+                    "children": [
+                        {
+                            "name": "Motor_vehicle_(road)",
+                            "children": [
+                                {
+                                    "name": "Car",
+                                    "children": [
+                                        {
+                                            "name": "Car_passing_by"
+                                        },
+                                        {
+                                            "name": "Vehicle_horn_and_car_horn_and_honking"
+                                        },
+                                        {
+                                            "name": "Race_car_and_auto_racing"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Traffic_noise_and_roadway_noise"
+                                },
+                                {
+                                    "name": "Motorcycle"
+                                },
+                                {
+                                    "name": "Bus"
+                                },
+                                {
+                                    "name": "Truck"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Rail_transport",
+                            "children": [
+                                {
+                                    "name": "Train"
+                                },
+                                {
+                                    "name": "Subway_and_metro_and_underground"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Bicycle",
+                            "children": [
+                                {
+                                    "name": "Bicycle_bell"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Aircraft",
+                            "children": [
+                                {
+                                    "name": "Fixed-wing_aircraft_and_airplane"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Skateboard"
+                        },
+                        {
+                            "name": "Boat_and_Water_vehicle"
+                        }
+                    ]
+                },
+                {
+                    "name": "Alarm",
+                    "children": [
+                        {
+                            "name": "Telephone",
+                            "children": [
+                                {
+                                    "name": "Ringtone"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Siren"
+                        }
+                    ]
+                },
+                {
+                    "name": "Engine",
+                    "children": [
+                        {
+                            "name": "Accelerating_and_revving_and_vroom"
+                        },
+                        {
+                            "name": "Idling"
+                        },
+                        {
+                            "name": "Engine_starting"
+                        }
+                    ]
+                },
+                {
+                    "name": "Liquid",
+                    "children": [
+                        {
+                            "name": "Pour",
+                            "children": [
+                                {
+                                    "name": "Trickle_and_dribble"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Splash_and_splatter"
+                        },
+                        {
+                            "name": "Drip"
+                        },
+                        {
+                            "name": "Fill_(with_liquid)"
+                        },
+                        {
+                            "name": "Boiling"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mechanisms",
+                    "children": [
+                        {
+                            "name": "Clock",
+                            "children": [
+                                {
+                                    "name": "Tick-tock"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Camera"
+                        },
+                        {
+                            "name": "Printer"
+                        },
+                        {
+                            "name": "Mechanical_fan"
+                        },
+                        {
+                            "name": "Ratchet_and_pawl"
+                        }
+                    ]
+                },
+                {
+                    "name": "Bell",
+                    "children": [
+                        {
+                            "name": "Chime",
+                            "children": [
+                                {
+                                    "name": "Wind_chime"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Church_bell"
+                        }
+                    ]
+                },
+                {
+                    "name": "Glass",
+                    "children": [
+                        {
+                            "name": "Chink_and_clink"
+                        },
+                        {
+                            "name": "Shatter"
+                        }
+                    ]
+                },
+                {
+                    "name": "Explosion",
+                    "children": [
+                        {
+                            "name": "Gunshot_and_gunfire"
+                        },
+                        {
+                            "name": "Fireworks"
+                        },
+                        {
+                            "name": "Boom"
+                        }
+                    ]
+                },
+                {
+                    "name": "Tools",
+                    "children": [
+                        {
+                            "name": "Hammer"
+                        },
+                        {
+                            "name": "Sawing"
+                        },
+                        {
+                            "name": "Power_tool",
+                            "children": [
+                                {
+                                    "name": "Drill"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Wood"
+                }
+            ]
+        },
+        {
+            "name": "Human_sounds",
+            "children": [
+                {
+                    "name": "Human_voice",
+                    "children": [
+                        {
+                            "name": "Speech",
+                            "children": [
+                                {
+                                    "name": "Male_speech_and_man_speaking"
+                                },
+                                {
+                                    "name": "Female_speech_and_woman_speaking"
+                                },
+                                {
+                                    "name": "Child_speech_and_kid_speaking"
+                                },
+                                {
+                                    "name": "Conversation"
+                                },
+                                {
+                                    "name": "Speech_synthesizer"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Laughter",
+                            "children": [
+                                {
+                                    "name": "Giggle"
+                                },
+                                {
+                                    "name": "Chuckle_and_chortle"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Singing",
+                            "children": [
+                                {
+                                    "name": "Male_singing"
+                                },
+                                {
+                                    "name": "Female_singing"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Shout",
+                            "children": [
+                                {
+                                    "name": "Yell"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Screaming"
+                        },
+                        {
+                            "name": "Whispering"
+                        },
+                        {
+                            "name": "Sigh"
+                        },
+                        {
+                            "name": "Crying_and_sobbing"
+                        }
+                    ]
+                },
+                {
+                    "name": "Human_group_actions",
+                    "children": [
+                        {
+                            "name": "Chatter"
+                        },
+                        {
+                            "name": "Crowd"
+                        },
+                        {
+                            "name": "Applause"
+                        },
+                        {
+                            "name": "Cheering"
+                        }
+                    ]
+                },
+                {
+                    "name": "Respiratory_sounds",
+                    "children": [
+                        {
+                            "name": "Breathing",
+                            "children": [
+                                {
+                                    "name": "Gasp"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Cough"
+                        },
+                        {
+                            "name": "Sneeze"
+                        }
+                    ]
+                },
+                {
+                    "name": "Hands",
+                    "children": [
+                        {
+                            "name": "Clapping"
+                        },
+                        {
+                            "name": "Finger_snapping"
+                        }
+                    ]
+                },
+                {
+                    "name": "Walk_and_footsteps"
+                },
+                {
+                    "name": "Fart"
+                },
+                {
+                    "name": "Burping_and_eructation"
+                },
+                {
+                    "name": "Run"
+                },
+                {
+                    "name": "Chewing_and_mastication"
+                }
+            ]
+        },
+        {
+            "name": "Animal",
+            "children": [
+                {
+                    "name": "Wild_animals",
+                    "children": [
+                        {
+                            "name": "Bird",
+                            "children": [
+                                {
+                                    "name": "Bird_vocalization_and_bird_call_and_bird_song"
+                                },
+                                {
+                                    "name": "Crow"
+                                },
+                                {
+                                    "name": "Gull_and_seagull"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Insect",
+                            "children": [
+                                {
+                                    "name": "Cricket"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Frog"
+                        }
+                    ]
+                },
+                {
+                    "name": "Domestic_animals_and_pets",
+                    "children": [
+                        {
+                            "name": "Dog",
+                            "children": [
+                                {
+                                    "name": "Bark"
+                                },
+                                {
+                                    "name": "Growling"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Cat",
+                            "children": [
+                                {
+                                    "name": "Meow"
+                                },
+                                {
+                                    "name": "Purr"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Livestock_and_farm_animals_and_working_animals",
+                    "children": [
+                        {
+                            "name": "Cowbell"
+                        },
+                        {
+                            "name": "Fowl",
+                            "children": [
+                                {
+                                    "name": "Chicken_and_rooster"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Natural_sounds",
+            "children": [
+                {
+                    "name": "Water",
+                    "children": [
+                        {
+                            "name": "Rain",
+                            "children": [
+                                {
+                                    "name": "Raindrop"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Stream"
+                        },
+                        {
+                            "name": "Gurgling"
+                        },
+                        {
+                            "name": "Ocean",
+                            "children": [
+                                {
+                                    "name": "Waves_and_surf"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Wind"
+                },
+                {
+                    "name": "Thunderstorm",
+                    "children": [
+                        {
+                            "name": "Thunder"
+                        }
+                    ]
+                },
+                {
+                    "name": "Fire"
+                }
+            ]
+        },
+        {
+            "name": "Source-ambiguous_sounds",
+            "children": [
+                {
+                    "name": "Chirp_and_tweet"
+                },
+                {
+                    "name": "Squeak"
+                },
+                {
+                    "name": "Thump_and_thud"
+                },
+                {
+                    "name": "Tap"
+                },
+                {
+                    "name": "Rattle"
+                },
+                {
+                    "name": "Hiss"
+                },
+                {
+                    "name": "Tearing"
+                },
+                {
+                    "name": "Crackle"
+                },
+                {
+                    "name": "Knock"
+                },
+                {
+                    "name": "Whoosh_and_swoosh_and_swish"
+                },
+                {
+                    "name": "Crumpling_and_crinkling"
+                },
+                {
+                    "name": "Crushing"
+                },
+                {
+                    "name": "Buzz"
+                },
+                {
+                    "name": "Crack"
+                },
+                {
+                    "name": "Screech"
+                },
+                {
+                    "name": "Tick"
+                }
+            ]
+        }
+    ]
+}

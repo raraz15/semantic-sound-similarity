@@ -11,6 +11,7 @@ if [ $# == 0 ]; then
     echo "param1: ImageBind name"
     echo "param2: suffix of prepared embedding"
     echo "param3: search_type"
+    echo "param4: N"
     exit 0
 fi
 
@@ -42,7 +43,7 @@ echo "======================================================================="
 # Perform similarity search
 
 echo "Similarity Search"
-python code/similarity_search.py $PREP_EMBED_DIR -s=$3
+python code/similarity_search.py $PREP_EMBED_DIR -s=$3 -N=$4
 SIMILARITY_PATH="$SIMILARITY_DIR/similarity_results.json"
 echo "======================================================================="
 
@@ -50,7 +51,7 @@ echo "======================================================================="
 # Evaluate
 
 echo "Evaluation"
-python code/evaluate_map_at_n.py $SIMILARITY_PATH
+python code/evaluate_map_at_n.py $SIMILARITY_PATH -N=$4
 echo "======================================================================="
 echo 
 
