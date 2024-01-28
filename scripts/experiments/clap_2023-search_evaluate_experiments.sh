@@ -6,14 +6,13 @@ export PATH="$SCRIPT_DIR:$PATH"
 
 #############################################################################
 
-if [ $# == 0 ]; then
-    echo "Description: Takes extracted and prepared CLAP model embeddings,
-    searches for similarity, and performs the evaluation pipeline using the
-    experiment variables defined inside this script."
-    echo "Usage: $0 param1"
-    echo "param1: clap model name: e.g. clap-630k-fusion-best"
-    exit 0
-fi
+# if [ $# == 0 ]; then
+#     echo "Description: Takes extracted and prepared CLAP model embeddings,
+#     searches for similarity, and performs the evaluation pipeline using the
+#     experiment variables defined inside this script."
+#     echo "Usage: $0 param1"
+#     exit 0
+# fi
 
 #############################################################################
 
@@ -34,7 +33,7 @@ for file in "$EMBED_DIR/"*; do # for each embedding dir
         echo $f
         SUFFIX="${f/$1-/""}" # Strip model name to get the suffix
         for v1 in ${variable1[@]}; do
-            clap-search_evaluate.sh $1 $SUFFIX $v1
+            clap_2023-search_evaluate.sh $SUFFIX $v1
         done
     fi
 done

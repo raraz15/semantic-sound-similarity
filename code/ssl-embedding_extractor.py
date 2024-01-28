@@ -28,14 +28,24 @@ if __name__=="__main__":
                         type=str, 
                         default="",
                         help="Path to output directory. Default: "
-                        f"<{EMBEDDINGS_DIR}>/<{DATASET_NAME}>/<model_name>")
+                        f"{EMBEDDINGS_DIR}/{DATASET_NAME}/<model_name>")
     args=parser.parse_args()
 
     # Get the model anem from models/model_name.pt
     model_name = os.path.splitext(os.path.basename(args.model_path))[0]
     # Load the corresponding model
-    if "clap" in model_name.lower():
-        print("Setting up CLAP model...")
+    if 'CLAP_weights_2023' == model_name:
+        print("Setting up Microsoft CLAP model...")
+        from msclap import CLAP
+        model = CLAP(model_fp=args.model_path ,version = '2023', use_cuda=False)
+        model_name = 'CLAP_2023'
+        # Define embedding extractor function
+        def extract_embeddings(model, audio_path):
+            # Process
+            audio_embeddings = model.get_audio_embeddings(audio_files=[audio_path]).tolist()
+            return audio_embeddings
+    elif "clap" in model_name.lower():
+        print("Setting up Laion CLAP model...")
         from lib.laion_clap import CLAP_Module
         # Decide type of CLAP model
         if model_name in ["clap-630k-audioset-fusion-best", "clap-630k-fusion-best"]:
@@ -56,7 +66,7 @@ if __name__=="__main__":
         print("Setting up ImageBind model...")
         from lib.imagebind import data
         from lib.imagebind.models import imagebind_model
-        from lib.imagebind.models.imagebind_model import ModalityType        
+        from lib.imagebind.models.imagebind_model import ModalityType
         # Load the model
         model = imagebind_model.imagebind_huge(args.model_path, pretrained=True)
         model.eval()
@@ -177,10 +187,10 @@ if __name__=="__main__":
             json.dump({'audio_path': audio_path, 'embeddings': embeddings}, outfile, indent=4)
         # Print progress
         if (i+1)%1000==0 or i==0 or i+1==len(audio_paths):
-            print(f"[{i+1:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")        
+            print(f"[{i+1:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")
     total_time = time.time()-start_time
     print(f"\nTotal time: {time.strftime('%H:%M:%S', time.gmtime(total_time))}")
     print(f"Average time/file: {total_time/len(audio_paths):.2f} sec.")
 
     #############
-    print("Done!\n")    
+    print("Done!\n")
