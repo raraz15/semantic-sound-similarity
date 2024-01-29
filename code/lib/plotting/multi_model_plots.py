@@ -11,8 +11,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from matplotlib.colors import TABLEAU_COLORS
-COLORS = list(TABLEAU_COLORS.values())
+from matplotlib.colors import CSS4_COLORS
+COLORS = list(CSS4_COLORS.values())
+np.random.seed(27)
+np.random.shuffle(COLORS)
 
 from .utils import save_function, sort_variation_paths, get_pca, clean_model_name
 from ..directories import EVAL_DIR, DATASET_NAME
@@ -56,7 +58,7 @@ def plot_map_N_comparisons_multimodel(models, map_type, N=15,
 
     # Determine Some Parameters
     positions = np.linspace(-0.4, 0.4, len(models))
-    delta = positions[1]-positions[0]        
+    delta = positions[1]-positions[0]
 
     # Plot the mAP for each model in a single figure
     fig,ax = plt.subplots(figsize=(18,6), constrained_layout=True)
@@ -87,7 +89,8 @@ def plot_map_N_comparisons_multimodel(models, map_type, N=15,
     ax.set_ylim([0,1])
     ax.grid(alpha=0.5)
     if legend:
-        ax.legend(loc="best", fontsize=10)
+        ax.legend(loc="upper right", title="QbE Systems", 
+                title_fontsize=15, ncols=3, fontsize=10)
 
     # Save and show
     save_function(save_fig, save_dir, figure_save_name, fig)
@@ -134,7 +137,7 @@ def plot_map_15_and_150_comparisons_multimodel(models, map_type,
 
     # Determine Some Parameters
     positions = np.linspace(-0.4, 0.4, len(models))
-    delta = positions[1]-positions[0]        
+    delta = positions[1]-positions[0]
 
     # Plot the mAP for each model in a single figure
     fig,ax = plt.subplots(ncols=2, figsize=(18,6), sharey=True, constrained_layout=True)
@@ -168,7 +171,7 @@ def plot_map_15_and_150_comparisons_multimodel(models, map_type,
         ax[i].grid(alpha=0.5)
         if legend and i==1:
             ax[i].legend(loc="upper right", title="QbE Systems", 
-                         title_fontsize=15, ncols=3, fontsize=12)
+                         title_fontsize=15, ncols=3, fontsize=10)
 
     # Save and show
     save_function(save_fig, save_dir, figure_save_name, fig)
