@@ -21,4 +21,4 @@ FIGURES_DIR = os.path.join(DATA_DIR, "figures")
 MODELS_DIR = os.path.join(PROJECT_DIR, "models")
 
 # Some useful files
-TAXONOMY_FAMILY_JSON = os.path.join(DATA_DIR, "taxonomy", "FSD50K_taxonomy-families.json")
+TAXONOMY_FAMILY_JSON = os.path.join(DATA_DIR, "ontology", "taxonomy", "FSD50K_taxonomy-families.json")
