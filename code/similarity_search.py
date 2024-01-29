@@ -65,9 +65,10 @@ if __name__=="__main__":
         # For pretty print
         if len(clip_embedding["audio_path"]) > str_len:
             str_len = len(clip_embedding["audio_path"])
-    print(f"{len(embeddings)} embeddings are read.")
+    print(f"{len(embeddings):,} embeddings are read.")
 
     # Create the export directory
+    args.embed_dir = os.path.normpath(args.embed_dir)
     model_name = os.path.basename(args.embed_dir)
     dataset_name = os.path.basename(os.path.dirname(args.embed_dir))
     output_dir = os.path.join(args.output_dir, dataset_name, model_name, args.search)

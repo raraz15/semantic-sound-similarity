@@ -80,6 +80,8 @@ if __name__=="__main__":
     model_name = os.path.basename(os.path.dirname(os.path.dirname(args.results_path)))
     dataset_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(args.results_path))))
     output_dir = os.path.join(args.output_dir, dataset_name, model_name, search_name)
+    print(f"Output directory: {output_dir}")
+
     # Create the output directory if it does not exist
     os.makedirs(output_dir, exist_ok=True)
 
