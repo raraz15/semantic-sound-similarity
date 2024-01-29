@@ -156,7 +156,7 @@ if __name__=="__main__":
         for family, val in family_maps:
             print(f"{family:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
         print("-"*40)
-        print(f"Results are exported to{output_path}")
+        print(f"Results are exported to {output_path}")
 
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
         print(f"Time: {time_str}")
