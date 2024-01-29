@@ -87,7 +87,7 @@ def plot_map_N_comparisons_multimodel(models, map_type, N=15,
     ax.set_ylim([0,1])
     ax.grid(alpha=0.5)
     if legend:
-        ax.legend(loc="best", fontsize=11)
+        ax.legend(loc="best", fontsize=10)
 
     # Save and show
     save_function(save_fig, save_dir, figure_save_name, fig)
