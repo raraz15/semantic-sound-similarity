@@ -143,7 +143,7 @@ if __name__=="__main__":
     else:
         output_dir = os.path.join(args.output_dir, os.path.basename(args.embed_dir))
     os.makedirs(output_dir, exist_ok=True)
-    print(f"Prepared embeddings will be extracte to: {output_dir}")
+    print(f"Prepared embeddings will be extracted to: {output_dir}")
 
     # Export the transformed embeddings
     print("Exporting the embeddings...")
