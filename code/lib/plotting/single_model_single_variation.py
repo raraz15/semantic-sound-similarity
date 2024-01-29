@@ -84,7 +84,7 @@ def plot_map_at_N_for_families(model_variation_search, N=15,
 
     # Get the path to the family-based mAP@N
     variation_dir = os.path.join(eval_dir, dataset_name, model+"-"+variation)
-    map_path = os.path.join(variation_dir, search, f"families_mAP{N}.csv")
+    map_path = os.path.join(variation_dir, search, f"families_mAP@{N}.csv")
 
     # Read the family-based mAP@N
     labels_map = pd.read_csv(map_path)
