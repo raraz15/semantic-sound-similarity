@@ -1,11 +1,9 @@
 ps/*
 
-models/*.json
-models/*.h5
-models/*.hdf5
-models/*.hdf5.*
-models/*.hdf5/*
-models/*.pb
+models/*
+
+cav-mae/*
+
 
 __pycache__/*
 *.pyc

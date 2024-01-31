@@ -5,7 +5,7 @@ source ps/bin/activate
 #############################################################################
 
 if [ $# == 0 ]; then
-    echo "Description: Takes extracted yamnet embeddings and prepares them, 
+    echo "Description: Takes extracted YamNet embeddings and prepares them, 
     searches for similarity, and performs the evaluation pipeline."
     echo "Usage: $0 param1 param2 param3 param4"
     echo "param1: aggregation"
@@ -81,7 +81,7 @@ echo
 # Evaluate
 echo "======================================================================="
 echo "Evaluation"
-python code/evaluate_map_at_15.py $SIMILARITY_PATH
+python code/evaluate_map_at_n.py $SIMILARITY_PATH
 echo
 echo "======================================================================="
 

@@ -26,7 +26,7 @@ def average_precision_at_n(relevance, n, n_relevant=None):
     if sum(relevance)==0:
         ap_at_n = 0
     else:
-        total = sum([rel_k*precision_at_k(relevance,k) for k,rel_k in enumerate(relevance)])
+        total = sum([precision_at_k(relevance,k) for k,rel_k in enumerate(relevance) if rel_k==1])
         # If n_relevant is provided, compare it with ranking length and
         # use the smaller to normalize the total
         normalization = min(n,n_relevant) if n_relevant is not None else n

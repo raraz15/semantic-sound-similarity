@@ -1,0 +1,97 @@
+Doorbell
+['Sounds_of_things', 'Domestic_sounds_and_home_sounds', 'Door', 'Doorbell']
+['Sounds_of_things', 'Alarm', 'Doorbell']
+
+Growling
+['Animal', 'Domestic_animals_and_pets', 'Dog', 'Growling']
+['Animal', 'Domestic_animals_and_pets', 'Cat', 'Growling']
+['Animal', 'Wild_animals', 'Roaring_cats_(lions_and_tigers)', 'Growling']
+['Animal', 'Wild_animals', 'Canidae_and_dogs_and_wolves', 'Growling']
+
+Cowbell
+['Animal', 'Livestock_and_farm_animals_and_working_animals', 'Cattle_and_bovinae', 'Cowbell']
+['Sounds_of_things', 'Bell', 'Cowbell']
+['Music', 'Musical_instrument', 'Percussion', 'Cowbell']
+['Music', 'Musical_instrument', 'Bell', 'Cowbell']
+
+Vehicle_horn_and_car_horn_and_honking
+['Sounds_of_things', 'Vehicle', 'Motor_vehicle_(road)', 'Car', 'Vehicle_horn_and_car_horn_and_honking']
+['Sounds_of_things', 'Alarm', 'Vehicle_horn_and_car_horn_and_honking']
+
+Bicycle_bell
+['Sounds_of_things', 'Vehicle', 'Non-motorized_land_vehicle', 'Bicycle', 'Bicycle_bell']
+['Sounds_of_things', 'Bell', 'Bicycle_bell']
+['Sounds_of_things', 'Alarm', 'Bicycle_bell']
+['Music', 'Musical_instrument', 'Bell', 'Bicycle_bell']
+
+Bell
+['Sounds_of_things', 'Bell']
+['Music', 'Musical_instrument', 'Bell']
+
+Chime
+['Sounds_of_things', 'Bell', 'Chime']
+['Music', 'Musical_instrument', 'Bell', 'Chime']
+
+Wind_chime
+['Sounds_of_things', 'Bell', 'Chime', 'Wind_chime']
+['Music', 'Musical_instrument', 'Bell', 'Chime', 'Wind_chime']
+
+Church_bell
+['Sounds_of_things', 'Bell', 'Church_bell']
+['Music', 'Musical_instrument', 'Bell', 'Church_bell']
+
+Chirp_and_tweet
+['Source-ambiguous_sounds', 'Onomatopoeia', 'Brief_tone', 'Chirp_and_tweet']
+['Animal', 'Wild_animals', 'Bird', 'Bird_vocalization_and_bird_call_and_bird_song', 'Chirp_and_tweet']
+
+Clapping
+['Human_sounds', 'Hands', 'Clapping']
+['Human_sounds', 'Human_group_actions', 'Clapping']
+
+Squeak
+['Source-ambiguous_sounds', 'Onomatopoeia', 'Brief_tone', 'Squeak']
+['Sounds_of_things', 'Domestic_sounds_and_home_sounds', 'Door', 'Squeak']
+
+Thump_and_thud
+['Source-ambiguous_sounds', 'Generic_impact_sounds', 'Thump_and_thud']
+['Sounds_of_things', 'Miscellaneous_sources', 'Arrow', 'Thump_and_thud']
+
+Tap
+['Source-ambiguous_sounds', 'Generic_impact_sounds', 'Tap']
+['Sounds_of_things', 'Domestic_sounds_and_home_sounds', 'Door', 'Tap']
+
+Rattle
+['Source-ambiguous_sounds', 'Onomatopoeia', 'Rattle']
+['Animal', 'Wild_animals', 'Snake', 'Rattle']
+
+Hiss
+['Source-ambiguous_sounds', 'Onomatopoeia', 'Hiss']
+['Animal', 'Domestic_animals_and_pets', 'Cat', 'Hiss']
+['Animal', 'Wild_animals', 'Snake', 'Hiss']
+['Natural_sounds', 'Water', 'Steam', 'Hiss']
+
+Crackle
+['Source-ambiguous_sounds', 'Onomatopoeia', 'Crackle']
+['Natural_sounds', 'Fire', 'Crackle']
+
+Knock
+['Source-ambiguous_sounds', 'Generic_impact_sounds', 'Knock']
+['Sounds_of_things', 'Domestic_sounds_and_home_sounds', 'Door', 'Knock']
+
+Whoosh_and_swoosh_and_swish
+['Source-ambiguous_sounds', 'Onomatopoeia', 'Whoosh_and_swoosh_and_swish']
+['Sounds_of_things', 'Miscellaneous_sources', 'Arrow', 'Whoosh_and_swoosh_and_swish']
+
+Buzz
+['Source-ambiguous_sounds', 'Onomatopoeia', 'Brief_tone', 'Buzz']
+['Animal', 'Wild_animals', 'Insect', 'Fly_and_housefly', 'Buzz']
+['Animal', 'Wild_animals', 'Insect', 'Bee_and_wasp_and_etc.', 'Buzz']
+
+Crack
+['Source-ambiguous_sounds', 'Onomatopoeia', 'Crack']
+['Sounds_of_things', 'Wood', 'Crack']
+
+Tick
+['Source-ambiguous_sounds', 'Onomatopoeia', 'Clicking', 'Tick']
+['Sounds_of_things', 'Mechanisms', 'Clock', 'Tick']
+

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Do not forget to append CLAP 
+
 ############################################################################################################
 
 echo "====================================================================================================="
@@ -54,7 +56,6 @@ done
 
 ############################################################################################################
 
-
 echo
 echo "====================================================================================================="
 echo "Downloading FSD SID Net Model"
@@ -74,7 +75,37 @@ for url in ${urls[@]}; do
     echo "$url"
     wget $url -P .
 done
-echo "====================================================================================================="
-echo "Done!"
 
 ############################################################################################################
+
+echo "====================================================================================================="
+echo "Downloading ImageBind model"
+
+wget https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth
+
+############################################################################################################
+
+echo "====================================================================================================="
+echo "Downloading AudioCLIP..."
+
+# AudioCLIP trained on AudioSet (text-, image- and audio-head simultaneously)
+wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/bpe_simple_vocab_16e6.txt.gz -P ./models/
+wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/AudioCLIP-Full-Training.pt -P ./models/
+wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/AudioCLIP-Partial-Training.pt -P ./models/
+wget https://github.com/AndreyGuzhov/AudioCLIP/releases/download/v0.1/ESRNXFBSP.pt -P ./models/ -O AudioCLIP-ESRNXFBSP.pt
+
+############################################################################################################
+
+echo "====================================================================================================="
+echo "Downloading Wav2CLIP..."
+
+wget https://github.com/descriptinc/lyrebird-wav2clip/releases/download/v0.1.0-alpha/Wav2CLIP.pt -P ./models/
+
+echo "Done!"
+
+# ############################################################################################################
+
+# echo "====================================================================================================="
+# echo "Downloading CAV-MAE..."
+
+# wget "https://www.dropbox.com/s/wxrjgr86gdhc5k8/cav-mae-base.pth?dl=1" -P ./models/

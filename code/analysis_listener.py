@@ -23,15 +23,15 @@ FREESOUND_STRING = '<iframe frameborder="0" scrolling="no" \
 st.set_page_config(page_title="Sound Similarity", page_icon=":loud_sound:", layout="wide")
 
 @st.cache_data(ttl=1800, show_spinner=False)
-def load_gt():
+def load_gt(gt_path):
     """Load the ground truth file and return the dataframe and all labels."""
-    df = pd.read_csv(GT_PATH)
+    df = pd.read_csv(gt_path)
     df.labels = df.labels.apply(lambda x: re.sub("_", " ", x))
     all_labels = sorted(list(set([y for x in df.labels.to_list() for y in x.split(",")])))
     return df, all_labels
 
 @st.cache_data(ttl=1800, show_spinner=False)
-def load_results(paths):
+def load_results(paths, N=15):
     """For each embedding analysis, load the results and store them in a dictionary. 
     Return a list of dictionaries, one for each embedding analysis."""
 
@@ -42,7 +42,7 @@ def load_results(paths):
         with open(path ,"r") as infile:
             for jline in infile:
                 result_dict = json.loads(jline)
-                similarity_dict[result_dict["query_fname"]] = result_dict["results"]
+                similarity_dict[result_dict["query_fname"]] = result_dict["results"][:N]
         # Get the search type
         if result_dict["search"]=="nearest_neighbour":
             search = "Nearest Neighbor"
@@ -137,8 +137,8 @@ def display_query_and_similar_sounds(query_fname, df, model_result_dcts, N=15, h
                                                                 df)
                     ap_at_15_intersection = average_precision_at_n(relevance_intersection, n=N)
                     # See how many items can be potentially relevant
-                    diff = [1 if (x==0 and y==1) else 0 for x,y in zip(relevance_inclusion, relevance_intersection)]
-                    st.write(f":green[{sum(diff)}] sound(s) share a label with the query sound other than the query label. "
+                    # diff = [1 if (x==0 and y==1) else 0 for x,y in zip(relevance_inclusion, relevance_intersection)]
+                    st.write(f":green[{sum(relevance_intersection)}] sound(s) share a label with the query sound. "
                              f"[AP@{N}: **{ap_at_15_intersection:.3f}**]")
                 st.divider()
 
@@ -237,6 +237,7 @@ def get_subsets(sound_classes, exclusion_classes, df, model_results_dcts, N=15):
                                             header=header,
                                             query_label=None)
 
+
 if __name__=="__main__":
 
     parser=ArgumentParser(description=__doc__, 
@@ -253,14 +254,17 @@ if __name__=="__main__":
                         help='Similarity Result Path 4.')
     parser.add_argument('-N', type=int, default=15, 
                         help="Number of top entries to display.")
+    parser.add_argument('--gt-path', type=str, default=None,
+                        help='Path to the ground truth file. Leave empty for auto.')
     args=parser.parse_args()
 
     # Get the none paths
     paths = [path for path in [args.path0, args.path1, args.path2, args.path3, args.path4] if path is not None]
 
     # Load the ground truth and results
-    df, all_labels = load_gt()
-    model_results_dcts = load_results(paths)
+    gt_path = args.gt_path if args.gt_path is not None else GT_PATH
+    df, all_labels = load_gt(gt_path)
+    model_results_dcts = load_results(paths, args.N)
 
     # Display general information
     st.title("Sound Similarity Performances of Embeddings and Search Algorithms")
@@ -290,3 +294,17 @@ if __name__=="__main__":
             args=(sound_classes, exclusion_classes, df, model_results_dcts), 
             kwargs={"N":args.N}
             )
+    
+    query_id = st.text_input("Enter a Sound ID to use it as a query.",
+                            value=58900, # guitar slide
+                            key="query_id",
+                            )
+    if len(df[df.fname==int(query_id)])>0:
+        st.button(label=":speaker:", 
+                on_click=display_query_and_similar_sounds, 
+                args=(query_id, df, model_results_dcts, args.N),
+                key="lol" 
+                ) 
+    else:
+        st.error("Sound ID not found. Choose Again.")
+

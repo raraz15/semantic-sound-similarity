@@ -63,13 +63,16 @@ if __name__=="__main__":
     # Read the ground truth annotations
     df = pd.read_csv(args.ground_truth)
     fnames = set(df["fname"].to_list())
+    print(f"Number of queries in the ground truth file: {len(fnames)}")
 
     # Read all the json files in the tree
     embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
-    print(f"{len(embed_paths)} embedding paths were found in the directory.")
+    print(f"{len(embed_paths):,} embedding paths were found in the directory.")
     # Filter the embeddings to only include the ones in the ground truth
     embed_paths = [embed_path for embed_path in embed_paths if int(get_fname(embed_path)) in fnames]
-    print(f"{len(embed_paths)} embeddings are in the ground truth.")
+    assert len(embed_paths)==len(fnames), \
+        f"Number of embeddings ({len(embed_paths)}) and number of queries ({len(fnames)}) do not match."
+    print(f"{len(embed_paths):,} embeddings are in the ground truth.")
 
     # Load the embeddings, convert to numpy and store with the audio path
     print("Loading the embeddings...")
@@ -79,9 +82,10 @@ if __name__=="__main__":
             clip_embedding = json.load(infile)
         fname = get_fname(embed_path)
         embeddings[fname] = np.array(clip_embedding["embeddings"])
-    print(f"{len(embeddings)} embeddings are read.")
+    print(f"{len(embeddings):,} embeddings are read.")
 
     # Determine the output directory
+    args.embed_dir = os.path.normpath(args.embed_dir)
     model_name = os.path.basename(args.embed_dir)
     dataset_name = os.path.basename(os.path.dirname(args.embed_dir))
     output_dir = os.path.join(args.output_dir, dataset_name, model_name, args.search)
@@ -158,4 +162,4 @@ if __name__=="__main__":
         print(f"Time: {time_str}")
 
     #############
-    print("Done!")
+    print("Done!\n")

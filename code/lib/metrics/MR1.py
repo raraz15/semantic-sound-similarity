@@ -38,8 +38,6 @@ def instance_based_MR1(embeddings, df):
 
     r1s = []
     for i,(query_fname,query_embed) in enumerate(embeddings.items()):
-        if (i+1)%1000==0:
-            print(f"{i+1}/{len(embeddings)}")
         # Remove the query from the corpus
         _embeddings = {k: v for k, v in embeddings.items() if k != str(query_fname)}
         # Compare the query to the rest of the corpus
@@ -47,6 +45,9 @@ def instance_based_MR1(embeddings, df):
         ranked_fnames = [{'result_fname': r[0]} for r in sorted(distances, key=lambda x: x[1])]
         # Calculate the Ranking of the first element
         r1s.append(R1(query_fname, ranked_fnames, df))
+        # Print the progress
+        if (i+1)%1000==0 or (i+1)==len(embeddings) or i==0:
+            print(f"[{i+1:>{len(str(len(embeddings)))}}/{len(embeddings)}]")        
     # Calculate the mean of the R1s
     mr1 = sum(r1s)/len(r1s)
     return mr1
@@ -59,7 +60,7 @@ def calculate_mr1_for_labels(embeddings, df):
     label_mr1s = []
     for i, query_label in enumerate(labels):
         if (i+1)%20==0:
-            print(f"{i+1}/{len(labels)}")
+            print(f"[{i+1}/{len(labels)}]")
         # Get the fnames containing this label
         fnames_with_label = df[find_indices_containing_label(query_label, df)]["fname"].to_list()
         # For each fname, get the embedding and compare it to the rest of the corpus
