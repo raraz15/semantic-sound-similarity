@@ -4,15 +4,13 @@ dataset."""
 
 import os
 import time
+import glob
 import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import numpy as np
-import pandas as pd
 
-import torch
-
-from lib.directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR, DATASET_NAME
+from lib.directories import EMBEDDINGS_DIR
 
 TRIM_DUR = 30 # seconds
 
@@ -23,12 +21,15 @@ if __name__=="__main__":
     parser.add_argument('model_path',
                         type=str, 
                         help="Path to model.pt chekpoint.")
+    parser.add_argument('audio_dir',
+                        type=str,
+                        help="Path to directory with audio files.")
     parser.add_argument('-o', 
                         '--output_dir', 
                         type=str, 
                         default="",
                         help="Path to output directory. Default: "
-                        f"{EMBEDDINGS_DIR}/{DATASET_NAME}/<model_name>")
+                        f"{EMBEDDINGS_DIR}/<dataset_name>/<model_name>")
     args=parser.parse_args()
 
     # Get the model anem from models/model_name.pt
@@ -37,6 +38,7 @@ if __name__=="__main__":
     if 'CLAP_weights_2023' == model_name:
         print("Setting up Microsoft CLAP model...")
         from msclap import CLAP
+        import torch
         model = CLAP(model_fp=args.model_path ,version = '2023', use_cuda=False)
         model_name = 'CLAP_2023'
         # Define embedding extractor function
@@ -47,6 +49,7 @@ if __name__=="__main__":
     elif "clap" in model_name.lower():
         print("Setting up Laion CLAP model...")
         from lib.laion_clap import CLAP_Module
+        import torch
         # Decide type of CLAP model
         if model_name in ["clap-630k-audioset-fusion-best", "clap-630k-fusion-best"]:
             model = CLAP_Module(enable_fusion=True)
@@ -67,6 +70,7 @@ if __name__=="__main__":
         from lib.imagebind import data
         from lib.imagebind.models import imagebind_model
         from lib.imagebind.models.imagebind_model import ModalityType
+        import torch
         # Load the model
         model = imagebind_model.imagebind_huge(args.model_path, pretrained=True)
         model.eval()
@@ -86,6 +90,7 @@ if __name__=="__main__":
         print("Setting up AudioCLIP model...")
         from lib.audio_clip.utils.transforms import ToTensor1D
         import librosa
+        import torch
         # Load the model
         if "ESRNXFBSP".lower() not in model_name.lower():
             from lib.audio_clip.model import AudioCLIP
@@ -106,6 +111,7 @@ if __name__=="__main__":
                 return embeddings
         else:
             from lib.audio_clip.model.esresnet import ESResNeXtFBSP
+            import torch
             model = ESResNeXtFBSP(n_fft=2048,
                                 hop_length=561,
                                 win_length=1654,
@@ -153,21 +159,17 @@ if __name__=="__main__":
     else:
         raise ValueError(f"Unknown model name: {model_name}.")
 
-    # Read the file names
-    fnames = pd.read_csv(GT_PATH)["fname"].to_list()
-    audio_paths = []
-    for fname in fnames:
-        audio_path = os.path.join(AUDIO_DIR, f"{fname}.wav")
-        if os.path.exists(audio_path):
-            audio_paths.append(audio_path)
-    assert len(audio_paths)==len(fnames), "Some audio files are missing."
-    print(f"There are {len(audio_paths)} audio files to process.")
+    # Get the list of audio files
+    args.audio_dir = os.path.normpath(args.audio_dir)
+    audio_paths = glob.glob(os.path.join(args.audio_dir, "*.wav"))
+    assert len(audio_paths)>0, f"No audio files found in {args.audio_dir}."
+    print(f"Found {len(audio_paths)} audio files in {args.audio_dir}.")
 
     # Determine the output directory
     if args.output_dir=="":
-        # If the default output directory is used add the AUDIO_DIR to the path
+        # If the default output directory is used add the args.audio_dir to the path
         output_dir = os.path.join(EMBEDDINGS_DIR, 
-                                os.path.basename(AUDIO_DIR),
+                                os.path.basename(args.audio_dir),
                                 model_name)
     else:
         output_dir = os.path.join(args.output_dir, model_name)

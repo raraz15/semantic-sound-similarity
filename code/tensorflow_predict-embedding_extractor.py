@@ -5,15 +5,15 @@ aggregation. Currently works with FSD-Sinet, VGGish, YamNet and OpenL3 models.""
 import os
 import time
 import json
+import glob
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import numpy as np
-import pandas as pd
 
 from essentia.standard import EasyLoader, TensorflowPredictFSDSINet, TensorflowPredictVGGish
 
 from lib.openl3 import EmbeddingsOpenL3
-from lib.directories import AUDIO_DIR, GT_PATH, EMBEDDINGS_DIR
+from lib.directories import EMBEDDINGS_DIR
 
 TRIM_DUR = 30 # seconds
 
@@ -65,6 +65,9 @@ if __name__=="__main__":
                         type=str, 
                         help="Path to config.json file of the model. "
                         "Assumes the model.pb is next to it.")
+    parser.add_argument('audio_dir',
+                        type=str,
+                        help="Path to directory with audio files.")
     parser.add_argument('-o', 
                         '--output_dir', 
                         type=str, 
@@ -97,15 +100,18 @@ if __name__=="__main__":
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
-    # Read the file names
-    fnames = pd.read_csv(GT_PATH)["fname"].to_list()
-    audio_paths = [os.path.join(AUDIO_DIR, f"{fname}.wav") for fname in fnames]
-    print(f"There are {len(audio_paths)} audio files to process.")
+    # Get the list of audio files
+    args.audio_dir = os.path.normpath(args.audio_dir)
+    audio_paths = glob.glob(os.path.join(args.audio_dir, "*.wav"))
+    assert len(audio_paths)>0, f"No audio files found in {args.audio_dir}."
+    print(f"Found {len(audio_paths)} audio files in {args.audio_dir}.")
 
     # Determine the output directory
     if args.output_dir=="":
-        # If the default output directory is used add the AUDIO_DIR to the path
-        output_dir = os.path.join(EMBEDDINGS_DIR, os.path.basename(AUDIO_DIR), model_name)
+        # If the default output directory is used add the args.audio_dir to the path
+        output_dir = os.path.join(EMBEDDINGS_DIR,
+                                os.path.basename(args.audio_dir),
+                                model_name)
     else:
         output_dir = os.path.join(args.output_dir, model_name)
     # Create the output directory
