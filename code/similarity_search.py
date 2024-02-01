@@ -8,11 +8,10 @@ import glob
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import numpy as np
-import pandas as pd
 
 from lib.search_algorithms import search_similar_sounds
 from lib.utils import get_fname
-from lib.directories import ANALYSIS_DIR, GT_PATH
+from lib.directories import ANALYSIS_DIR
 
 if __name__=="__main__":
 
@@ -34,7 +33,7 @@ if __name__=="__main__":
                         help="Number of queries to return.")
     parser.add_argument("--ground-truth",
                         type=str,
-                        default=GT_PATH,
+                        default=None,
                         help="Path to the ground truth CSV file. "
                         "You can provide a subset of the ground truth by "
                         "filtering the CSV file before passing it to this script.")
@@ -44,18 +43,22 @@ if __name__=="__main__":
                         help="Path to the output directory.")
     args=parser.parse_args()
 
-    # Read the ground truth annotations
-    df = pd.read_csv(args.ground_truth)
-    fnames = set(df["fname"].to_list())
-
     # Read all the json files in the tree
     embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
     assert len(embed_paths)>0, "No embedding files were found in the directory."
-    print(f"{len(embed_paths)} embedding paths were found in the directory.")
-    # Filter the embeddings to only include the ones in the ground truth
-    embed_paths = [embed_path for embed_path in embed_paths if int(get_fname(embed_path)) in fnames]
-    assert len(embed_paths)>0, "No embedding files are referenced in the ground truth file."
-    print(f"{len(embed_paths)} embeddings are in the ground truth file.")
+    print(f"{len(embed_paths):,} embedding paths were found in the directory.")
+
+    # Get the ground truth file if provided
+    if args.ground_truth is not None:
+        print("Reading the ground truth file...")
+        # Read the ground truth annotations
+        import pandas as pd
+        df = pd.read_csv(args.ground_truth)
+        fnames = set(df["fname"].to_list())
+        # Filter the embeddings to only include the ones in the ground truth
+        embed_paths = [embed_path for embed_path in embed_paths if int(get_fname(embed_path)) in fnames]
+        assert len(embed_paths)>0, "No embedding files are referenced in the ground truth file."
+        print(f"{len(embed_paths)} embeddings are in the ground truth file.")
 
     # Load the embeddings, convert to numpy and store with the audio path
     print("Loading the embeddings...")
@@ -67,7 +70,7 @@ if __name__=="__main__":
         # For pretty print
         if len(clip_embedding["audio_path"]) > str_len:
             str_len = len(clip_embedding["audio_path"])
-    print(f"{len(embeddings):,} embeddings are read.")
+    print(f"{len(embeddings):,} embeddings are read successfully.")
 
     # Create the export directory
     args.embed_dir = os.path.normpath(args.embed_dir)
@@ -79,7 +82,7 @@ if __name__=="__main__":
     print(f"Analysis results will be exported to: {output_path}")
 
     # For each element in the dataset, perform the sound search to the rest of the dataset
-    print("For each sound in the dataset, searching for similar sounds...")
+    print("Making similarity search queries for each embedding...")
     start_time = time.monotonic()
     with open(output_path, "w") as outfile:
         for i in range(len(embeddings)):
@@ -95,7 +98,7 @@ if __name__=="__main__":
                 print(f"[{i+1:>{len(str(len(embeddings)))}}/{len(embeddings)}]")
     total_time = time.monotonic()-start_time
     print(f"Total computation time: {time.strftime('%M:%S', time.gmtime(total_time))}")
-    print(f"Average time/file: {total_time/len(embeddings):.3f} sec.")
+    print(f"Average time/query: {total_time/len(embeddings):.3f} sec.")
 
     ##############
     print("Done!")
