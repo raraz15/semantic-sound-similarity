@@ -30,7 +30,7 @@ if __name__=="__main__":
     parser.add_argument('-N', 
                         type=int, 
                         default=15, 
-                        help="Number of queries to return.")
+                        help="Number of search results per query to save.")
     parser.add_argument("--ground-truth",
                         type=str,
                         default=None,
@@ -38,6 +38,7 @@ if __name__=="__main__":
                         "You can provide a subset of the ground truth by "
                         "filtering the CSV file before passing it to this script.")
     parser.add_argument("--output-dir",
+                        "-o",
                         type=str,
                         default=ANALYSIS_DIR,
                         help="Path to the output directory.")

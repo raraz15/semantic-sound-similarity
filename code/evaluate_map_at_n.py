@@ -54,13 +54,10 @@ if __name__=="__main__":
     assert set(args.metrics).issubset(set(METRICS)), \
         f"Invalid metrics. Valid metrics are: {METRICS}"
 
-    # Test the average precision function
-    metrics.test_average_precision_at_n()
-
     # Read the ground truth annotations
     df = pd.read_csv(args.ground_truth)
     fnames = set(df["fname"].to_list())
-    print(f"Number of queries in the ground truth file: {len(fnames)}")
+    print(f"Number of queries in the ground truth file: {len(fnames):,}")
 
     # Read the results
     print("Reading the similarity results...")
@@ -81,7 +78,6 @@ if __name__=="__main__":
     dataset_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(args.results_path))))
     output_dir = os.path.join(args.output_dir, dataset_name, model_name, search_name)
     print(f"Output directory: {output_dir}")
-
     # Create the output directory if it does not exist
     os.makedirs(output_dir, exist_ok=True)
 

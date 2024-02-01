@@ -109,7 +109,7 @@ if __name__=="__main__":
         # Append the concatenated array
         embeddings += [embed]
         if (i+1)%1000==0 or i==0 or i+1==len(embed_paths):
-            print(f"Processed [{i+1}/{len(embed_paths)}] embeddings...")        
+            print(f"Processed [{i+1}/{len(embed_paths)}] embeddings...")
     embeddings = np.array(embeddings)
     print(f"Embedding shape: {embeddings.shape}")
     total_time = time.time()-start_time
