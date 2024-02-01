@@ -11,7 +11,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import pandas as pd
 
 import lib.metrics as metrics
-from lib.directories import GT_PATH, EVAL_DIR, TAXONOMY_FAMILY_JSON
+from lib.directories import EVAL_DIR
 
 METRICS = ["micro_map@n", "macro_map@n"]
 
@@ -22,6 +22,11 @@ if __name__=="__main__":
     parser.add_argument('results_path',
                         type=str,
                         help='Path to similarity_results.json file.')
+    parser.add_argument("ground_truth",
+                        type=str,
+                        help="Path to the ground truth CSV file. "
+                        "You can provide a subset of the ground truth by "
+                        "filtering the CSV file before passing it to this script.")
     parser.add_argument('--metrics',
                         type=str,
                         nargs='+',
@@ -31,19 +36,14 @@ if __name__=="__main__":
                         type=int, 
                         default=15, 
                         help="Cutoff rank.")
-    parser.add_argument("--ground-truth",
-                        type=str,
-                        default=GT_PATH,
-                        help="Path to the ground truth CSV file. "
-                        "You can provide a subset of the ground truth by "
-                        "filtering the CSV file before passing it to this script.")
     parser.add_argument("--families-json",
                         type=str,
-                        default=TAXONOMY_FAMILY_JSON,
+                        default=None,
                         help="Path to the JSON file containing the family information "
                         "of the FSD50K Taxonomy. You can also provide the family "
                         "information from an ontology")
     parser.add_argument("--output-dir",
+                        "-o",
                         type=str,
                         default=EVAL_DIR,
                         help="Path to the output directory.")
@@ -138,23 +138,23 @@ if __name__=="__main__":
         print("-"*40)
         print(f"Results are exported to {output_path}")
 
-        # Calculate the Family-based mAP@N
-        # Read the family information
-        with open(args.families_json, "r") as infile:
-            families = json.load(infile)
-        print(f"\nCalculating the Family-based mAP@{args.N}...")
-        family_maps, columns = metrics.family_based_map_at_n(label_maps, families)
-        # Convert to a dataframe
-        _df = pd.DataFrame(family_maps, columns=columns)
-        # Export the labels' maps to CSV
-        output_path = os.path.join(output_dir, f"families_mAP@{args.N}.csv")
-        _df.to_csv(output_path, index=False)
-        print("-"*40)
-        print(f"  mAP@{args.N} for each family")
-        for family, val in family_maps:
-            print(f"{family:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
-        print("-"*40)
-        print(f"Results are exported to {output_path}")
+        if args.families_json is not None:
+            # Read the family information
+            with open(args.families_json, "r") as infile:
+                families = json.load(infile)
+            print(f"\nCalculating the Family-based mAP@{args.N}...")
+            family_maps, columns = metrics.family_based_map_at_n(label_maps, families)
+            # Convert to a dataframe
+            _df = pd.DataFrame(family_maps, columns=columns)
+            # Export the labels' maps to CSV
+            output_path = os.path.join(output_dir, f"families_mAP@{args.N}.csv")
+            _df.to_csv(output_path, index=False)
+            print("-"*40)
+            print(f"  mAP@{args.N} for each family")
+            for family, val in family_maps:
+                print(f"{family:>{len('Source-ambiguous_sounds')}}: {val:.5f}")
+            print("-"*40)
+            print(f"Results are exported to {output_path}")
 
         time_str = time.strftime('%M:%S', time.gmtime(time.time()-start_time))
         print(f"Time: {time_str}")
