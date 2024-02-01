@@ -50,10 +50,12 @@ if __name__=="__main__":
 
     # Read all the json files in the tree
     embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
+    assert len(embed_paths)>0, "No embedding files were found in the directory."
     print(f"{len(embed_paths)} embedding paths were found in the directory.")
     # Filter the embeddings to only include the ones in the ground truth
     embed_paths = [embed_path for embed_path in embed_paths if int(get_fname(embed_path)) in fnames]
-    print(f"{len(embed_paths)} embeddings are in the ground truth.")
+    assert len(embed_paths)>0, "No embedding files are referenced in the ground truth file."
+    print(f"{len(embed_paths)} embeddings are in the ground truth file.")
 
     # Load the embeddings, convert to numpy and store with the audio path
     print("Loading the embeddings...")
@@ -96,4 +98,4 @@ if __name__=="__main__":
     print(f"Average time/file: {total_time/len(embeddings):.3f} sec.")
 
     ##############
-    print("Done!\n")
+    print("Done!")
