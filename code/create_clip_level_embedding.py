@@ -13,7 +13,6 @@ import numpy as np
 from sklearn.decomposition import PCA
 
 from lib.utils import get_fname
-from lib.directories import AUDIO_DIR
 
 def aggregate_frames(embeds, aggregation="mean"):
     """ Takes a list of frame level embeddings and aggregates 
@@ -49,7 +48,7 @@ def aggregate_frames(embeds, aggregation="mean"):
     return embeds
 
 def normalize_embedding(embedding):
-    """Normalize the clip level embedding"""
+    """Normalize the clip level embedding by its l2 norm."""
 
     assert len(embedding.shape)==1, "Expects a 1D Clip Embedding"
     return embedding/np.linalg.norm(embedding)
@@ -84,17 +83,20 @@ if __name__=="__main__":
                         "as the embed_dir.")
     args=parser.parse_args()
 
-    if args.normalization and args.no_normalization:
-        raise ValueError("Cannot specify both --normalization and --no-normalization")
+    assert args.normalization != args.no_normalization, "You must specify either --normalization or --no-normalization."
+
+    # Normalize the path
+    args.embed_dir = os.path.normpath(args.embed_dir)
 
     # Read all the json files in the tree
     embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
+    assert len(embed_paths)>0, f"No embeddings found in {args.embed_dir}"
     print(f"{len(embed_paths)} embeddings were found in the directory.")
 
     # Load the embeddings and process them
     print("Reading the embeddings and processing them...")
     start_time = time.time()
-    embeddings = []
+    embeddings, audio_paths = [], []
     for embed_path in embed_paths:
         with open(embed_path, 'r') as infile:
             model_outputs = json.load(infile)
@@ -103,6 +105,7 @@ if __name__=="__main__":
             clip_embedding = aggregate_frames(model_outputs["embeddings"], 
                                               aggregation=args.a)
             embeddings.append(clip_embedding)
+            audio_paths.append(model_outputs["audio_path"])
     assert len(embed_paths)==len(embeddings), \
         f"Number of embeddings and paths do not match. " \
         f"Embeddings: {len(embeddings)}, Paths: {len(embed_paths)}"
@@ -147,10 +150,9 @@ if __name__=="__main__":
 
     # Export the transformed embeddings
     print("Exporting the embeddings...")
-    for embed_path,embed in zip(embed_paths,embeddings):
+    for embed_path,audio_path,embed in zip(embed_paths,audio_paths,embeddings):
         fname = get_fname(embed_path)
-        embed = {"audio_path": os.path.join(AUDIO_DIR,f"{fname}.wav"),
-                "embeddings": embed.tolist()}
+        embed = {"audio_path": audio_path, "embeddings": embed.tolist()}
         output_path = os.path.join(output_dir, f"{fname}.json")
         with open(output_path, "w") as outfile:
             json.dump(embed, outfile, indent=4)
