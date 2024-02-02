@@ -30,7 +30,7 @@ def evaluate_relevance(query_fname, result, df, query_label=None, cutoff=False):
                 relevance.append(1)
             else:
                 relevance.append(0)
-    # Cutoff the relevance from the last 1 if cutoff is True
+    # Cutoff the relevance from the last relevant item (1), if cutoff is True
     if cutoff:
         last_one = relevance[::-1].index(1)
         relevance = relevance[:-last_one]

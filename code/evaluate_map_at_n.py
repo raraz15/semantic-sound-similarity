@@ -56,6 +56,7 @@ if __name__=="__main__":
 
     # Read the ground truth annotations
     df = pd.read_csv(args.ground_truth)
+    df["fname"] = df["fname"].astype(str) # To unify different datasets
     fnames = set(df["fname"].to_list())
     print(f"Number of queries in the ground truth file: {len(fnames):,}")
 
@@ -67,7 +68,7 @@ if __name__=="__main__":
             result_dict = json.loads(jline)
             query_fname = result_dict["query_fname"]
             # Only calculate metrics for queries that are in the ground truth
-            if int(query_fname) in fnames:
+            if query_fname in fnames:
                 results_dict[query_fname] = result_dict["results"]
                 assert args.N <= len(result_dict["results"]), \
                 f"Number of returned results for {query_fname} is less than {args.N}."
