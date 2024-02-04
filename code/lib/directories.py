@@ -14,7 +14,7 @@ PROJECT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 
 DATA_DIR = os.path.join(PROJECT_DIR, "data")
 EMBEDDINGS_DIR = os.path.join(DATA_DIR, "embeddings")
-ANALYSIS_DIR = os.path.join(DATA_DIR, "similarity_results")
+ANALYSIS_DIR = os.path.join(DATA_DIR, "similarity_rankings")
 EVAL_DIR = os.path.join(DATA_DIR, "evaluation_results")
 FIGURES_DIR = os.path.join(DATA_DIR, "figures")
 

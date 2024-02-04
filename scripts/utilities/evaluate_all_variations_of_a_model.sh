@@ -6,7 +6,7 @@ source ps/bin/activate
 
 DATA_DIR="$(pwd)/data"
 DATASET_NAME="FSD50K.eval_audio"
-SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME"
+SIMILARITY_DIR="$DATA_DIR/similarity_rankings/$DATASET_NAME"
 
 #############################################################################
 

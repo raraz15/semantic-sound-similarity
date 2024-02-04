@@ -41,7 +41,7 @@ EMBED_NAME="$MODEL_NAME-PCA_$N"
 #############################################################################
 
 EMBED_DIR="$DATA_DIR/embeddings/$DATASET_NAME/$EMBED_NAME"
-SIMILARITY_DIR="$DATA_DIR/similarity_results/$DATASET_NAME/$EMBED_NAME"
+SIMILARITY_DIR="$DATA_DIR/similarity_rankings/$DATASET_NAME/$EMBED_NAME"
 EVAL_DIR="$DATA_DIR/evaluation_results/$DATASET_NAME/$EMBED_NAME"
 
 echo "Output Directories:"
