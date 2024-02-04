@@ -64,6 +64,31 @@ if __name__=="__main__":
             embeddings = model.get_audio_embedding_from_filelist(x=[audio_path], 
                                                                     use_tensor=False).tolist()
             return embeddings
+    elif 'beats' in model_name.lower():
+        print("Setting up BEATs model...")
+        from lib.beats.BEATs import BEATs, BEATsConfig
+        import essentia.standard as es
+        import torch
+        # load the pre-trained checkpoints
+        checkpoint = torch.load(args.model_path)
+        # Load the model
+        cfg = BEATsConfig(checkpoint['cfg'])
+        model = BEATs(cfg)
+        model.load_state_dict(checkpoint['model'])
+        model.eval()
+        # Define embedding extractor function
+        def extract_embeddings(model, audio_path):
+            # Load the audio file and downsample to 16kHz
+            audio = es.MonoLoader(filename=audio_path, sampleRate=16000)()
+            audio = torch.tensor(audio).unsqueeze(0)
+            padding_mask = torch.zeros(1, audio.shape[1]).bool()
+            with torch.no_grad():
+                embeddings = model.extract_features(
+                    audio, 
+                    padding_mask=padding_mask
+                    )[0]
+            embeddings = embeddings.squeeze(0).cpu().numpy().tolist()
+            return embeddings
     elif "imagebind" in model_name.lower():
         print("Setting up ImageBind model...")
         from lib.imagebind import data
@@ -161,8 +186,8 @@ if __name__=="__main__":
     # Get the list of audio files
     args.audio_dir = os.path.normpath(args.audio_dir)
     audio_paths = glob.glob(os.path.join(args.audio_dir, "*.wav"))
-    assert len(audio_paths)>0, f"No audio files found in {args.audio_dir}."
-    print(f"Found {len(audio_paths)} audio files in {args.audio_dir}.")
+    assert len(audio_paths)>0, f"No audio files found in {args.audio_dir}"
+    print(f"Found {len(audio_paths)} audio files in {args.audio_dir}")
 
     # Determine the output directory
     if args.output_dir=="":
