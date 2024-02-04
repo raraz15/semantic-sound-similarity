@@ -1,6 +1,5 @@
-"""This script load a self-supervised model with a pre-trained checkpoint and
-extracts clip level embeddings for all the audio files in the FSD50K evaluation 
-dataset."""
+"""This script loads a model with a pre-trained checkpoint and extracts clip level embeddings 
+for all the audio files in the FSD50K evaluation dataset."""
 
 import os
 import time
