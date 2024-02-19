@@ -63,7 +63,7 @@ if __name__=="__main__":
     # Read the results
     print("Reading the similarity results...")
     results_dict = {}
-    with open(args.results_path, "r") as infile:
+    with open(args.results_path) as infile:
         for jline in infile:
             result_dict = json.loads(jline)
             query_fname = result_dict["query_fname"]
@@ -72,6 +72,7 @@ if __name__=="__main__":
                 results_dict[query_fname] = result_dict["results"]
                 assert args.N <= len(result_dict["results"]), \
                 f"Number of returned results for {query_fname} is less than {args.N}."
+    print(f"Number of queries in the results file: {len(results_dict):,}")
 
     # Determine the output directory
     search_name = os.path.basename(os.path.dirname(args.results_path))
