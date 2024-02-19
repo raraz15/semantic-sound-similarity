@@ -14,7 +14,7 @@ import pandas as pd
 
 import lib.metrics as metrics
 from lib.utils import get_fname
-from lib.directories import EVAL_DIR, GT_PATH, TAXONOMY_FAMILY_JSON
+from lib.directories import EVAL_DIR, TAXONOMY_FAMILY_JSON
 
 METRICS = ["micro_mr1", "macro_mr1"]
 
@@ -26,6 +26,11 @@ if __name__=="__main__":
                         type=str, 
                         help='Directory containing embedding.json files. ' 
                         'Embeddings should be prepared with create_clip_level_embedding.py.')
+    parser.add_argument("ground_truth",
+                        type=str,
+                        help="Path to the ground truth CSV file. "
+                        "You can provide a subset of the ground truth by "
+                        "filtering the CSV file before passing it to this script.")
     parser.add_argument("-s", 
                         "--search", 
                         type=str, 
@@ -37,12 +42,6 @@ if __name__=="__main__":
                         nargs='+',
                         default=METRICS, 
                         help='Metrics to calculate.')
-    parser.add_argument("--ground-truth",
-                        type=str,
-                        default=GT_PATH,
-                        help="Path to the ground truth CSV file. "
-                        "You can provide a subset of the ground truth by "
-                        "filtering the CSV file before passing it to this script.")
     parser.add_argument("--families-json",
                         type=str,
                         default=TAXONOMY_FAMILY_JSON,
@@ -62,16 +61,16 @@ if __name__=="__main__":
 
     # Read the ground truth annotations
     df = pd.read_csv(args.ground_truth)
-    fnames = set(df["fname"].to_list())
-    print(f"Number of queries in the ground truth file: {len(fnames)}")
+    gt_fnames = set(df["fname"].to_list())
+    print(f"Number of audio clips in the ground truth file: {len(gt_fnames):,}")
 
     # Read all the json files in the tree
     embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
     print(f"{len(embed_paths):,} embedding paths were found in the directory.")
     # Filter the embeddings to only include the ones in the ground truth
-    embed_paths = [embed_path for embed_path in embed_paths if int(get_fname(embed_path)) in fnames]
-    assert len(embed_paths)==len(fnames), \
-        f"Number of embeddings ({len(embed_paths)}) and number of queries ({len(fnames)}) do not match."
+    embed_paths = [embed_path for embed_path in embed_paths if int(get_fname(embed_path)) in gt_fnames]
+    assert len(embed_paths)==len(gt_fnames), \
+        f"Number of embeddings ({len(embed_paths)}) and number of queries ({len(gt_fnames)}) do not match."
     print(f"{len(embed_paths):,} embeddings are in the ground truth.")
 
     # Load the embeddings, convert to numpy and store with the audio path
