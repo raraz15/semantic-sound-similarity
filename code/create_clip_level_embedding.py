@@ -59,7 +59,7 @@ if __name__=="__main__":
                         formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('embed_dir', 
                         type=str, 
-                        help='Directory containing embedding.json files.')
+                        help='Path to an embedding or a directory containing embedding.json files.')
     parser.add_argument("-a", "-aggregation", 
                         type=str, 
                         choices=["mean", "median", "max", "none"], 
@@ -85,13 +85,17 @@ if __name__=="__main__":
 
     assert args.normalization != args.no_normalization, "You must specify either --normalization or --no-normalization."
 
-    # Normalize the path
-    args.embed_dir = os.path.normpath(args.embed_dir)
-
-    # Read all the json files in the tree
-    embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
-    assert len(embed_paths)>0, f"No embeddings found in {args.embed_dir}"
-    print(f"{len(embed_paths)} embeddings were found in the directory.")
+    if os.path.isdir(args.embed_dir):
+        # Normalize the path
+        args.embed_dir = os.path.normpath(args.embed_dir)
+        # Read all the json files in the tree
+        embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
+        assert len(embed_paths)>0, f"No embeddings found in {args.embed_dir}"
+        print(f"{len(embed_paths)} embeddings were found in the directory.")
+    elif os.path.isfile(args.embed_dir) and os.path.splitext(args.embed_dir)[1]==".json":
+        embed_paths = [args.embed_dir]
+    else:
+        raise ValueError('Invalid input. Please provide a directory or a json file.')
 
     # Load the embeddings and process them
     print("Reading the embeddings and processing them...")
