@@ -61,6 +61,7 @@ if __name__=="__main__":
 
     # Read the ground truth annotations
     df = pd.read_csv(args.ground_truth)
+    df["fname"] = df["fname"].astype(str) # To unify different datasets
     gt_fnames = set(df["fname"].to_list())
     print(f"Number of audio clips in the ground truth file: {len(gt_fnames):,}")
 
@@ -68,7 +69,7 @@ if __name__=="__main__":
     embed_paths = glob.glob(os.path.join(args.embed_dir, "*.json"))
     print(f"{len(embed_paths):,} embedding paths were found in the directory.")
     # Filter the embeddings to only include the ones in the ground truth
-    embed_paths = [embed_path for embed_path in embed_paths if int(get_fname(embed_path)) in gt_fnames]
+    embed_paths = [embed_path for embed_path in embed_paths if get_fname(embed_path) in gt_fnames]
     assert len(embed_paths)==len(gt_fnames), \
         f"Number of embeddings ({len(embed_paths)}) and number of queries ({len(gt_fnames)}) do not match."
     print(f"{len(embed_paths):,} embeddings are in the ground truth.")
