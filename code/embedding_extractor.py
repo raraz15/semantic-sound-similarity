@@ -22,7 +22,7 @@ if __name__=="__main__":
                         help="Path to model.pt chekpoint.")
     parser.add_argument('audio_dir',
                         type=str,
-                        help="Path to directory with audio files.")
+                        help="Path to an audio file or a directory with audio files.")
     parser.add_argument('-o', 
                         '--output_dir', 
                         type=str, 
@@ -67,8 +67,8 @@ if __name__=="__main__":
     elif 'beats' in model_name.lower():
         print("Setting up BEATs model...")
         from lib.beats.BEATs import BEATs, BEATsConfig
-        import essentia.standard as es
         import torch
+        import librosa
         # load the pre-trained checkpoints
         checkpoint = torch.load(args.model_path)
         # Load the model
@@ -79,7 +79,8 @@ if __name__=="__main__":
         # Define embedding extractor function
         def extract_embeddings(model, audio_path):
             # Load the audio file and downsample to 16kHz
-            audio = es.MonoLoader(filename=audio_path, sampleRate=16000)()
+            audio = librosa.load(audio_path, sr=16000)[0]
+            print(audio.shape)
             audio = torch.tensor(audio).unsqueeze(0)
             padding_mask = torch.zeros(1, audio.shape[1]).bool()
             with torch.no_grad():
@@ -183,11 +184,15 @@ if __name__=="__main__":
     else:
         raise ValueError(f"Unknown model name: {model_name}.")
 
-    # Get the list of audio files
-    args.audio_dir = os.path.normpath(args.audio_dir)
-    audio_paths = glob.glob(os.path.join(args.audio_dir, "*.wav"))
-    assert len(audio_paths)>0, f"No audio files found in {args.audio_dir}"
-    print(f"Found {len(audio_paths)} audio files in {args.audio_dir}")
+    if os.path.isdir(args.audio_dir):
+        # Get the list of audio files
+        args.audio_dir = os.path.normpath(args.audio_dir)
+        audio_paths = glob.glob(os.path.join(args.audio_dir, "*.wav"))
+        assert len(audio_paths)>0, f"No audio files found in {args.audio_dir}"
+        print(f"Found {len(audio_paths)} audio files in {args.audio_dir}")
+    else:
+        audio_paths = [args.audio_dir]
+        print(f"Found 1 audio file: {args.audio_dir}")
 
     # Determine the output directory
     if args.output_dir=="":
