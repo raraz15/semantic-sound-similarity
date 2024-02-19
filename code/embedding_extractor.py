@@ -204,13 +204,19 @@ if __name__=="__main__":
     # Process each audio clip
     start_time = time.time()
     for i,audio_path in enumerate(audio_paths):
-        # Extract the embeddings
-        embeddings = extract_embeddings(model, audio_path)
-        # Save results
+        # Create the output path
         fname = os.path.splitext(os.path.basename(audio_path))[0]
         output_path = os.path.join(output_dir, f"{fname}.json")
-        with open(output_path, 'w') as outfile:
-            json.dump({'audio_path': audio_path, 'embeddings': embeddings}, outfile, indent=4)
+        # Check if the output file already exists
+        if not os.path.exists(output_path):
+            try:
+                # Extract the embeddings
+                embeddings = extract_embeddings(model, audio_path)
+                # Save results
+                with open(output_path, 'w') as outfile:
+                    json.dump({'audio_path': audio_path, 'embeddings': embeddings}, outfile, indent=4)
+            except:
+                print(f"Error processing {audio_path}")
         # Print progress
         if (i+1)%1000==0 or i==0 or i+1==len(audio_paths):
             print(f"[{i+1:>{len(str(len(audio_paths)))}}/{len(audio_paths)}]")
