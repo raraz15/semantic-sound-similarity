@@ -109,7 +109,7 @@ def plot_map_at_15_comparisons(model, map_type,
     # Remove cos for freesound
     map_dict = {k:v for k,v in map_dict.items() if len(v)>0}
     searches = list(map_dict.keys())
-       
+
     # Determine some plot parameters
     if len(searches)>1:
         positions = np.linspace(-0.2, 0.2, len(searches))
@@ -147,7 +147,7 @@ def plot_map_at_15_comparisons(model, map_type,
             if len(searches)>1:
                 if len(map_dict[search])<=3:
                     text_delta = 0
-                else:                        
+                else:
                     if j==0:
                         text_delta = -0.07
                     elif j==1:
@@ -156,26 +156,26 @@ def plot_map_at_15_comparisons(model, map_type,
                         text_delta = 0.07
             else:
                 text_delta = 0
-            ax.text(z+positions[j]+text_delta,
-                    map+0.01, 
-                    f"{map:.{map_precision}f}", 
-                    ha='center', 
-                    va='bottom', 
-                    fontsize=11,
-                    weight='bold'
-                    )
+            # ax.text(z+positions[j]+text_delta,
+            #         map+0.01, 
+            #         f"{map:.{map_precision}f}", 
+            #         ha='center', 
+            #         va='bottom', 
+            #         fontsize=13,
+            #         weight='bold'
+            #         )
 
-    ax.tick_params(axis='y', which='major', labelsize=11)
-    ax.tick_params(axis='x', which='major', labelsize=12)
+    ax.tick_params(axis='y', which='major', labelsize=13)
+    ax.tick_params(axis='x', which='major', labelsize=17)
     ax.set_xticks(np.arange(len(xticks)), xticks)
     ax.set_yticks(np.arange(0,1.05,0.05))
     ax.set_ylim([0,1])
     ax.set_xlim([-0.75, len(xticks)-0.25])
-    ax.set_ylabel("mAP@15 (↑)", fontsize=15)
-    ax.set_xlabel("Embedding Processing Parameters", fontsize=15)
+    ax.set_ylabel("MAP@15 (↑)", fontsize=17)
+    # ax.set_xlabel("Embedding Processing Parameters", fontsize=15)
     ax.grid(alpha=0.5)
-    ax.legend(fontsize=12, loc=1, title="Search Algorithms", 
-            title_fontsize=14, fancybox=True)
+    ax.legend(fontsize=16, loc=1, title="Search Algorithms", 
+            title_fontsize=18, fancybox=True)
 
     save_function(save_fig, save_dir, figure_save_name, fig)
     plt.show()
