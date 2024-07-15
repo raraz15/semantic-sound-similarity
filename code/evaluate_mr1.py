@@ -51,7 +51,8 @@ if __name__=="__main__":
     parser.add_argument("--output-dir",
                         type=str,
                         default=EVAL_DIR,
-                        help="Path to the output directory.")
+                        help="Root output directory. Default: "
+                        f"{EVAL_DIR}/<dataset_name>/<model_name>/<search_type>/")
     args=parser.parse_args()
 
     # Check the metrics
