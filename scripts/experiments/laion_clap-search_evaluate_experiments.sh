@@ -34,7 +34,7 @@ for file in "$EMBED_DIR/"*; do # for each embedding dir
         echo $f
         SUFFIX="${f/$1-/""}" # Strip model name to get the suffix
         for v1 in ${variable1[@]}; do
-            clap_2022-search_evaluate.sh $1 $SUFFIX $v1
+            laion_clap-search_evaluate.sh $1 $SUFFIX $v1
         done
     fi
 done

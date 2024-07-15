@@ -29,7 +29,7 @@ for v1 in ${variable1[@]}; do
             echo "======================================================================="
             echo "Experiment Variables:"
             echo "v1=$v1, v2=$v2, v3=$v3"
-            clap_2022-prepare_search_evaluate.sh $1 $v1 $v2 $v3
+            laion_clap-prepare_search_evaluate.sh $1 $v1 $v2 $v3
         done
     done
 done
