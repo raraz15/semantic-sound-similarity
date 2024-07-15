@@ -76,6 +76,7 @@ if __name__=="__main__":
                         action="store_true", 
                         help="Normalize the final clip embedding.")
     parser.add_argument("--output-dir",
+                        "-o",
                         type=str,
                         default="",
                         help="Path to output directory. If not provided, "
