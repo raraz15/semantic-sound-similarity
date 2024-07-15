@@ -34,12 +34,17 @@ if __name__=="__main__":
     # Get the model anem from models/model_name.pt
     model_name = os.path.splitext(os.path.basename(args.model_path))[0]
     # Load the corresponding model
-    if 'CLAP_weights_2023' == model_name:
-        print("Setting up Microsoft CLAP model...")
+    if 'clap_weights_' in model_name.lower():
         from msclap import CLAP
         import torch
-        model = CLAP(model_fp=args.model_path ,version = '2023', use_cuda=False)
-        model_name = 'CLAP_2023'
+        if "2023" in model_name:
+            print("Setting up Microsoft CLAP (2023) model...")
+            model = CLAP(model_fp=args.model_path, version = '2023', use_cuda=False)
+            model_name = 'CLAP_2023'
+        elif "2022" in model_name:
+            print("Setting up CLAP (2022) model...")
+            model = CLAP(model_fp=args.model_path, version = '2022', use_cuda=False)
+            model_name = 'CLAP_2022'
         # Define embedding extractor function
         def extract_embeddings(model, audio_path):
             # Process
