@@ -27,12 +27,12 @@ def plot_map_at_15_comparisons(model, map_type,
         file_name = "micro_mAP@15.txt"
         default_fig_name = f"Sound Similarity Performances of AIR Systems by " \
                             f"Instance-Based mAP@15\n{model}"
-        figure_save_name = "micro_mAP@15-comparisons.png"
+        figure_save_name = "micro_mAP@15-comparisons.pdf"
     elif map_type=="macro":
         file_name = "balanced_mAP@15.txt"
         default_fig_name = f"Sound Similarity Performances of AIR Systems by " \
                             f"Label-Based mAP@15\n{model}"
-        figure_save_name = "macro_map@15-comparisons.png"
+        figure_save_name = "macro_map@15-comparisons.pdf"
     else:
         raise("map_type must be one of 'micro', 'macro'")
 
@@ -165,18 +165,19 @@ def plot_map_at_15_comparisons(model, map_type,
             #         weight='bold'
             #         )
 
-    ax.tick_params(axis='y', which='major', labelsize=13)
+    ax.tick_params(axis='y', which='major', labelsize=15)
     ax.tick_params(axis='x', which='major', labelsize=17)
     ax.set_xticks(np.arange(len(xticks)), xticks)
     # ax.set_yticks(np.arange(0,1.05,0.05))
     ax.set_yticks(np.arange(0,0.50,0.05))
     # ax.set_ylim([0,1])
     ax.set_xlim([-0.75, len(xticks)-0.25])
+    ax.set_ylim([0,0.43])
     ax.set_ylabel("MAP@15 (↑)", fontsize=17)
     # ax.set_xlabel("Embedding Processing Parameters", fontsize=15)
     ax.grid(alpha=0.5)
-    ax.legend(fontsize=16, loc=1, title="Search Algorithms", 
-            title_fontsize=18, fancybox=True)
+    ax.legend(fontsize=14, loc=1, title="Search Algorithms", 
+            title_fontsize=15, fancybox=True)
 
     save_function(save_fig, save_dir, figure_save_name, fig)
     plt.show()
