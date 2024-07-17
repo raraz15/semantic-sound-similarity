@@ -122,6 +122,15 @@ if __name__=="__main__":
     # Determine PCA components
     n_components = args.N if args.N!=-1 else embeddings.shape[1]
 
+    print("Normalizing embeddings...")
+    start_time = time.time()
+    embeddings = np.vstack([normalize_embedding(embed) for embed in embeddings])
+    print(f"Embeddings shape: {embeddings.shape}")
+    print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
+    # Control the normalization
+    assert np.allclose(1, np.linalg.norm(embeddings, axis=1)), \
+        "Embeddings are not normalized properly."
+
     # Apply PCA if specified
     if args.N!=-1:
         print("Applying PCA to each embedding...")
@@ -143,7 +152,7 @@ if __name__=="__main__":
         print(f"Total time: {time.strftime('%M:%S', time.gmtime(total_time))}")
         # Control the normalization
         assert np.allclose(1, np.linalg.norm(embeddings, axis=1)), \
-            "Embeddings are not normalized."
+            "Embeddings are not normalized properly."
 
     # Determine the output directory and create it
     if args.output_dir=="":
