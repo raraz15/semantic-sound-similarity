@@ -229,6 +229,10 @@ scripts/experiments/clap_2023-search_evaluate_experiments.sh
 ## Web-interface
 
 ```bash
+streamlit run code/analysis_listener.py -- -p0 data/similarity_rankings/FSD50K.eval_audio/fs-essentia-extractor_legacy-PCA_100/nn/similarity_results.json -p1 data/similarity_rankings/FSD50K.eval_audio/BEATs_iter3_plus_AS2M-Agg_mean-PCA_100-Norm_True/nn/similarity_results.json -p2 data/similarity_rankings/FSD50K.eval_audio/CAVMAE-as_46.6-Agg_none-PCA_100-Norm_True/nn/similarity_results.json -p3 data/similarity_rankings/FSD50K.eval_audio/clap-630k-fusion-best-Agg_none-PCA_100-Norm_True/
+```
+
+```bash
 usage: analysis_listener.py [-h] [-p0 PATH0] [-p1 PATH1] [-p2 PATH2] [-p3 PATH3] [-p4 PATH4] [-N N] [--gt-path GT_PATH]
 
 Listen to randomly selected target and query sounds from an analysis file.
