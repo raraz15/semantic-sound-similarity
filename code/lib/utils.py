@@ -9,7 +9,7 @@ def get_labels_of_fname(fname: str, df):
     """Returns the set of labels of the fname from the dataframe.
     Expects the fname to be a string."""
 
-    return set(df[df["fname"]==fname]["labels"].values[0].split(","))
+    return set(df[df["fname"]==int(fname)]["labels"].values[0].split(","))
 
 def get_all_labels(df):
     """Returns the set of all the labels in the dataframe."""
