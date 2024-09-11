@@ -1,16 +1,36 @@
-# freesound-sound_similarity
+# semantic-sound-similarity
 
-This repository contains the Sound and Music Computing Master's Thesis of Recep Oğuz Araz at University of Pompeu Fabra.
+This repository contains the code to run the experiments described in our [CBMI2024](https://cbmi2024.org/) paper, "Evaluation of Deep Audio Representations for Semantic Sound Similarity".
 
-Our goal is to use deep embeddings for improving the similar sounds functionality of Freesound in terms of perceptual similarity.
-
-Advisors: Dmitry Bogdanov, Pablo Alonso
-Collaboration with: Frederic Font, Alastair Porter
-
-contact: <oguza97@gmail.com>
+A copy of the paper is included in the `paper-poster-presentation/` directory
 
 ## Installation
 
-We use Python 3.10
+To set up the environment and install the necessary dependencies, follow these steps:
 
-Coming Soon...
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/raraz15/semantic-sound-similarity
+    cd semantic-sound-similarity
+    ```
+
+2. Create a virtual environment (Python 3.10.12 is required):
+
+    ```bash
+    python3.10 -m venv sss
+    ```
+
+3. Activate the virtual environment:
+
+     ```bash
+     source sss/bin/activate
+     ```
+
+4. Install the required dependencies:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+You're now ready to run the project!
