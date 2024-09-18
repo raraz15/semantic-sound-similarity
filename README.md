@@ -3,27 +3,28 @@
 This repository contains the code to run the experiments described in our [CBMI2024](https://cbmi2024.org/) paper, "Evaluation of Deep Audio Representations for Semantic Sound Similarity".
 
 We provide a flexible framework to:
-- Extract deep audio representations from neural networks, 
+
+- Extract deep audio representations from neural networks,
 - Process the embeddings
-    - time aggregation (mean, max, median, none),
-    - dimensionality reduction with PCA,
-    - L2 normalization
+  - time aggregation (mean, max, median, none),
+  - dimensionality reduction with PCA,
+  - L2 normalization
 - Perform similarity search
-    - Maximum Inner Product Search (MIPS),
-    - Maximum Cosine Similarity Search (MCSS),
-    - Nearest Neighbour Search (NNS)
+  - Maximum Inner Product Search (MIPS),
+  - Maximum Cosine Similarity Search (MCSS),
+  - Nearest Neighbour Search (NNS)
 - Evaluate retrieval results
-    - Metrics:
-        - Mean Average Precision@N (MAP@N)
-        - Mean Rank of the First Relevant Item (MR1)
-    - Granularity:
-        - Class-wise
-        - Sound Family-wise
-        - Macro averaged (average of the class-wise metrics)
+  - Metrics:
+    - Mean Average Precision@N (MAP@N)
+    - Mean Rank of the First Relevant Item (MR1)
+  - Granularity:
+    - Class-wise
+    - Sound Family-wise
+    - Macro averaged (average of the class-wise metrics)
 
 We use the [FSD50K](https://zenodo.org/records/4060432) evaluation set for our experiments, but you can use other datasets with minimal changes.
 
-A copy of the paper is included in the `paper-poster-presentation/` directory. Poster TODO
+A copy of the paper and the poster are included in the `paper-poster-presentation/` directory.
 
 ## Table of Contents
 
@@ -37,7 +38,6 @@ A copy of the paper is included in the `paper-poster-presentation/` directory. P
     - [MR1](#mr1)
 - [Pipelines](#pipelines)
 - [Web Interface](#web-interface)
-
 
 ## Installation
 
